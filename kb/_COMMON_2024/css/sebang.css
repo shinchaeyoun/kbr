@@ -1,0 +1,21 @@
+@font-face {
+	font-family: "SEBANG Gothic";
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+	src: url('../font/SEBANG-Gothic.eot');
+	src: local('../font/SEBANG-Gothic'),
+		url('../font/SEBANG-Gothic.eot?#iefix') format('embedded-opentype'),
+		url('../font/SEBANG-Gothic.woff') format('woff')
+}
+
+@font-face {
+	font-family: "SEBANG Gothic";
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+	src: url('../font/SEBANG-Gothic-Bold.eot');
+	src: local('../font/SEBANG-Gothic-Bold'),
+		url('../font/SEBANG-Gothic-Bold.eot?#iefix') format('embedded-opentype'),
+		url('../font/SEBANG-Gothic-Bold.woff') format('woff')
+}

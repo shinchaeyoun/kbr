@@ -1,67 +1,24 @@
 <script>
-
-
-alert_message: class alert_message {
-      constructor(sound_class, main_wrap) {
-        const move_con = `<div class="viewer_top_btn">
-                                    <div>
-                                        <button class="prev_btn" id="prev_btn" type="button" onclick="clickBtn()" title="이전 차시 이동"></button>
-                                        <p>목차이동</p>
-                                        <button class="next_btn" id="next_btn" type="button" onclick="clickBtn()" title="다음 차시 이동"></button>
-                                    </div>
-                                </div>`
-
-
-        this.main_wrap = main_wrap;
-        this.message_wraps = {};
-        this.datas = [
-          { id: 'network', text: `서버 통신 오류` },
-          { id: 'browser', text: `녹음기능을 지원하지 않는 <br>브라우저입니다.` },
-          { id: 'audio', text: `음성 재생 중에는 <br> 사용할 수 없습니다.` }
-          
-        ];
-        this.alert_message = document.createElement('div');
-        this.alert_message.classList.add('alert_message');
-
-        this.alert_message_wrap = document.createElement('div');
-        this.alert_message_wrap.classList.add('alert_message_wrap');
-        this.datas.forEach(v => {
-          const text_wrap = document.createElement("div");
-          text_wrap.innerHTML = v.text;
-          text_wrap.classList.add('alert_message_text');
-          text_wrap.classList.add('alert_message_' + v.id);
-          this.message_wraps[v.id] = text_wrap;
-          this.alert_message_wrap.appendChild(text_wrap);
-        });
-        this.alert_message.appendChild(this.alert_message_wrap);
-
-
-        //document.body.appendChild(this.alert_message);
-        this.main_wrap.appendChild(this.alert_message);
-        //this.scale_set();
-      }
-      scale_set() {
-        var mw = this.alert_message.clientWidth;
-        var limitX = Math.min(1, mw / 983);
-        limitX = Math.max(0.7, limitX);
-        this.alert_message_wrap.style.transform = 'scale(' + limitX + ')';
-        const divs = this.alert_message_wrap.querySelectorAll("div");
-        divs.forEach(wrap => {
-          wrap.style.transform = 'scale(' + limitX + ')';
-        });
-      }
-      show(type) {
-        //console.log("alert-show-type : ", type)
-        this.alert_message.setAttribute("data-type", type);
-        setTimeout(() => this.hide(), 2000);
-      }
-      hide() {
-        this.alert_message.removeAttribute('data-type');
-        //this.scale_set()
+  k_main = {
+    name: 'objectName',
+    ClassManager: class ClassManager {
+      constructor(quiz_wrap, history_data, quiz_num, quiz_type) {
+        this.quiz_wrap = quiz_wrap;
+        this.quiz_num = quiz_num;
+        this.quiz_type = quiz_type;
       }
     }
-    
+  }
 
+  k_main.DRAG_DROP = class DRAG_DROP extends k_main.ClassManager {
+    constructor(_args) {
+      // super(_args);
+      this.init(_args.history_data);
+    }
+    init(history_data){
+      console.log('init fn');
+    }
+  }
 
-
+  console.log(k_main.DRAG_DROP);
 </script>

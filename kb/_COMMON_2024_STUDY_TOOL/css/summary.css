@@ -1,0 +1,273 @@
+#organizeDiv .imgList {
+  display: inline-block;
+  position: absolute;
+  left: 92px;
+  top: 195px;
+}
+
+#organizeDiv .boxData {
+  position: absolute;
+  display: inline-block;
+  top: 40px;
+  left: 60px;
+}
+
+.organizePageInfo {
+  display: inline-block;
+  position: absolute;
+  width: 123px;
+  height: 33px;
+  top: 622px;
+  left: 563px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.sumCur {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.sumTotal {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.sumSlash {
+  font-size: 20px;
+  color: #333;
+  font-weight: bold;
+}
+
+.organizePageInfo span:nth-child(2) {
+  width: 5px;
+  display: inline-block;
+  height: 6px;
+  position: relative;
+  top: -2px;
+  margin: 0 4px;
+}
+
+#organizeDataBox {
+  width: 833px;
+  display: inline-block;
+  position: absolute;
+  left: 110px;
+  top: 100px;
+}
+
+.boxData .dataEq {
+  width: 800px;
+  display: none;
+}
+
+#organizeDataBox {
+  width: 833px;
+  display: inline-block;
+}
+
+.dataList {
+  max-width: 760px;
+  margin-left: 50px;
+}
+
+.dataList h3 {
+  position: relative;
+  font-size: 26px;
+  color: #381D03;
+  font-weight: bold;
+  word-break: keep-all;
+  word-wrap: break-word;
+  line-height: 62px;
+  margin-top: 30px;
+}
+
+.dataList h3 span:nth-child(1) {
+  position: absolute;
+  width: 50px;
+  height: 30px;
+  top: 0;
+  left: -55px;
+  text-align: right;
+}
+
+.data_p {
+  position: relative;
+  font-size: 19px;
+  font-weight: bold;
+  left: 20px;
+  word-break: keep-all;
+  word-wrap: break-word;
+  margin-top: 10px;
+}
+
+.data_p2 {
+  position: relative;
+  font-size: 19px;
+  font-weight: bold;
+  left: 37px;
+  word-break: keep-all;
+  word-wrap: break-word;
+}
+
+.dataList .data_p2 .bullet {
+  position: absolute;
+  width: 50px;
+  height: 30px;
+  top: 0;
+  left: -55px;
+  text-align: right;
+}
+
+.dataList .data_p .bullet {
+  position: absolute;
+  width: 50px;
+  height: 30px;
+  top: 0;
+  left: -55px;
+  text-align: right;
+}
+
+.dataList .dataText.check::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: url(.././common/organizeData/images/bullet.png) no-repeat;
+  position: absolute;
+  top: 8px;
+  left: -15px;
+}
+
+.dataList .dataText2.check::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 9px;
+  background: url(.././common/organizeData/images/bullet2.png) no-repeat;
+  position: absolute;
+  top: 9px;
+  left: -15px;
+}
+
+.dataList .check1::before {
+  content: '1)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -12px;
+}
+
+.dataList .check2::before {
+  content: '2)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check3::before {
+  content: '3)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check4::before {
+  content: '4)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check5::before {
+  content: '5)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check6::before {
+  content: '6)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check7::before {
+  content: '7)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check8::before {
+  content: '8)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .check9::before {
+  content: '9)';
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  left: -25px;
+  background-position-y: 2px;
+}
+
+.dataList .dataText {
+  position: relative;
+  word-break: keep-all;
+  word-wrap: break-word;
+  display: inline-block;
+  font-size: 22px;
+  width: 850px;
+  line-height: 30px;
+}
+
+.dataList .dataText2 {
+  position: relative;
+  word-break: keep-all;
+  word-wrap: break-word;
+  display: inline-block;
+  font-size: 20px;
+  width: 840px;
+  line-height: 28px;
+}
