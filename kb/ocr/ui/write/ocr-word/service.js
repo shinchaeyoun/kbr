@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const parnet_wrap = window.frameElement;
     quiz_data = JSON.parse(parnet_wrap.dataset.option);
-    console.log("data : ", quiz_data)
+    //console.log("data : ", quiz_data)
 
     
 	// 사용자가 작성해야 할 단어/문장 : 정답
@@ -135,19 +135,13 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
             for (const answerCanvasWorkspaceGroup of answerCanvasWorkspaceGroups) {
                 const answerCharacterWordImages = await createCharacterWordOcrImages(answerCanvasWorkspaceGroup);
 
-                const canvas_system = document.createElement('canvas');
+               const canvas_system = document.createElement('canvas');
                 const canvas_user 	= document.createElement('canvas');
                 
 		        const ctx = canvas_system.getContext('2d');
 		        const ctx_user = canvas_user.getContext('2d');
 		        
-		    	// var fontSize = 180;
-		    	// var textCnt = script.length;
-		    	// var templateSize = 15;
-		    	// var startX = 45;
-		    	// var startY = 184;
-
-                var fontSize = quiz_data.fontSize;
+		    	var fontSize = 180;
 		    	var textCnt = script.length;
 		    	var templateSize = 15;
 		    	var startX = 45;
@@ -162,7 +156,7 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
 		        canvas_user.height = fontSize;
 		        
                 var image = new Image();
-				image.src = "/kb/ocr/ui/write/ocr-word/template.png";
+				image.src = "/viewer/ocr/ui/write/ocr-word/template.png";
 		
 				image.onload = async () => {
 				    ctx.drawImage(image, 0, 0);
@@ -176,13 +170,19 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
 				        // 비동기 처리를 위해 await를 사용할 수 있습니다.
 				        await new Promise((resolve, reject) => {
 				            img.onload = () => {
+   				            	
+   				            	const width= 180;
+				            	const height= 180;
+				            	
 				                // 테두리에 선을 그립니다.
 				                ctx.strokeStyle = 'red'; // 선의 색상 설정
 				                ctx.lineWidth = 5; // 선의 두께 설정
-				                ctx.strokeRect(startX + img.width * imageIndex + imageIndex * 5, startY, img.width + 10, img.height + 10); // 사각형의 경계를 그립니다
-				                ctx.drawImage(img, startX + img.width * imageIndex + (img.width - (img.width / 1.1)) + imageIndex * 5, startY + (img.height - (img.height / 1.1)), img.width / 1.1, img.height / 1.1);
+				                ctx.strokeRect(startX + width * imageIndex + imageIndex * 5, startY, width + 10, height + 10); // 사각형의 경계를 그립니다
+				                ctx.drawImage(img, startX + width * imageIndex + (width - (width / 1.1)) + imageIndex * 5, startY + (height - (height / 1.1)), width / 1.1, height / 1.1);
 				                
-				                ctx_user.drawImage(img,img.width*imageIndex,0);
+				                ctx_user.drawImage(img, width*imageIndex, 0, width, height);
+				                
+				                ctx_user.drawImage(img,img.width*imageIndex,0); 
 				                
 				                if (imageIndex == answerCanvasWorkspaceGroup.length - 1) {
 				                    // 가상의 링크를 생성하여 다운로드합니다.(템플릿 생성시 필요하므로 삭제X)
@@ -218,7 +218,7 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
 					                        };
 					                        let res = await ocr(units, units_user, questionScript, script);
 					                        ocrResults.push(res.ocrApiResponse);
-					                        console.log("ocr-res : ", res);
+					                        //console.log("ocr-res : ", res);
             								// 점수 계산
 								            initScore(quiz_data.dap, res.ocrApiResponse);
 								            
@@ -246,6 +246,7 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
             }
             
             // 점수 계산
+            let match_score_cnt = 0;
             const initScore = (dap_text, res_text) => {
                 const dap_arr = dap_text.split("");
                 const res_arr = res_text.split("");
@@ -255,20 +256,11 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
                     if(dap_arr[i] != res_arr[i]) {
                         canvas_con.querySelector(".workspace").classList.add("false");
                         isPass = false;
-                    };
-                });
-                if(isPass){
-                    finished_fn(true);
-                }else{
-                    console.log(failCnt, failCnt < 3)
-                    if(failCnt < 3){
-                        main_class.quizs[main_class.cur_quiz_num-1].retry_fn(failCnt+1);
-                        viewRetryButton();
                     }else{
-                        finished_fn(false);
+                        match_score_cnt++;
                     }
-                }
-
+                });
+                
 
                 const getScore = () => {
                     let score = 0;
@@ -287,6 +279,26 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
                     return Math.floor(score / (answerCanvasWorkspaceGroups.length || 1));
                 };
                 document.querySelector("#score").innerText = getScore().toString();
+                //console.log("getScore : ", getScore().toString())
+
+
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /////// 산출식에 맞춰서 기능을 보완해야 하는 상황 ///////////////////////////////////////////////////////////////////////////
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                const match_score =  Math.floor(match_score_cnt / dap_arr.length * 100);
+                const result_score = Math.floor((match_score + getScore()) / 2);
+                if(isPass){
+                    finished_fn(true, result_score);
+                }else{
+                    //console.log(failCnt, failCnt < 2)
+                    if(failCnt < 2){
+                        main_class.quizs[main_class.cur_quiz_num-1].retry_fn(failCnt+1 , result_score);
+                        viewRetryButton();
+                    }else{
+                        
+                        finished_fn(false, result_score);
+                    }
+                }
             }
             
         }catch (e) {
@@ -302,7 +314,7 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
             };
             main_class.quizs[main_class.cur_quiz_num-1].error_message();
             
-            console.error(e);
+            //console.error(e);
             viewErrorResultWrapper();
         }
         finally {//promise 오기전에 여기가 먼저 돌아버림
@@ -310,14 +322,14 @@ const initEventListeners = (answerCanvasWorkspaceGroups, questionScript, script,
         }
     });
 };
-const finished_fn = (isBool) => {
+const finished_fn = (isBool, score) => {
     document.querySelector("#done").classList.add("disp-none1");
     document.querySelector("#retryBtn").classList.add("disp-none1");
     document.querySelector("#score-wrapper").classList.add("disp-none1");
     document.querySelector("#ocr-wrapper").classList.add("disp-none1");
     
-    console.log(main_class.cur_quiz_num, main_class.quizs)
-    main_class.quizs[main_class.cur_quiz_num-1].end_check_fn(isBool, failCnt+1);
+    //console.log(main_class.cur_quiz_num, main_class.quizs)
+    main_class.quizs[main_class.cur_quiz_num-1].end_check_fn(isBool, score, failCnt+1);
 };
 
 const setOcrResultText = (answers) => {
@@ -392,7 +404,7 @@ const viewErrorResultWrapper = () => {
 };
 const viewRetryButton = () => {
     //toggleViewElementInParent(document.querySelector("#retryBtn"));
-    console.log("viewRetry");
+    //console.log("viewRetry");
     setTimeout( () => {
         retry_click_fn();
     }, 3000);

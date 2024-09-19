@@ -474,6 +474,26 @@
 	}
 
 
+	/* 듣고 말하기 들어가기 start */
+	.quiz[data-open="listen_speak_motion"] {
+		position: relative;
+		background: url(../img/quiz/ganji/listen_and_speak_Bg.png) no-repeat 0 0;
+		background-size: cover;
+		animation: bg_start 1s ease-in-out forwards;
+	}
+
+	.quiz[data-open="listen_speak_motion"] .ticket_mo2 {
+		position: relative;
+		top: 53px;
+		left: 82px;
+		width: 1009px;
+		height: 500px;
+		background: url(../img/quiz/ganji/ticket7.png) no-repeat 0 0;
+		animation: ticket2_start .8s ease-in-out forwards;
+	}
+	/* 듣고 말하기 들어가기 end */
+	
+
 	/* 차시 들어가기 start */
 	.quiz[data-open="chasi_in_motion"] {
 		position: relative;
@@ -597,6 +617,10 @@
 			top: 53px;
 		}
 	}
+
+
+	
+	
 
 
 	/* 차시 나가기 start */
@@ -1474,6 +1498,12 @@
 	.line_box.left{
 		cursor: auto;
 	} */
+	.line_box .blank_box{
+		position: relative;
+		display: inline-block;
+		width: 37px;
+		height: auto;
+	}
 
 
 	.text {
@@ -2117,4 +2147,263 @@
 	.ex_box p {
 		margin: 0px;
 	}
+}
+/* 문화 간지 */
+@media all {
+	.quiz[data-open="culture_in_motion"] {
+		position: relative;
+		background: url(../img/quiz/ganji/culture_in_Bg.png) no-repeat 0 0;
+		background-size: cover;
+		animation: bg_start 1s ease-in-out forwards;
+	}
+
+	.quiz .korea_mo {
+		position: relative;
+		top: -342px;
+		left: 860px;
+		width: 281px;
+		height: 242px;
+		background: url(../img/quiz/ganji/korea.png) no-repeat 0 0;
+		animation: korea_start 1.5s ease-in-out forwards;
+	}
+
+	.quiz .ticket_mo6 {
+		position: relative;
+		top: 53px;
+		left: 82px;
+		width: 1009px;
+		height: 500px;
+		background: url(../img/quiz/ganji/ticket6.png) no-repeat 0 0;
+		animation: ticket6_start .8s ease-in-out forwards;
+	}
+
+	@keyframes korea_start {
+		0% {
+			transform: scale(1.2);
+			left: 960px;
+		}
+
+		100% {
+			transform: scale(1);
+			left: 860px;
+		}
+	}
+
+	@keyframes ticket6_start {
+		0% {
+			transform: scale(1.03);
+			top: 83px;
+		}
+
+		100% {
+			transform: scale(1);
+			top: 53px;
+		}
+	}
+
+}
+
+
+
+
+/* 어휘 간지 */
+@media all {
+	.quiz[data-open="vocabulary_in_motion"] {
+		position: relative;
+		background: url(../img/quiz/ganji/vocabulary_in_Bg.png) no-repeat 0 0;
+		background-size: cover;
+		animation: bg_start 1s ease-in-out forwards;
+	}
+
+	.quiz .notebook_mo {
+		position: relative;
+		top: -342px;
+		left: 870px;
+		width: 280px;
+		height: 231px;
+		background: url(../img/quiz/ganji/notebook.png) no-repeat 0 0;
+		animation: notebook_start 1.5s ease-in-out forwards;
+	}
+
+	.quiz .ticket_mo5 {
+		position: relative;
+		top: 53px;
+		left: 82px;
+		width: 1009px;
+		height: 500px;
+		background: url(../img/quiz/ganji/ticket5.png) no-repeat 0 0;
+		animation: ticket5_start .8s ease-in-out forwards;
+	}
+
+	@keyframes notebook_start {
+		0% {
+			transform: scale(1.2);
+			left: 970px;
+		}
+
+		100% {
+			transform: scale(1);
+			left: 870px;
+		}
+	}
+
+	@keyframes ticket5_start {
+		0% {
+			transform: scale(1.03);
+			top: 83px;
+		}
+
+		100% {
+			transform: scale(1);
+			top: 53px;
+		}
+	}
+
+	.quiz[data-open="check_motion"] {
+		position: relative;
+		background: url(../img/quiz/check/check_Bg.png) no-repeat 0 0;
+		background-size: cover;
+		animation: bg_start 1s ease-in-out forwards;
+	}
+
+}
+
+/* 클릭만 하는 학습활동 관련 */
+@media all{
+	.click_img_box_con{
+		position: absolute;
+		top: 0px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 100%;
+		height: 400px;
+	}
+	.click_img_box_con .img_box{
+		position: relative;
+		margin: 10px 10px;
+	}
+
+	.click_img_box_con .img_box .bg{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		width: 100%;
+		height: 100%;
+	}
+
+	.click_img_box_con .btns_con{
+		display: inline-block;
+		position: absolute;
+		width: 200px;
+		min-width: 200px;
+		height: 55px;
+		font-weight: 600;
+		font-size: 28px;
+		color: #fff;
+	}
+	.click_img_box_con .btns_con button{
+		position: absolute;
+		margin: 0;
+		padding: 0;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		width: calc(100% - 8px);
+		height: calc(100% - 8px);
+		min-width: 100px;
+		min-height: 47px;
+		background: #fff;
+		border: 4px solid #b7b7b7;
+		border-radius: 50px;
+		box-shadow: none;
+		z-index: 1;
+	}
+	.click_img_box_con .btns_con button.check{
+		display: none;
+	}
+	.click_img_box_con .btns_con button::before{
+		position: absolute;
+		display: inline-block;
+		content: '';
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		width: 42px;
+		height: 39px;
+		background: url(../img/quiz/question_mark.png) no-repeat 0 0;
+		background-size: 42px 39px;
+	}
+	.click_img_box_con .btns_con p{
+		position: absolute;
+		margin: 0px;
+		padding: 5px 5px 5px 5px;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		text-align: center;
+		width: 100%;
+		height: 100%;
+		border: 4px solid #fff;
+		border-radius: 50px;
+		background: #1e734f;
+		box-shadow: 5px 5px 1px 1px rgba(0, 0, 0, 0.35);
+	}
+}
+/* 익힘책 관련  */
+
+@media all {
+	.talk_drag {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.talk_drag .drag {
+		width: 100%;
+		margin: 0px;
+		height: auto;
+	}
+
+	.talk_drop {
+		position: absolute;
+		top: 480px;
+		left: 50%;
+		transform: translateX(-50%);
+
+		display: flex;
+		flex-flow: column;
+		align-items: flex-start;
+		justify-content: center;
+
+		width: 1056px;
+		height: 225px;
+	}
+
+	.talk_drop .talk_box_outer {
+		border: 6px solid #fff;
+		width: 100%;
+		border-radius: 20px;
+		overflow: hidden;
+		box-shadow: 15px 15px 0px #3ca1ad;
+	}
+	.talk_drop .talk_box_outer .talk_box_inner{
+		margin: 10px 0px 0px 10px;
+		padding: 1% 3% 2% 2%;
+		border-radius: 20px;
+		width: 100%;
+		background: url(../img/quiz/wb_bg/drag_box_bg_patten.png);
+	}
+
+	.talk_drop .wide {
+		margin: 5px 0px;
+		width: 100%;
+	}
+
+	.talk_drop .drop_wrap .drop {
+		margin: 0;
+		padding: 0;
+		width: 990px;
+		height: 80px;
+	}
+
+
 }

@@ -139,6 +139,7 @@ to {
 		margin:0;
 		line-height: 0;
 		text-align: center;
+		border: none !important;
 	}
 
 	.video-container td.ci_wrap{
@@ -465,7 +466,7 @@ to {
 		top:0;
 		width:200px;
 		height:40px;
-		background: url(end_b.png) no-repeat 0 0;
+		/* background: url(end_b.png) no-repeat 0 0; */
 		opacity: 0;
 		transform: translateY(0%);
 		transition: 0.3s all;

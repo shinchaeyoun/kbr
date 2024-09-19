@@ -766,7 +766,7 @@
 }
 
 /* quiz OX형 관련 */
-@media all {
+/* @media all {
 	.selection.ox {
 		display: flex;
 		flex-flow: row;
@@ -796,7 +796,7 @@
 	.selection.ox button.check {
 		background-position-x: -119px;
 	}
-}
+} */
 
 /* 녹음 관련 */
 @media all {
@@ -1931,9 +1931,7 @@
 
 /* 주사위 게임 관련 */
 @media all{
-	.quiz[data-type="game_dice_ox"]{
-		background: url(../img/quiz/game_dice_ox/game_dice_ox_bg.png) no-repeat 0 0;
-	}
+	
 }
 
 @media all{

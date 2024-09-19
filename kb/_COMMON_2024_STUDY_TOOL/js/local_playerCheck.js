@@ -970,6 +970,19 @@ var playerChk = {
 			}
 		});
 	},
+	getQuestionRslt: function() {
+		let _this = this;
+		return new Promise((resolve, reject) => {
+			var _this = this;
+			_this.response_result.result = _this.CODE.RESPONSE_RESULT_TYPE.SUCESS;
+			_this.response_result.code = '';
+			_this.response_result.message = '';
+
+			resolve(_this.response_result);
+
+		})
+
+	},
 	getGameRankInfo: function (
 		gameId
 		, gameLevel

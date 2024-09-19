@@ -15,6 +15,9 @@ export class HandwritingDefaultLayer extends CanvasLayer {
             await handwritingEvent.execute(this.canvasManager);
         }
     }
+    undo() {
+        super.undo();
+    }
     clear() {
         super.clear();
         this.lineOptions = {

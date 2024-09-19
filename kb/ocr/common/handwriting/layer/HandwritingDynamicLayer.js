@@ -3,6 +3,9 @@ export class HandwritingDynamicLayer extends HandwritingDefaultLayer {
     _isEditable;
     isWriting;
     currentTouch;
+    undo() {
+        super.undo();
+    }
     clear() {
         super.clear();
         this.setEditable();
@@ -36,7 +39,7 @@ export class HandwritingDynamicLayer extends HandwritingDefaultLayer {
         return {
             pointerdown: this.eventCallbackAsInitDraw,
             pointerup: this.eventCallbackAsDrawDone,
-            pointerout: this.eventCallbackAsDrawDone,
+            pointerout: this.eventCallbackAsDrawOutDone,
             pointermove: this.eventCallbackAsDraw,
         };
     }
@@ -49,10 +52,19 @@ export class HandwritingDynamicLayer extends HandwritingDefaultLayer {
             this.addEvent(this.createHandwritingEvent([]));
         }
     };
+    eventCallbackAsDrawOutDone = async () => {
+        if (this._isEditable) {
+            this.currentTouch = undefined;
+            this.isWriting = false;
+        }
+    };
     eventCallbackAsDrawDone = async () => {
         if (this._isEditable) {
             this.currentTouch = undefined;
             this.isWriting = false;
+            
+            const lens = (this.events.length) ? this.events[this.events.length - 1].line.length : 0;
+            if(!lens) this.deleteEvent();
         }
     };
     eventCallbackAsDraw = async (e) => {
@@ -66,5 +78,14 @@ export class HandwritingDynamicLayer extends HandwritingDefaultLayer {
                 await currentHandwritingEvent.execute(this.canvasManager);
             }
         }
+    };
+    undoDraw = () => {
+        this.events.forEach( async evt => {
+            evt.addCoordinate({
+                x: evt.line.x,
+                y: evt.line.y,
+            });
+            await evt.execute(this.canvasManager);
+        });
     };
 }

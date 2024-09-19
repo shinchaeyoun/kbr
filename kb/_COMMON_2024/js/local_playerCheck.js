@@ -617,6 +617,7 @@ var playerChk = {
 	// API Name : 모듈_완료
 	// API Desc : 웹 콘텐츠(모듈) 완료시 진도율 100프로 처리를 하기 위한 함수
 	wcontsComplete: async function (nextYn) {
+		console.log("wcontsComplete-call")
 		await window.parent.parent.Local_frame.set_move_page()
 		//console.log(window.parent.parent.Local_frame.set_move_page())
 		/* return new Promise((resolve, reject) => {
@@ -969,6 +970,19 @@ var playerChk = {
 				console.log("error");
 			}
 		});
+	},
+	getQuestionRslt: function() {
+		let _this = this;
+		return new Promise((resolve, reject) => {
+			var _this = this;
+			_this.response_result.result = _this.CODE.RESPONSE_RESULT_TYPE.SUCESS;
+			_this.response_result.code = '';
+			_this.response_result.message = '';
+
+			resolve(_this.response_result);
+
+		})
+
 	},
 	getGameRankInfo: function (
 		gameId

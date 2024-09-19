@@ -23,12 +23,25 @@ export class CanvasLayer {
         this.clear();
         this.canvasManager.remove();
     }
+    undo(){
+        if(!this.events.length) return;
+
+        this.canvasManager.clear();
+        this.events.splice(-1, 1);
+        this.undoDraw();
+    }
     clear() {
         this.canvasManager.clear();
         this.events = [];
     }
     addEvent(event) {
         this.events.push(event);
+    }
+    deleteEvent(){
+        this.events.splice(-1,1);
+
+
+        console.log(this.events)
     }
     cloneEvents() {
         return cloneDeep(this.events);

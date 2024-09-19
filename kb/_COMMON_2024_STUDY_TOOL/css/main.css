@@ -630,7 +630,7 @@
 	}
 
 	.tab_con {
-		/* display: none; */
+		display: none;
 		z-index: 999999;
 		position: absolute;
 		left: 80px;
@@ -2237,13 +2237,18 @@
 		width: 100%;
 		height: 100%;
 		background-color: #5b5b5b;
-		border-radius: 5px;
+		border-radius: 50px;
+		line-height: 0;
+		font-size: 0;
+		transform: translateY(-50%);
+		transition: 0.2s height;
+		/* border-radius: 5px;
 		border: 4px solid #131313;
 		overflow: hidden;
 		line-height: 0;
 		font-size: 0;
 		transform: translateY(-50%);
-		transition: 0.2s height;
+		transition: 0.2s height; */
 	}
 
 	.range_viewer .fill {
@@ -4540,11 +4545,11 @@
 		position: absolute;
 		bottom: 10px;
 		right: 100px;
-		width: 81px;
-		height: 81px;
+		width: 78px;
+		height: 78px;
 		background: url(../img/quiz/pdf_down_btn.png) no-repeat 0 0;
 	}
-	.pdf_save_btn:hover{
+	.pdf_down_btn:hover{
 		transform: scale(1.1);
 	}
 }

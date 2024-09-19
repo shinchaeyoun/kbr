@@ -43,7 +43,7 @@ export const initDictationBoard = async (question, answerCount, boardWrapperElem
 	                pathLayer.draw();
                 }
             }else{
-                console.log(canvasWrapperElement)
+                //console.log(canvasWrapperElement)
                 //console.log(canvasWorkspace);
                 canvasWrapperElement.classList.add("blank");
                 canvasWorkspace.workspaceWrapperElement.classList.add("blank");
@@ -55,7 +55,8 @@ export const initDictationBoard = async (question, answerCount, boardWrapperElem
             const handwritingLayer = await canvasWorkspace.addHandwritingFluencyLayer(CanvasLayerId.HANDWRITING_LAYER_ID);
             handwritingLayer.lineOptions = { lineWidth: 5 };
             // add event to clear canvas
-            EventManager.addEventHandler("click", canvasWrapperElement.querySelector(".clear-canvas"), () => handwritingLayer.clear());
+            //EventManager.addEventHandler("click", canvasWrapperElement.querySelector(".clear-canvas"), () => handwritingLayer.clear());
+            EventManager.addEventHandler("click", canvasWrapperElement.querySelector(".clear-canvas"), () => handwritingLayer.undo());
             canvasWorkspaceGroups.push(canvasWorkspace);
         }
         canvasWorkspaces.push(canvasWorkspaceGroups);
