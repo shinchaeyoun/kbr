@@ -1,0 +1,9 @@
+.index_group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1254901961);
+  display: none;
+}/*# sourceMappingURL=index.css.map */

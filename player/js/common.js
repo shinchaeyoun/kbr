@@ -1,9 +1,22 @@
 $(function(){
-  complete();
+  $('#wrap').append('<div class="index_container"></div>');
+  $('#wrap').append('<div class="media_container"></div>');
+  
+  $('.index_container').load('index.html', function (){
+    complete();
+  });
+  $('.media_container').load('media.html', function (){
+    complete();
+  });
 })
 
-let info;
+let loadCheck = 0;
 
 function complete (){
-  info = new pageInfoFn();
+  ++loadCheck;
+  
+  if(loadCheck == 2){
+    mediaFn();
+  }
+
 }
