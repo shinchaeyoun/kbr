@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$']],
+        displayMath: [['$$','$$']],
+        processEscapes: true
+      }
+    });
+    </script>
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+
+<body>
+  <p>$$ y^2 = x^3 + ax +b $$</p>
+  <p>Elliptic Curve on GF(p) : $ y^2 = x^3 + ax + b $</p>
+  <p>$$ \brack $$</p>
+  <p>$ \brack $</p>
+  <p>$a \brack b$</p>
+  <p>$ a \brack b $</p>
+
+  <p>$ \def\specialFrac#1#2{\frac{x + #1}{y + #2}}
+    \specialFrac{7}{z+3} $</p>
+  <p>$$\def\specialFrac#1#2{\frac{x + #1}{y + #2}}
+    \specialFrac{7}{z+3}$$</p>
+
+  <hr>
+
+  <p> $$
+    % 메모: (x+1)^2 is NOT x^2 + 1
+    (x+1)^2 % original expression
+    = (x+1)(x+1) % definition of exponent
+    = x^2 + 2x + 1 % FOIL, combine like terms
+    $$</p>
+
+  <p>
+    $$
+    % test
+    abc \brack abc % aha
+    $$
+  </p>
+
+  <p>$$ ^i $$</p>
+  <p>$$ x^4 $$</p>
+
+  <div class="div"></div>
+</body>
+<script>
+  const test = 'talk about topics related to practice'
+
+  test.slice(0,'$$');
+  // test.slice(test.length -1,'%%')
+
+  console.log(test,test.slice(0,'$$'));
+</script>
+
+</html>

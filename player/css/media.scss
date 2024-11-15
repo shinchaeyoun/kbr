@@ -23,6 +23,7 @@
     .controls {
         position: absolute;
         bottom: -43px;
+        bottom: 0;
         left: 50%;
 
         display: flex;
@@ -70,7 +71,7 @@
             height: 100%;
 
             &:hover {
-                > div {
+                >div {
                     height: 8px;
                 }
             }
@@ -97,7 +98,7 @@
         }
 
         .play_bar {
-            width: 500px;
+            width: 600px;
 
             .duration_bar {
                 width: 100%;
@@ -110,6 +111,7 @@
             .current_bar {
                 background-color: #11a9e2;
                 z-index: 400;
+                border-radius: 50px;
             }
 
             .play_pointer {
@@ -141,10 +143,25 @@
         }
 
         .speed_btn {
+            position: relative;
+            padding: 2px 20px 2px 7px;
+            width: 65px;
+            font-size: 12px;
             border: 1px solid #fff;
             border-radius: 5px;
-            padding: 2px 7px;
-            font-size: 12px;
+
+            ul {
+                display: none;
+                position: absolute;
+                bottom: 25px; left: 50%;
+                transform: translateX(-50%);
+                li {
+                    width: 65px;
+                    text-align: center;
+                    border: 1px solid #fff;
+                    border-radius: 5px;
+                }
+            }
         }
 
         .mute_btn {
