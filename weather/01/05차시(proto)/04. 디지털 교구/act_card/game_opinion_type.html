@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>카드 뒤집기</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=2.0, user-scalable=1" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+	<link rel="stylesheet" type="text/css" href="../common_act/css/common_act.css">
+	<link rel="stylesheet" type="text/css" href="./page.css">
+
+	<script type="text/javascript" src="../common_act/js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="../common_act/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../common_act/js/jquery.ui.touch-punch.min.js"></script>
+	<script type="text/javascript" src="../common_act/js/common_act.js"></script>
+	<script type="text/javascript" src="./page.js"></script>
+
+	<script>
+		const page_audio = [
+			{ id: "none", src: "../common_act/mp3/none.mp3", volume: 0.5, controls: false },
+			{ id: "ganji", src: "./mp3/01_01.mp3", volume: 0.5, controls: false },
+
+			{ id: "start", src: "./mp3/01_02.mp3", volume: 0.5, controls: false },
+
+			{ id: "quiz_end", src: "./mp3/01_03.mp3", volume: 0.5, controls: false },
+		];
+	</script>
+</head>
+
+<body>
+	<div id="active_main">
+		<div class="section active" data-page="1">
+			<div class="gisang_i_ganji" alt=""></div>
+			<div class="gisang_i_ganji_wait" alt=""></div>
+			<p>
+				기후변화가 동식물과 우리 생활에 미치는 영향을
+				<br />게임을 통해 알아볼까요?
+			</p>
+		</div>
+		<div class="section" data-page="2">
+			<!-- 콘텐츠 내용 넣을 부분 -->
+			<div class="startBtn"><img src="./img/start.png" alt=""></div>
+			<ul class="cards">
+				<li data-card="1">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front1-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="2">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front2-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="2">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front2-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="4">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front4-1.png" alt="">
+					</div>
+				</li>
+
+				<li data-card="7">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front7-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="8">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front8-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="3">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front3-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="1">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front1-2.png" alt="">
+					</div>
+				</li>
+
+				<li data-card="5">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front5-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="3">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front3-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="9">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front9-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="7">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front7-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="5">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front5-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="4">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front4-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="6">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front6-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="6">
+					<div class="back">
+						<img src="./img/back2.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front6-2.png" alt="">
+					</div>
+				</li>
+				<li data-card="8">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front8-1.png" alt="">
+					</div>
+				</li>
+				<li data-card="9">
+					<div class="back">
+						<img src="./img/back1.png" alt="">
+					</div>
+					<div class="front">
+						<img src="./img/front9-1.png" alt="">
+					</div>
+				</li>
+			</ul>
+
+<!--			<div class="resetBtn"></div>-->
+
+			<div class="popup">
+				<!-- <div class="close"></div> -->
+			</div>
+			<img src="./img/bg.png" alt="">
+		</div>
+
+		<div class="section" data-page="3">
+			<!-- 콘텐츠 내용 넣을 부분 -->
+
+
+
+		</div>
+
+		<div class="pre_wrap">
+			<button class="pre_play" title="학습시작"></button>
+		</div>
+		<!-- scaffold -->
+		<div class="scaffold t_">
+			<img src="../common_act/img/scaffold/none.png" class="wait">
+			<img src="../common_act/img/scaffold/none.png" class="talk">
+			<img src="../common_act/img/scaffold/none.png" class="no">
+			<img src="../common_act/img/scaffold/none.png" class="yes">
+		</div>
+
+	</div>
+</body>
+
+</html>

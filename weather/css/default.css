@@ -1,0 +1,330 @@
+@font-face {
+    font-family: 'NanumGothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./NanumGothic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'NanumGothic';
+    font-style: normal;
+    font-weight: 700;
+    src: url('./NanumGothic-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'scd9';
+    font-style: normal;
+    font-weight: 700;
+    src: url('./SCD9.woff') format('woff');
+}
+
+/* Reset */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background: url("./bg.png") #ddd;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+form,
+fieldset,
+p,
+button {
+    margin: 0;
+    padding: 0
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+input,
+button {
+    font-family: 'NanumGothic', Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+}
+
+img,
+fieldset,
+iframe {
+    border: 0 none
+}
+
+li {
+    list-style: none
+}
+
+input,
+select,
+button {
+    vertical-align: middle
+}
+
+img {
+    vertical-align: top
+}
+
+i,
+em,
+address {
+    font-style: normal
+}
+
+label,
+button {
+    cursor: pointer
+}
+
+button {
+    margin: 0;
+    padding: 0
+}
+
+a {
+    color: #333;
+    text-decoration: none
+}
+
+a:hover {
+    color: #333;
+    padding-bottom: 2px;
+    text-decoration: underline;
+}
+
+/*  */
+button img {
+    left: -3px;
+}
+
+html:first-child select {
+    height: 20px;
+    padding-right: 6px
+}
+
+option {
+    padding-right: 6px
+}
+
+hr {
+    display: none
+}
+
+.grid {
+    display: grid;
+}
+
+.flex {
+    display: flex;
+}
+
+#container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 10;
+}
+
+#container .point_line {
+    position: absolute;
+    width: 100%;
+    height: 5px;
+    background: #9A5B6C;
+}
+
+#container .wrap {
+    width: 90%;
+    min-width: 700px;
+    max-width: 1200px;
+    min-height: 500px;
+    margin: 0 auto;
+    padding: 0 5px;
+}
+
+.title .t_top {
+    height: 80px;
+    font-family: "scd9";
+    font-size: 41px;
+    font-weight: 700;
+    text-align: center;
+    padding: 45px 0;
+    text-shadow: 3px 3px #eee;
+    letter-spacing: -2px;
+    color: #333;
+    position: relative;
+}
+
+.title .t_top div {
+    width: 100%;
+}
+
+.title .t_top div div {
+    width: 10%;
+    height: 20px;
+    border-bottom: 1px solid #333;
+    margin: 0 auto;
+}
+
+.category 
+.sub_title {
+    font-weight: bold;
+    color: #fff;
+    background: #9A5B6C;
+    text-align: center;
+    padding: 5px 5px 7px 5px;
+    margin: 5px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 5px;
+}
+
+.category li:nth-child(1) {
+    width: 190px;
+}
+
+.category li:nth-child(2) {
+    width: 90px;
+}
+
+.category li:nth-child(3) {
+    width: 860px;
+}
+
+
+.content_wrap {
+    grid-template-columns: 200px 980px;
+    margin: 0 5px;
+    gap: 10px;
+}
+
+.tabs li {
+    display: flex;
+}
+
+.tabs li {
+    height: 45px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid #ccc;
+}
+
+.tabs div {
+    text-align: center;
+    align-content: center;
+    margin: 10px;
+}
+
+.tabs li:hover {
+    background: #fff;
+}
+
+.tabs li.active {
+    background: #9A5B6C;
+}
+
+.tabs li div {
+    background: url("icon01.png") 5px 50% no-repeat;
+    border-radius: 5px;
+    padding-left: 30px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tabs li:hover div {
+    background: url("icon01.png") 5px 50% no-repeat;
+}
+
+.tabs li.active div {
+    background: url("icon01_off.png") 5px 50% no-repeat;
+    border-right: none;
+    color: #fff;
+    padding-left: 33px;
+}
+
+.chasi {
+    height: 50px;
+    justify-content: space-between;
+}
+
+.chasi,
+.chasi .list {
+    display: flex;
+}
+
+.chasi .num,
+.chasi .list {
+    background: #ffffff4d;
+    border: 1px solid #ccc;
+}
+
+.chasi .num,
+.chasi .list div {
+    align-content: center;
+}
+
+.chasi .num {
+    width: 100px;
+    text-align: center;
+}
+
+.chasi .list {
+    padding: 5px 0px;
+    width: 870px;
+}
+
+.chasi .list div {
+    margin-left: 20px;
+    padding: 0 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.chasi .list > div.active {
+    background: #fff;
+}
+
+
+
+
+#footer {
+    z-index: 1;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+}
+
+#copyright {
+    height: 75px;
+    width: 80%;
+    min-width: 700px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+    background: url("logo.png") 0 21px no-repeat;
+    font-size: 14px;
+    color: #555;
+}
+
+#copyright p {
+    padding: 19px 0 11px 130px;
+}

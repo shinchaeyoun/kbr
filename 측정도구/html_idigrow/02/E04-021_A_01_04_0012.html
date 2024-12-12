@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta content="width=1715,height=1000" name="viewport" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="../../common_idigrow/css/common.css" />
+<script defer src="../../common_idigrow/js/jquery.min.js"></script>
+<script defer src="../../common_idigrow/js/jquery-ui.min.js"></script>
+<script defer src="../../common_idigrow/js/jquery.ui.touch-punch.min.js"></script>
+<script defer src="../../common_idigrow/js/jquery.ui.rotatable.min.js"></script>
+<script defer src="../../common_idigrow/js/jquery.magnify.js"></script>
+<script defer src="../../common_idigrow/js/bootstrap.min.js"></script>
+<script defer src="../../common_idigrow/js/dragdrop.fix.js"></script>
+<script defer src="../../common_idigrow/js/dragdrop.js"></script>
+<script defer src="../../common_idigrow/js/common.js"></script>
+<!-- 페이지별 -->
+<script src="../../common_idigrow/js/scene.js"></script>
+<script src="../../common_idigrow/js/moveable.min.js"></script>
+<script type="text/javascript" src="../../common_idigrow/js/html2canvas.min.js"></script>
+<script type="text/javascript" src="../../common_idigrow/js/events.js"></script>
+<script type="text/javascript" src="../../common_idigrow/js/receiver.js"></script>
+<script defer src="../../js_idigrow/communication.js"></script>
+
+</head>
+<body>
+
+<div id="wrap" class="" data-lesson="" data-ctr="b,c,d,e,f">
+	<!-- 학습도구 영역 -->
+	<div id="ctr"></div>
+
+	<main id="ct">
+		<!-- 페이지 시작 -->
+
+		<assessmentItem data-qid="" data-response-type="fillInTheBlank">
+			<!-- 질문 -->
+			<header id="q-hd">
+				<h1>각도기를 이용하여 각도를 재어 보세요.</h1>
+			</header>
+			<!-- 내용 -->
+			<div id="content">
+				<!-- 정답표시 -->
+				<div id="a-ox"><b>O</b><b>X</b></div>
+				<!-- 문항 영역 -->
+				<div id="q-body">
+					<itemBody>
+						<div class="text-center mb40">
+							<img src="../../img_idigrow/E04-021_A/0012_001.png" alt="">
+						</div>
+						<div class="q-box q-box-2 font-serif">
+							<input type="text" placeholder=" " data-answer="130" maxlength="10">°
+						</div>
+					</itemBody>
+				</div>
+				<!-- 답 영역 -->
+				<div id="a-wrap">
+					<!-- 도움말 -->
+					<section id="help">
+						<h2>도움말</h2>
+						<div id="help-body">
+
+						</div>
+					</section>
+					<div class="a-box">
+						<!-- 정답 -->
+						<section id="a">
+							<h2>정답</h2>
+							<div id="a-body">
+								<correctResponse>
+									<span class="font-serif">130</span>
+								</correctResponse>
+							</div>
+						</section>
+							
+						<!-- 해설 -->
+						<section id="comment">
+							<h2>해설</h2>
+							<div id="comment-body">
+								각의 한 변이 안쪽 눈금 <span class="font-serif">0</span>에 맞춰져 있으므로 안쪽 눈금을 읽습니다. 각의 나머지 변과 만나는 안쪽 눈금을 읽으면 <span class="font-serif">130<span class="mr-n3">°</span></span>입니다.
+								<div class="btn-wrap">
+                                    <a class="btn" href="#"><i class="icon icon-video"></i>해설 영상</a>
+                                </div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</div>
+		</assessmentItem>
+
+		<!-- 네비게이션 영역 -->
+		<footer id="ft"></footer>
+		<!-- 페이지 끝 -->
+	</main>
+
+	<div id="ctr-zone">
+		<span class="sr-only">선생님의 도움을 받아 문제를 해결해 보세요.</span>
+
+		<!-- 삼각자 -->
+		<div id="ctr3" class="ctr-drag hidden">
+			<div class="moveable">
+				<img src="../../common_idigrow/img/triangle_ruler.svg" alt="삼각자">
+				<button type="button" class="icon icon-revers" title="삼각자">뒤집기</button>
+				<button type="button" class="icon icon-tool-x" title="삼각자">닫기</button>
+			</div>
+		</div>
+		<!-- 각도기 -->
+		<div id="ctr4" class="ctr-drag hidden">
+			<div class="moveable">
+				<img src="../../common_idigrow/img/protractor.svg" alt="각도기">
+				<button type="button" class="icon icon-tool-x" title="각도기">닫기</button>
+			</div>
+		</div>
+		<!-- 자 -->
+		<div id="ctr6" class="ctr-drag hidden">
+			<div class="moveable">
+				<!-- <img src="../../common_idigrow/img/line_ruler15.svg" alt="자"> -->
+				<div id="ruler" role="img" aria-label="자" data-cm="13"></div>
+				<button type="button" class="icon icon-tool-x" title="자">닫기</button>
+			</div>
+		</div>
+
+		<!-- 컴퍼스 -->
+		<canvas id="ctr7-canvas" width="1656" height="650"></canvas>
+		<div id="ctr7" class="ctr-drag hidden">
+			<div class="compass" role="img" aria-label="컴퍼스">
+				<div class="left-leg"></div>
+				<div class="right">
+					<div class="right-leg">
+						<div class="top"></div>
+					</div>
+					<div class="pencil"></div>
+					<div class="dot"></div>
+					<button type="button" class="icon compass-draw">원그리기</button>
+				</div>
+			</div>
+			<button type="button" class="icon icon-tool-x" title="컴퍼스">닫기</button>
+		</div>
+		<!-- // -->
+	</div>
+</div>
+</body>
+</html>

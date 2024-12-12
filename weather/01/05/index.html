@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+	<title>카드 뒤집기</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+          overflow: hidden;
+          margin: 0 auto;
+        }
+        iframe {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+	<iframe id="container" src="./act_card/game_opinion_type.html" width="1280" height="720" frameborder="0"></iframe>
+	<script type="text/javascript" src="./common_act/js/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="./common_act/js/common_act.js"></script>
+	<script>
+    resize_fn();
+    $(window).resize(function () {
+      resize_fn();
+    });
+  </script>
+</body>
+</html>

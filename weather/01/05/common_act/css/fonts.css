@@ -1,0 +1,47 @@
+/* 완주누리체 */
+@font-face {
+  font-family: "Wanju";
+  font-style: normal;
+  font-weight: 600;
+  src: local("../font/WanjuR"), /* computer */
+    url("../font/WanjuR.eot"), /* IE9 Compat Modes */
+    url("../font/WanjuR.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("../font/WanjuR.woff2") format("woff2"), /* Modern Browsers */    
+    url("../font/WanjuR.woff") format("woff"), /* Modern Browsers */
+    url("../font/WanjuR.ttf") format("truetype"); /* Safari, Android, iOS */
+}
+ 
+/* Gongjungjeonwha */
+@font-face {
+  font-family: "Nightbeach";
+  font-style: normal;
+  font-weight: 400;
+  src: local("../font/NightbeachL"), /* computer */
+    url("../font/NightbeachL.eot"), /* IE9 Compat Modes */
+    url("../font/NightbeachL.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("../font/NightbeachL.woff2") format("woff2"), /* Modern Browsers */
+    url("../font/NightbeachL.woff") format("woff"), /* Modern Browsers */
+    url("../font/NightbeachL.ttf") format("truetype"); /* Safari, Android, iOS */
+}
+@font-face {
+  font-family: "Nightbeach";
+  font-style: normal;
+  font-weight: 600;
+  src: local("../font/NightbeachR"), /* computer */
+    url("../font/NightbeachR.eot"), /* IE9 Compat Modes */
+    url("../font/NightbeachR.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("../font/NightbeachR.woff2") format("woff2"), /* Modern Browsers */    
+    url("../font/NightbeachR.woff") format("woff"), /* Modern Browsers */
+    url("../font/NightbeachR.ttf") format("truetype"); /* Safari, Android, iOS */
+}
+@font-face {
+  font-family: "Nightbeach";
+  font-style: normal;
+  font-weight: 800;
+  src: local("../font/NightbeachB"), /* computer */
+    url("../font/NightbeachB.eot"), /* IE9 Compat Modes */
+    url("../font/NightbeachB.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+    url("../font/NightbeachB.woff2") format("woff2"), /* Modern Browsers */
+    url("../font/NightbeachB.woff") format("woff"), /* Modern Browsers */
+    url("../font/NightbeachB.ttf") format("truetype"); /* Safari, Android, iOS */
+}

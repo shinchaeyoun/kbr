@@ -1,0 +1,9 @@
+diff a/common_idigrow/js/common.js b/common_idigrow/js/common.js	(rejected hunks)
+@@ -246,7 +246,6 @@
+ 
+ 	// 선긋기 다시하기
+ 	$('#btn-re').on('click', function () {
+-		$('itemBody').show();
+ 		$('.q-line').each(function () {
+ 
+ 

@@ -1,0 +1,137 @@
+/*// 기본 관련 ///////////////////////////////////////////////*/
+@media all {
+  .section {
+    display: none;
+    width: 100%;
+    height: 100%;
+  }
+  .section.active {
+    display: block;
+  }
+  .section[data-page="1"] {
+    background: url("./img/intro.png") no-repeat;
+  }
+  .section[data-page="1"] .gisang_i_ganji {
+    position: relative;
+    opacity: 0;
+  }
+  .section[data-page="1"] .gisang_i_ganji_wait {
+    position: relative;
+  }
+  
+  .section[data-page="1"] p {
+    position: absolute;
+    font-family: "Nightbeach", sans-serif;
+    top: 0;
+    text-align: center;
+    width: 100%;
+    font-size: 26px;
+    color: #fff;
+    margin-top: 304px;
+    line-height: 1.2;
+  }
+
+  .section[data-page="2"] > .cards {
+    position: absolute;
+    top: calc(105px - 6px);
+    left: calc(55px - 6px);
+    width: 1200px;
+  }
+
+  .section[data-page="2"] > .cards > li {
+    position: relative;
+    display: inline-block;
+    width: 186px;
+    height: 171px;
+    margin: 0 10px 6px 0;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .section[data-page="2"] > .cards > li > div {
+    position: absolute;
+    backface-visibility: hidden;
+  }
+
+  .section[data-page="2"] > .cards > li > div.front {
+    transform: rotateY(180deg);
+  }
+
+  .section[data-page="2"] > .cards > li.fliped,
+  .section[data-page="2"] > .cards > li.active {
+    transform: rotateY(180deg);
+  }
+
+  .section[data-page="2"] > .cards > li.active {
+    pointer-events: none;
+/*    visibility: hidden;*/
+  }
+
+  .section[data-page="2"] {
+    /* background: url("./img/bg.png") no-repeat; */
+  }
+
+  .section[data-page="2"] > .resetBtn {
+    position: absolute;
+    top: 590px;
+    left: 1000px;
+    width: 253px;
+    height: 102px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-image: url("./img/reset.png");
+    cursor: pointer;
+  }
+
+  .section[data-page="2"] > .popup {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-image: url("./img/popup.png");
+    z-index: 1;
+  }
+
+  .section[data-page="2"] > .popup > .close {
+    position: absolute;
+    top: 116px;
+    left: 1003px;
+    width: 68.5px;
+    height: 66px;
+    background-repeat: no-repeat;
+    background-position-x: -68.5px;
+    background-image: url("./img/close_btn.png");
+    cursor: pointer;
+  }
+
+  .section[data-page="2"] > .popup > .close:hover {
+    background-position-x: 0;
+  }
+
+  .section[data-page="2"] > .popup > .buttons {
+    position: absolute;
+    top: calc(515px - 3px);
+    left: calc(388px - 12px);
+  }
+
+  .section[data-page="2"] > .popup > .buttons > .button {
+    float: left;
+    width: 266px;
+    height: 89px;
+    background-repeat: no-repeat;
+    background-image: url("./img/popup-click.png");
+    cursor: pointer;
+  }
+
+  .section[data-page="2"] > .popup > .buttons > .button.buttonM1 {
+    background-position-x: 0;
+  }
+
+  .section[data-page="2"] > .popup > .buttons > .button.buttonM2 {
+    background-position-x: -266px;
+  }
+}
