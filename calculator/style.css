@@ -1,0 +1,54 @@
+.calculator .display {
+  position: absolute;
+  top: 195px;
+  left: 377px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+  align-items: center;
+
+  height: 63px;
+  width: 170px;
+  text-align: right;
+  overflow: hidden;
+}
+
+.calculator .display * {
+  width: 100%;
+  height: 50%;
+  align-content: center;
+}
+
+.calculator .display span {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.calculator .display p {
+  margin: 0;
+  font-size: 20px;
+}
+
+.calculator .grid-container {
+  position: absolute;
+  left: 368px;
+  top: 275px;
+  display: grid;
+  grid-template-columns: repeat(4, 41px);
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.calculator .grid-container div {
+  box-sizing: border-box;
+  font-size: 20px;
+  min-height: 40px;
+  align-content: center;
+  text-align: center;
+  font-size: 0;
+
+  border: 1px solid #99999910;
+
+  cursor: pointer;
+}

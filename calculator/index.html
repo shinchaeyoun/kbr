@@ -1,13 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <script src="jquery.min.js"></script>
   <script src="app.js"></script>
 </head>
+
 <body>
-  
+  <div class="calculator">
+    <div class="display">
+      <span></span>
+      <p></p>
+    </div>
+
+    <div class="grid-container">
+      <div class="on">ON</div>
+      <div class="off">OFF</div>
+      <div class="c">C</div>
+      <div class="ac">AC</div>
+
+      <div data-item="number">7</div>
+      <div data-item="number">8</div>
+      <div data-item="number">9</div>
+      <div data-item="operator">÷</div>
+
+      <div data-item="number">4</div>
+      <div data-item="number">5</div>
+      <div data-item="number">6</div>
+      <div data-item="operator">×</div>
+
+      <div data-item="number">1</div>
+      <div data-item="number">2</div>
+      <div data-item="number">3</div>
+      <div data-item="operator">-</div>
+
+      <div data-item="number">0</div>
+      <div data-item="number">.</div>
+      <div data-item="operator">=</div>
+      <div data-item="operator">+</div>
+    </div>
+  </div>
 </body>
 </html>
