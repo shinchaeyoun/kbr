@@ -4,7 +4,7 @@ $(function () {
 
 
 function sparkFn() {
-    const sparkColor = ['#f44336', '#f43688', '#e7f436', '#a236f4', '#36f443'];
+    const sparkColor = ['#f44336', '#f43688', '#e7f436','#c2e9fb', '#a236f4', '#36f443','#ff758c','#89f7fe'];
 
     class ClickSpark extends HTMLElement {
         constructor() {
