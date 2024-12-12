@@ -4,7 +4,7 @@ $(function () {
 
 
 function sparkFn() {
-    const sparkColor = '#000000';
+    const sparkColor = ['#f44336', '#f43688', '#e7f436', '#a236f4', '#36f443'];
 
     class ClickSpark extends HTMLElement {
         constructor() {
@@ -71,13 +71,9 @@ function sparkFn() {
                         pointer-events: none;
                     }
                 </style>
-                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="4" stroke="${sparkColor}" transform="rotate(-20)">
-                    ${Array.from({ length: 8 }, (_) =>
-                `
-                            <line x1="50" y1="30" x2="50" y2="4" stroke-dasharray="30" stroke-dashoffset="30"
-                                style="transform-origin: center" />`
-            ).join("")}
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" stroke="${sparkColor[1]}" transform="rotate(-20)">
+                    ${Array.from({ length: 8 }, (_,idx) =>`<line x1="50" y1="30" x2="50" y2="4" stroke="${sparkColor[idx]}" stroke-dasharray="30" stroke-dashoffset="30" style="transform-origin: center" />`
+                    ).join("")}
                 </svg>
             `;
         }
