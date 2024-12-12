@@ -4,12 +4,37 @@ $(function () {
 
 
 function sparkFn() {
-    const sparkColor = ['#ff758c', '#89f7fe', '#ff9a9e','#b7f8db', '#005aa7', '#a8c0ff','#dd1818','#40e0d0'];
+    const sparkColor = ['#ff758c', '#89f7fe', '#ff9a9e', '#b7f8db', '#005aa7', '#a8c0ff', '#dd1818', '#40e0d0'];
+
+    function generateRandomColors(num) {
+        //make an array
+        var arr = []
+        //add num random colors to arr
+        for (var i = 0; i < num; i++) {
+            //get random color and push into arr
+            arr.push(randomColor())
+        }
+        //return that array
+        let colorArr = arr.join('');
+        return colorArr;
+    }
+
+    function randomColor() {
+        //pick a 'red' from 0 - 255
+        var r = Math.floor(Math.random() * 256);
+        //pick a 'green' from 0 - 255
+        var g = Math.floor(Math.random() * 256);
+        //pick a 'blue' from 0 - 255
+        var b = Math.floor(Math.random() * 256)
+        return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+    }
 
     class ClickSpark extends HTMLElement {
         constructor() {
             super();
             this.attachShadow({ mode: "open" });
+            this.strokeNum = 8;
+            this.colorNum = 0;
         }
 
         connectedCallback() {
@@ -25,6 +50,7 @@ function sparkFn() {
         }
 
         handleEvent(e) {
+            this.resetColor();
             this.setSparkPosition(e);
             this.animateSpark();
         }
@@ -33,6 +59,8 @@ function sparkFn() {
             let sparks = [...this.svg.children];
             let size = parseInt(sparks[0].getAttribute("y1"));
             let offset = size / 2 + "px";
+
+            this.svg.style.setProperty("stroke", generateRandomColors(1))
 
             let keyframes = (i) => {
                 let deg = `calc(${i} * (360deg / ${sparks.length}))`;
@@ -63,6 +91,10 @@ function sparkFn() {
             this.style.top = e.pageY - this.clientHeight / 2 + "px";
         }
 
+        resetColor() {
+            this.colorNum = Math.floor(Math.random() * 8);
+        }
+
         createSpark() {
             return `
                 <style>
@@ -71,14 +103,14 @@ function sparkFn() {
                         pointer-events: none;
                     }
                 </style>
-                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" stroke="${sparkColor[1]}" transform="rotate(-20)">
-                    ${Array.from({ length: 8 }, (_,idx) =>`<line x1="50" y1="30" x2="50" y2="4" stroke="${sparkColor[idx]}" stroke-dasharray="30" stroke-dashoffset="30" style="transform-origin: center" />`
-                    ).join("")}
+                <svg width="25" height="25" viewBox="0 0 100 100" fill="none" stroke="${sparkColor[this.colorNum]}" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" transform="rotate(-20)">
+                    ${Array.from({ length: 8 }, (_) => `<line x1="50" y1="30" x2="50" y2="4" stroke-dasharray="30" stroke-dashoffset="30" style="transform-origin: center" />`).join("")}
                 </svg>
             `;
         }
+        // stroke="${sparkColor[this.colorNum]}" -> random colors
+        // stroke="var(--click-spark-color, currentcolor)"
     }
-
 
     customElements.define("click-spark", ClickSpark);
 
