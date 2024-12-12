@@ -4,7 +4,7 @@ $(function () {
 
 
 function sparkFn() {
-    const sparkColor = ['#ff758c', '#89f7fe', '#ff9a9e', '#b7f8db', '#005aa7', '#a8c0ff', '#dd1818', '#40e0d0'];
+    // const sparkColor = ['#ff758c', '#89f7fe', '#ff9a9e', '#b7f8db', '#005aa7', '#a8c0ff', '#dd1818', '#40e0d0'];
 
     function generateRandomColors(num) {
         //make an array
@@ -103,7 +103,7 @@ function sparkFn() {
                         pointer-events: none;
                     }
                 </style>
-                <svg width="25" height="25" viewBox="0 0 100 100" fill="none" stroke="${sparkColor[this.colorNum]}" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" transform="rotate(-20)">
+                <svg width="25" height="25" viewBox="0 0 100 100" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" transform="rotate(-20)">
                     ${Array.from({ length: 8 }, (_) => `<line x1="50" y1="30" x2="50" y2="4" stroke-dasharray="30" stroke-dashoffset="30" style="transform-origin: center" />`).join("")}
                 </svg>
             `;
