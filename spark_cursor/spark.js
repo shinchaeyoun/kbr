@@ -117,4 +117,3 @@ function sparkFn() {
     const spark = document.createElement("click-spark");
     document.body.appendChild(spark);
 }
-
