@@ -71,7 +71,7 @@ function sparkFn(){
                         pointer-events: none;
                     }
                 </style>
-                <svg width="25" height="25" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="5" stroke="var(--click-spark-color, currentcolor)" transform="rotate(-20)">
                     ${Array.from(
                 { length: 8 },
