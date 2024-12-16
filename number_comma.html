@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./app.js"></script>
+</head>
+
+<body>
+
+</body>
+<script>
+    // 1. toLocaleString을 사용한 콤마 포맷팅
+    const formatNumber1 = (number) => number.toLocaleString();
+    console.log(formatNumber1(4234124412));  // 4,234,124,412
+
+    // 2. Intl.NumberFormat을 사용한 콤마 포맷팅
+    const numberFormatter = new Intl.NumberFormat();
+    const formatNumber2 = (number) => numberFormatter.format(number);
+    console.log(formatNumber2(4234124412));  // 4,234,124,412
+
+    // 3. 정규표현식을 사용한 콤마 포맷팅
+    const commaRegex = /\B(?=(\d{3})+(?!\d))/g;
+    const formatNumber3 = (number) => number.toString().replace(commaRegex, ',');
+    console.log(formatNumber3(4234124412));  // 4,234,124,412
+
+    /*
+    셋 다 고만고만한 성능을 보여주지만 정규표현식이 가장 빠르고, Intl.NumberFormat이 toLocaleString보다 느린 것을 볼 수 있다.
+    느린 이유는 Intl 모듈이 무거워서(= 내부적으로 제공되는 기능이 많아서) 그런 것으로 보인다.
+     */
+</script>
+
+</html>
