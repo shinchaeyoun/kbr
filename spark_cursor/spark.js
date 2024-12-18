@@ -101,6 +101,7 @@ function sparkFn() {
                     :host {
                         position: absolute;
                         pointer-events: none;
+                        z-index: 999;
                     }
                 </style>
                 <svg width="25" height="25" viewBox="0 0 100 100" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" transform="rotate(-20)">
