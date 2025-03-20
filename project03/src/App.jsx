@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./AuthProvider";
+import ProtectedRoute from "./ProtectedRoute";
 import axios from "axios";
 
 // pages
@@ -29,8 +31,8 @@ export const AppContext = createContext();
 
 function App(props) {
   const level = props.level;
-  console.log('app level', level);
-  
+  console.log("app level", level);
+
   const pageList = [
     "main",
     // "sendtest",
@@ -71,51 +73,59 @@ function App(props) {
     document.location.href = "/";
   };
 
+  const moveToSignup = () => {
+    navigate("/signup"); // 회원가입 페이지로 이동
+  };
+
   return (
-    <>
-      <div className="userInfo">id : {sessionStorage.user_id} level: {level}
+    <AuthProvider>
+      <div className="userInfo">
+        id : {sessionStorage.user_id} level: {level}
         <button onClick={onLogout}>Logout</button>
       </div>
-      <br/><br/>
+      <br />
+      <br />
       <Header />
 
       {/* <button onClick={authorityTest}>authorityTest</button>
       <br /> */}
+      <Router>
+        <Routes>
+          {/* <Route path="/" element={<PrivateEnterRoute />} /> */}
+          {/* <Route path="/" element={<Main isLogin={isLogin} isTrue={isLogin} />} /> */}
+          <Route path="/" element={<BoardList level={level} />} />
+          <Route path="/sendtest" element={<SendTest />} />
+          <Route
+            path="/login"
+            element={<Login isLogin={isLogin} onSignupClick={moveToSignup} />}
+          />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/board" element={<BoardList level={level} />} />
+          <Route path="/write" element={<BoardWrite />} />
+          <Route path="/board/:idx" element={<BoardDetail />} />
+          <Route path="/update/:idx" element={<BoardUpdate />} />
+          <Route path="/userinfo" element={<UserInfo />} />
 
-      <Routes>
-        {/* <Route path="/" element={<PrivateEnterRoute />} /> */}
-        {/* <Route path="/" element={<Main isLogin={isLogin} isTrue={isLogin} />} /> */}
-        <Route path="/" element={<BoardList level={level}/>} />
-        <Route path="/sendtest" element={<SendTest />} />
-        <Route path="/login" element={<Login isLogin={isLogin} />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/board" element={<BoardList level={level}/>} />
-        <Route path="/write" element={<BoardWrite />} />
-        <Route path="/board/:idx" element={<BoardDetail />} />
-        <Route path="/update/:idx" element={<BoardUpdate />} />
-        <Route path="/userinfo" element={<UserInfo />} />
+          <Route
+            path="/public"
+            element={
+              <PrivatePublicRoute level={level} component={<Public />} />
+            }
+          />
+          <Route
+            path="/master"
+            element={
+              <PrivateMasterRoute level={level} component={<Master />} />
+            }
+          />
 
-        <Route
-          path="/public"
-          element={
-            <PrivatePublicRoute level={level} component={<Public />} />
-          }
-        />
-        <Route
-          path="/master"
-          element={
-            <PrivateMasterRoute level={level} component={<Master />} />
-          }
-        />
-
-        <Route
-          path="/admin"
-          element={
-            <PrivateAdminRoute level={level} component={<Admin />} />
-          }
-        />
-      </Routes>
-    </>
+          <Route
+            path="/admin"
+            element={<PrivateAdminRoute level={level} component={<Admin />} />}
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

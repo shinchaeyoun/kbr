@@ -371,26 +371,47 @@ app.patch("/update", (req, res) => {
   });
 });
 
-// signup
+// signup 아이디 중복 확인
+app.get("/signup", (req, res) => {
+  const query = `
+    SELECT COUNT(*) AS result FROM user WHERE id = ?
+  `
+  connection.query(query, req.query.id, (err, data, fields) => {
+    let sendMsg = '';
+    data[0].result == 1 ? sendMsg = "중복 아이디" : sendMsg = "생성 가능 아이디";
+    res.send({result: data[0].result, msg: sendMsg});
+  });
+});
+// 계정 생성
 app.post("/signup", (req, res) => {
   const { id, password } = req.body;
   console.log("Received data:", { id, password });
 
   const query = `
-    INSERT INTO user (id, password)
-    VALUES (?, ?);
+    INSERT INTO user (id, password, level)
+    VALUES (?, ?, 1);
   `;
-
+  
   // 데이터베이스에 데이터를 삽입
-  connection.execute(query, [id, password], (error, results, fields) => {
+  connection.query(query, [id, password], (error, data, fields) => {
+    console.log('~~~~send data /////',data);
+    
     if (error) {
       console.error("데이터 삽입 실패:", error);
-      res.status(500).send("데이터 삽입에 실패했습니다.");
+      res.send({ msg: "전송 실패" });
     } else {
-      console.log("데이터 삽입 성공:", results);
-      res.status(200).send("데이터가 성공적으로 삽입되었습니다.");
+      console.log("데이터 삽입 성공:", data);
+      res.send(data);
     }
+    // if (error) {
+    //   console.error("전송 실패:", error);
+    //   res.send({ msg: "전송 실패" });
+    // };
+    // res.send(data);
+
   });
+
+
 });
 
 app.post("/authority", (req, res) => {

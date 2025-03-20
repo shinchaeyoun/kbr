@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Login = (isLogin) => {
+const Login = ({ isLogin, onSignupClick }) => {
   const navigate = useNavigate();
 
   const [inputId, setInputId] = useState("");
@@ -84,14 +84,9 @@ const Login = (isLogin) => {
     }
   };
 
-  const moveToSignup = () => {
-    console.log("회원가입 페이지로 이동");
-    navigate("/signup");
-  };
-
   return (
     <>
-      {isLogin.isLogin ? (
+      {isLogin ? (
         <>
           <button type="button" onClick={onLogout}>
             logout
@@ -99,7 +94,7 @@ const Login = (isLogin) => {
         </>
       ) : (
         <>
-          <h1>login</h1>
+          <h1>로그인</h1>
           <label> ID 입력 :</label>
           <br />
           <input
@@ -126,7 +121,7 @@ const Login = (isLogin) => {
             로그인
           </button>
 
-          <button type="button" onClick={moveToSignup}>
+          <button type="button" onClick={onSignupClick}>
             회원가입
           </button>
         </>
