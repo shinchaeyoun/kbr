@@ -1,8 +1,8 @@
 import React from "react";
 import AuthAlert from './AuthAlert.jsx';
 
-const PrivateMasterRoute = ({ authenticated, component: Component }) => {
-  return authenticated === "master" || authenticated === "admin" ? (
+const PrivateMasterRoute = ({ level, component: Component }) => {
+  return level >= 3 ? (
     Component
   ) : (
     <AuthAlert/>

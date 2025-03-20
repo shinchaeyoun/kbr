@@ -3,20 +3,18 @@
 // const util = require("util");
 // const mysql = require("mysql2");
 // const bodyParser = require("body-parser");
-import express from 'express';
-import cors from 'cors';
-import util from 'util';
-import mysql from 'mysql2';
-import bodyParser from 'body-parser';
-import path from 'path';
-import { fileURLToPath } from "url"; 
+import express from "express";
+import cors from "cors";
+import util from "util";
+import mysql from "mysql2";
+import bodyParser from "body-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const __filename = fileURLToPath(import.meta.url);
 
-
 const port = 5000;
-
 
 const app = express();
 
@@ -43,8 +41,7 @@ connection.connect((error) => {
 // JSON 형식의 본문을 파싱할 수 있도록 설정
 app.use(bodyParser.json());
 
-
-app.use('/', express.static(path.join(__dirname, './dist')));
+app.use("/", express.static(path.join(__dirname, "./dist")));
 // app.get("*", (req, res) => {
 //   res.sendFile(path.join(__dirname, "../front-end/build/index.html"));
 // });
@@ -53,17 +50,16 @@ app.use('/', express.static(path.join(__dirname, './dist')));
 //     const { html } = ssr(); // ssr.tsx의 render 함수 호출
 
 //     const index = fs.readFileSync('./dist/client/index.html'); // 클라이언트 HTML 파일 읽기
-//     const result = `${index}`.replace('<!-- root-container -->', html); // HTML 삽입    
+//     const result = `${index}`.replace('<!-- root-container -->', html); // HTML 삽입
 
 //     res.setHeader('Content-Type', 'text/html').send(result); // 클라이언트에 응답
 // });
 
 // app.listen(5000); // 서버 시작
 
-
 // 데이터베이스 쿼리 실행 예제
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("server");
 });
 
 // 데이터베이스 쿼리 실행 예제
@@ -109,13 +105,15 @@ app.get("/login", (req, res) => {
   //   if (!err) res.send(data);
   //   else res.send(err);
   // });
+  console.log("??? login");
+
   res.send("login");
 });
 app.post("/login", (req, res) => {
   console.log(`= = = > req : ${util.inspect(req.body)}`);
   const userId = req.body.id;
   const userPw = req.body.password;
-  const userAuth = req.body.authority;
+  const userAuth = req.body.level;
   const sql1 = "SELECT COUNT(*) AS result FROM user WHERE id = ?";
 
   console.log("userAuth", userAuth);
@@ -127,36 +125,8 @@ app.post("/login", (req, res) => {
         console.log("동일한 id가 없다면", data, req.body);
         res.send({ msg: "입력하신 id 가 일치하지 않습니다." });
       } else {
-        // 동일한 id 가 있으면 비밀번호 일치 확인
-        // const sql2 = `SELECT
-        //                     CASE (SELECT COUNT(*) FROM user WHERE id = ? AND password = ?)
-        //                         WHEN '0' THEN NULL
-        //                         ELSE (SELECT id FROM user WHERE id = ? AND password = ?)
-        //                     END AS userId
-        //                     , CASE (SELECT COUNT(*) FROM user WHERE id = ? AND password = ?)
-        //                         WHEN '0' THEN NULL
-        //                         ELSE (SELECT password FROM user WHERE id = ? AND password = ?)
-        //                     END AS userPw
-        //                     , CASE (SELECT authority FROM user WHERE id = ?)
-        //                       WHEN '0' THEN NULL
-        //                       ELSE (SELECT authority FROM user WHERE id = ?)
-        //                     END AS userAuth`;
-
-        // // sql 란에 필요한 parameter 값을 순서대로 기재
-        // const params = [
-        //   userId,
-        //   userPw,
-        //   userId,
-        //   userPw,
-        //   userId,
-        //   userPw,
-        //   userId,
-        //   userPw,
-        //   userAuth,
-        // ];
-
         const sql2 = `
-                      SELECT id AS userId, password AS userPw, authority AS userAuth
+                      SELECT id AS userId, password AS userPw, level AS userAuth
                       FROM user
                       WHERE id = ? AND password = ?
                     `;
@@ -165,16 +135,8 @@ app.post("/login", (req, res) => {
 
         connection.query(sql2, params, (err, data) => {
           if (!err) {
-            // console.log("server : 로그인 성공", data[0]);
-
-            const user = data[0];
-            if (user.userAuth) {
-              console.log("server: 로그인 성공, authority 값:", user.userAuth);
-            } else {
-              console.log("server: 로그인 성공, authority 값 없음");
-            }
-
-            res.send(user);
+            console.log("server : 로그인 성공 //////", data[0]);
+            res.send(data[0]);
           } else {
             console.log("로그인 실패", err);
             res.send(err);
@@ -184,6 +146,228 @@ app.post("/login", (req, res) => {
     } else {
       res.send(err);
     }
+  });
+});
+
+app.post("/search", (req, res) => {
+  console.log(`= = = > req.query : ${util.inspect(req.query)}`);
+  console.log(`= = = > req.body : ${util.inspect(req.body)}`);
+
+  const searchValue = req.body.search;
+  const params = [`%${searchValue}%`];
+
+  if (searchValue !== undefined) {
+    console.log("검색 값 보여주기");
+    console.log("if =============", searchValue !== undefined);
+    const query = `
+      SELECT * FROM board 
+      WHERE title LIKE ? 
+      ORDER BY idx DESC 
+      LIMIT 0, 10;
+    `;
+
+    connection.query(query, params, (error, data, fields) => {
+      if (data !== undefined) {
+        res.send(data);
+      }
+    });
+  } else {
+    console.log("전체 값 보여주기");
+
+    const queryDESC = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10";
+    connection.query(queryDESC, (error, data, fields) => {
+      res.send(data);
+    });
+  }
+});
+
+app.get("/board", (req, res) => {
+  console.log(`= = = > req.body.idx : ${util.inspect(req.query.idx)}`);
+  const index = req.query.idx;
+
+  if (index == undefined) {
+    // 0~n 번째 데이터만 가져오기
+    const queryDESC = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10";
+    const queryASC = "SELECT * FROM board ORDER BY idx ASC LIMIT 0, 10";
+    connection.query(queryDESC, (error, data, fields) => {
+      res.send(data);
+    });
+  } else {
+    // 인덱스 값을 받았을 때 해당 정보만 보내주기)
+    const query = `
+      SELECT * FROM board WHERE idx = ?
+    `;
+    connection.query(query, [index], (error, data, fields) => {
+      console.log("data[0]", data[0]);
+
+      res.send(data[0]);
+    });
+  }
+});
+app.post("/board", (req, res) => {
+  // req.body에서 데이터를 바로 추출
+  const {
+    title,
+    subTitle,
+    customer,
+    pm1,
+    pm2,
+    pm3,
+    startAt,
+    scheduledAt,
+    completedAt,
+    totalCha,
+    lmsTime,
+    lmsCode,
+    innerUrl,
+    outerUrl,
+    customerName,
+    customerTel,
+    customerPlan,
+    pottingComp,
+    etc,
+  } = req.body;
+
+  // SQL 쿼리와 데이터 매핑
+  const query = `
+    INSERT INTO board
+    VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+  `;
+  const params = [
+    title,
+    subTitle,
+    customer,
+    pm1,
+    pm2,
+    pm3,
+    startAt,
+    scheduledAt,
+    completedAt,
+    totalCha,
+    lmsTime,
+    lmsCode,
+    innerUrl,
+    outerUrl,
+    customerName,
+    customerTel,
+    customerPlan,
+    pottingComp,
+    etc,
+  ];
+
+  // DB 쿼리 실행
+  connection.query(query, params, (err, data) => {
+    if (err) {
+      console.error("전송 실패:", err);
+      // return res.status(500).send({ msg: "전송 실패" });
+      res.send({ msg: "전송 실패" });
+    }
+    res.send(data);
+  });
+
+  console.log("Board 데이터 추가 시도");
+});
+
+app.delete("/board/delete", (req, res) => {
+  console.log(`= = = > req : ${util.inspect(req.body)}`);
+  const idx = req.body.idx;
+  console.log(`= = = > idx : ${idx}`);
+
+  const query = `
+    DELETE FROM board WHERE idx = ?  
+  `;
+  connection.query(query, [idx], (err, data) => {
+    res.send(data);
+    console.log(err, data);
+  });
+});
+app.patch("/update", (req, res) => {
+  console.log(`= = = > req.query : ${util.inspect(req.query)}`);
+  console.log(`= = = > req.body : ${util.inspect(req.body)}`);
+  const index = req.query.idx;
+
+  const {
+    title,
+    subTitle,
+    customer,
+    pm1,
+    pm2,
+    pm3,
+    startAt,
+    scheduledAt,
+    completedAt,
+    totalCha,
+    lmsTime,
+    lmsCode,
+    innerUrl,
+    outerUrl,
+    customerName,
+    customerTel,
+    customerPlan,
+    pottingComp,
+    etc,
+  } = req.body;
+
+  const formattedStartAt = new Date(startAt)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+
+  const query = `
+    UPDATE board SET 
+    title = ?,
+    subTitle = ?,
+    customer = ?,
+    pm1 = ?,
+    pm2 = ?,
+    pm3 = ?,
+    startAt = ?,
+    scheduledAt = ?,
+    completedAt = ?,
+    totalCha = ?,
+    lmsTime = ?,
+    lmsCode = ?,
+    innerUrl = ?,
+    outerUrl = ?,
+    customerName = ?,
+    customerTel = ?,
+    customerPlan = ?,
+    pottingComp = ?,
+    etc = ?
+    WHERE idx = ?
+  `;
+
+  const params = [
+    title,
+    subTitle,
+    customer,
+    pm1,
+    pm2,
+    pm3,
+    formattedStartAt,
+    scheduledAt,
+    completedAt,
+    totalCha,
+    lmsTime,
+    lmsCode,
+    innerUrl,
+    outerUrl,
+    customerName,
+    customerTel,
+    customerPlan,
+    pottingComp,
+    etc,
+    index,
+  ];
+
+  connection.query(query, params, (error, data, fields) => {
+    console.log([params, index], "data ===== ", error, data, fields);
+    // res.send(data[0]);
+    if (error) {
+      console.error("수정 실패:", error);
+      return res.status(500).send({ msg: "수정 실패", error });
+    }
+    res.status(200).send({ msg: "수정 성공", data });
   });
 });
 
@@ -213,7 +397,17 @@ app.post("/authority", (req, res) => {
   console.log("authority", req.body);
 });
 
+app.get("/userinfo", (req, res) => {
+  console.log(`= = = > req.query : ${util.inspect(req.query)}`);
+  console.log(`= = = > req.body : ${util.inspect(req.body)}`);
+
+  const query = "SELECT * FROM user";
+  connection.query(query, (error, data, fields) => {
+    res.send(data);
+  });
+});
+
 // 서버 실행
 app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+  console.log(`Server listening at http://192.168.23.65:${port}`);
 });

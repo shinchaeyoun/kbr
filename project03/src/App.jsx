@@ -8,21 +8,29 @@ import Main from "./pages/Main.jsx";
 import Public from "./pages/Public.jsx";
 import Master from "./pages/Master.jsx";
 import Admin from "./pages/Admin.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
 import BoardList from "./pages/BoardList.jsx";
+import BoardWrite from "./pages/BoardWrite.jsx";
+import BoardDetail from "./pages/BoardDetail.jsx";
+import BoardUpdate from "./pages/BoardUpdate.jsx";
 
 // components
-import Login from "./components/Login.jsx";
-import Signup from "./components/Signup.jsx";
+import Header from "./components/Header.jsx";
 import PrivatePublicRoute from "./components/PrivatePublicRoute.jsx";
 import PrivateMasterRoute from "./components/PrivateMasterRoute.jsx";
 import PrivateAdminRoute from "./components/PrivateAdminRoute.jsx";
 import AuthAlert from "./components/AuthAlert.jsx";
+import UserInfo from "./components/UserInfo.jsx";
 
 import "./App.css";
 
 export const AppContext = createContext();
 
-function App() {
+function App(props) {
+  const level = props.level;
+  console.log('app level', level);
+  
   const pageList = [
     "main",
     // "sendtest",
@@ -35,7 +43,7 @@ function App() {
 
   const [isLogin, setIsLogin] = useState(false);
 
-  const isAuth = sessionStorage.user_at;
+  const isAuth = sessionStorage.user_lvl;
 
   const authorityTest = () => {
     console.log("authorityTest", isLogin, isAuth);
@@ -59,39 +67,51 @@ function App() {
 
   const onLogout = () => {
     sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_at");
+    sessionStorage.removeItem("user_lvl");
     document.location.href = "/";
   };
 
   return (
     <>
-      <button onClick={authorityTest}>authorityTest</button>
-      <br />
+      <div className="userInfo">id : {sessionStorage.user_id} level: {level}
+        <button onClick={onLogout}>Logout</button>
+      </div>
+      <br/><br/>
+      <Header />
+
+      {/* <button onClick={authorityTest}>authorityTest</button>
+      <br /> */}
 
       <Routes>
-        <Route path="/" element={<Main isLogin={isLogin} isTrue={isLogin} />} />
+        {/* <Route path="/" element={<PrivateEnterRoute />} /> */}
+        {/* <Route path="/" element={<Main isLogin={isLogin} isTrue={isLogin} />} /> */}
+        <Route path="/" element={<BoardList level={level}/>} />
         <Route path="/sendtest" element={<SendTest />} />
         <Route path="/login" element={<Login isLogin={isLogin} />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/border" element={<BoardList />} />
+        <Route path="/board" element={<BoardList level={level}/>} />
+        <Route path="/write" element={<BoardWrite />} />
+        <Route path="/board/:idx" element={<BoardDetail />} />
+        <Route path="/update/:idx" element={<BoardUpdate />} />
+        <Route path="/userinfo" element={<UserInfo />} />
 
         <Route
           path="/public"
           element={
-            <PrivatePublicRoute authenticated={isAuth} component={<Public />} />
+            <PrivatePublicRoute level={level} component={<Public />} />
           }
         />
         <Route
           path="/master"
           element={
-            <PrivateMasterRoute authenticated={isAuth} component={<Master />} />
+            <PrivateMasterRoute level={level} component={<Master />} />
           }
         />
 
         <Route
           path="/admin"
           element={
-            <PrivateAdminRoute authenticated={isAuth} component={<Admin />} />
+            <PrivateAdminRoute level={level} component={<Admin />} />
           }
         />
       </Routes>

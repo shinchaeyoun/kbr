@@ -1,5 +1,5 @@
 import React from "react";
-import Login from "../components/Login.jsx";
+import Login from "./Login.jsx";
 
 const Main = (props) => {
   console.log("props", props);
@@ -9,7 +9,7 @@ const Main = (props) => {
 
   const onLogout = () => {
     sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_at");
+    sessionStorage.removeItem("user_lvl");
     document.location.href = "/main";
   };
 

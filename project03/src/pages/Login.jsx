@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = (isLogin) => {
+  const navigate = useNavigate();
+
   const [inputId, setInputId] = useState("");
   const [inputPw, setInputPw] = useState("");
   const [inputAt, setInputAt] = useState("");
@@ -17,8 +19,8 @@ const Login = (isLogin) => {
 
   const onLogout = () => {
     sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_at");
-    document.location.href = "/main";
+    sessionStorage.removeItem("user_lvl");
+    document.location.href = "/";
   };
 
   const onClickLogin = () => {
@@ -29,6 +31,7 @@ const Login = (isLogin) => {
       .post("http://192.168.23.65:5000/login", {
         id: inputId,
         password: inputPw,
+        level: inputAt,
       })
       .then((res) => {
         console.log("res.data ===", res.data);
@@ -54,7 +57,7 @@ const Login = (isLogin) => {
           console.log("sessionStorage.user_id :", sessionStorage.user_id);
 
           if (res.data.userAuth !== null) {
-            sessionStorage.setItem("user_at", res.data.userAuth);
+            sessionStorage.setItem("user_lvl", res.data.userAuth);
           }
           // 작업 완료 되면 페이지 이동(새로고침)
           document.location.href = "/";
@@ -65,14 +68,35 @@ const Login = (isLogin) => {
       });
   };
 
+  const enterLogin = (e) => {
+    if (e.key === "Enter") {
+      console.log(
+        "엔터 == 아이디 인풋 값과 패스워드 인풋 값 채워져있는지 확인"
+      );
+      // getDataList();
+
+      if (inputId !== "" && inputPw !== "") {
+        console.log("값 입력 완");
+        onClickLogin();
+      } else {
+        console.log("inputId,inputPw===", inputId == "", inputPw == "");
+      }
+    }
+  };
+
+  const moveToSignup = () => {
+    console.log("회원가입 페이지로 이동");
+    navigate("/signup");
+  };
+
   return (
     <>
       {isLogin.isLogin ? (
         <>
-        <button type="button" onClick={onLogout}>
-          logout
-        </button>
-      </>
+          <button type="button" onClick={onLogout}>
+            logout
+          </button>
+        </>
       ) : (
         <>
           <h1>login</h1>
@@ -83,6 +107,7 @@ const Login = (isLogin) => {
             name="id"
             value={inputId}
             onChange={handleInputId}
+            onKeyDown={enterLogin}
           />
           <br />
           <br />
@@ -93,11 +118,16 @@ const Login = (isLogin) => {
             name="password"
             value={inputPw}
             onChange={handleInputPw}
+            onKeyDown={enterLogin}
           />
           <br />
           <br />
           <button type="button" onClick={onClickLogin}>
-            login
+            로그인
+          </button>
+
+          <button type="button" onClick={moveToSignup}>
+            회원가입
           </button>
         </>
       )}
