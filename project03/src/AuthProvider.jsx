@@ -1,23 +1,29 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // 인증 상태 관리
-  const [userRole, setUserRole] = useState(null); // 사용자 역할 (예: 'admin', 'member')
+  const [level, setLevel] = useState(Number(sessionStorage.getItem("user_lvl")) || 0);
+  const [userId, setUserId] = useState(sessionStorage.getItem("user_id") || null);
 
-  const login = (role) => {
-    setIsAuthenticated(true);
-    setUserRole(role);
+  const login = (id, lvl) => {
+    sessionStorage.setItem("user_id", id);
+    sessionStorage.setItem("user_lvl", lvl);
+    setUserId(id);
+    setLevel(lvl);
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUserRole(null);
+    sessionStorage.removeItem("user_id");
+    sessionStorage.removeItem("user_lvl");
+    setUserId(null);
+    setLevel(0);
   };
 
+  const isAuthenticated = level > 0;
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userRole, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userId, level, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

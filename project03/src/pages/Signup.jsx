@@ -1,33 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Signup = () => {
+const Signup = ({setShowSignup}) => {
   const navigate = useNavigate();
-  const [data, setData] = useState({
-    id: "",
-    password: "",
-  });
+  const [data, setData] = useState({ id: "", password: "" });
+  const [idCheck, setIdCheck] = useState(false);
 
   const { id, password } = data;
-  const [idCheck, setIdCheck] = useState(false);
-  const [pwCheck, setPwCheck] = useState(false);
 
   const checkUserId = async () => {
     if (data.id.length == 0) {
-      alert("id 값 입력 필요");
-      return false;
+      alert("ID를 입력하세요.");
+      return;
     }
     await axios
       .get(`http://192.168.23.65:5000/signup?id=${data.id}`)
       .then((res) => {
-        if (res.data.result == 0) {
+        if (res.data.result === 0) {
           setIdCheck(true);
         }
         alert(res.data.msg);
       });
   };
-
+  
   const onChange = (e) => {
     const nextData = {
       ...data,
@@ -37,20 +33,31 @@ const Signup = () => {
   };
 
   const onSubmit = async () => {
-    if (data.id.length < 1 || data.password.length < 1) return false;
     if (!idCheck) {
-      alert("아이디 중복 체크 필요");
-      return false;
+      alert("아이디 중복 체크를 진행하세요.");
+      return;
     }
-    
-    await axios.post(`http://192.168.23.65:5000/signup`, data).then((res) => {
-      console.log(res);
-      // navigate("/");
-      window.location.reload();
+    if (!data.id || !data.password) {
+      alert("모든 입력값을 입력해주세요.");
+      return;
+    }
+    await axios.post("http://192.168.23.65:5000/signup", data).then(() => {
+      alert("회원가입 완료");
+      navigate("/login"); // 회원가입 후 로그인 페이지로 이동
     });
 
+    // if (data.id.length < 1 || data.password.length < 1) return false;
+    // if (!idCheck) {
+    //   alert("아이디 중복 체크 필요");
+    //   return false;
+    // }
 
-    navigate("/");
+    // await axios.post(`http://192.168.23.65:5000/signup`, data).then((res) => {
+    //   console.log(res);
+    //   navigate("/");
+    //   // window.location.reload();
+    // });
+
     // await axios.post(`http://192.168.23.65:5000/signup`, data).then((res) => {
     //   console.log("??res.data.msg", res);
     //   // if (res.data.msg == undefined) {
@@ -107,7 +114,7 @@ const Signup = () => {
       <br />
       <br />
       <button onClick={onSubmit}> 회원가입 </button>
-      <button onClick={() => navigate(-1)}> 이전 </button>
+      <button onClick={()=>{setShowSignup(false)}}> 이전 </button>
     </>
   );
 };

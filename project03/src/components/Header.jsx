@@ -8,12 +8,12 @@ const Header = () => {
 
   return (
     <header>
-      <div onClick={()=>{navigate("/")}} >main</div>
+      {/* <div onClick={()=>{navigate("/")}} >main</div> */}
       <div onClick={()=>{navigate("/login")}} >login</div>
       <div onClick={()=>{navigate("/public")}} >public</div>
       <div onClick={()=>{navigate("/master")}} >master</div>
       <div onClick={()=>{navigate("/admin")}} >admin</div>
-      <div onClick={()=>{navigate("/board")}} >board</div>
+      <div onClick={()=>{navigate("/")}} >board</div>
       {/* <Link to="/">main</Link>
       <Link to="/login">login</Link>
       <Link to="/public">public</Link>

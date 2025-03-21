@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = ({ isLogin, onSignupClick }) => {
@@ -84,6 +84,9 @@ const Login = ({ isLogin, onSignupClick }) => {
     }
   };
 
+  const moveToSignup = () => {
+    navigate("/signup");
+  };
   return (
     <>
       {isLogin ? (

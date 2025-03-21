@@ -116,8 +116,6 @@ app.post("/login", (req, res) => {
   const userAuth = req.body.level;
   const sql1 = "SELECT COUNT(*) AS result FROM user WHERE id = ?";
 
-  console.log("userAuth", userAuth);
-
   connection.query(sql1, userId, (err, data, fields) => {
     if (!err) {
       // 동일한 id가 없다면
