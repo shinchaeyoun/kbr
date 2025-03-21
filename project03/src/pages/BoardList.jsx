@@ -12,8 +12,6 @@ const ButtonWrap = styled(S.FlexBox)`
 const Search = styled.div``;
 
 const BoardList = (props) => {
-  console.log('board list props',props);
-  
   const level = props.level;
 
   const navigate = useNavigate();

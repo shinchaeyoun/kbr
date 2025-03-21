@@ -428,6 +428,39 @@ app.patch("/setlevel", (req, res) => {
     res.send(data);
   });
 });
+app.patch("/accountupdate", (req, res) => {
+  console.log(`= = = > req.query : ${util.inspect(req.query)}`);
+  console.log(`= = = > req.body : ${util.inspect(req.body)}`);
+  const index = req.query.idx;
+
+  console.log(`Query idx: ${req.query.idx}`);
+
+  const { id, level, name, team, tel, email, etc1, etc2, etc3 } = req.body;
+  const query = `
+    UPDATE user SET 
+    id = ?,
+    level = ?,
+    name = ?,
+    team = ?,
+    tel = ?,
+    email = ?,
+    etc1 = ?,
+    etc2 = ?,
+    etc3 = ?
+    WHERE idx = ?
+  `;
+  const params = [id, level, name, team, tel, email, etc1, etc2, etc3, index];
+
+  connection.query(query, params, (err, data, fields) => {
+    console.log("accountupdate send data=========", data);
+
+    // if (err) {
+    //   console.error("수정 실패:", err);
+    //   res.send({ msg: "수정 실패", err });
+    // }
+    res.send(data);
+  });
+});
 
 // 서버 실행
 app.listen(port, () => {

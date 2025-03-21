@@ -7,57 +7,78 @@ import axios from "axios";
 //components
 import User from "../components/User.jsx";
 
-
 const UserDetail = () => {
+    const navigate = useNavigate();
+  
   const [isUpdate, setIsUpdate] = useState(false);
   const { idx } = useParams();
 
-  const [user, setUser] = useState({});
+  // 유저 정보 상태 관리리
+  const [user, setUser] = useState({
+    id: null,
+    level: null,
+    name: null,
+    team: null,
+    tel: null,
+    email: null,
+    etc1: null,
+    etc2: null,
+    etc3: null,
+  });
+
+  // 필드 배열 생성
   const fields = [
-    { label: "아이디", value: user.id },
-    { label: "레벨", value: user.level },
-    { label: "이름", value: user.name },
-    { label: "팀", value: user.team },
-    { label: "번호", value: user.tel },
-    { label: "메일", value: user.eMail },
-    { label: "etc1", value: user.etc1 },
-    { label: "etc2", value: user.etc2 },
-    { label: "etc3", value: user.etc3 },
+    { label: "아이디", name: "id", value: user.id },
+    { label: "레벨", name: "level", value: user.level },
+    { label: "이름", name: "name", value: user.name },
+    { label: "팀", name: "team", value: user.team },
+    { label: "번호", name: "tel", value: user.tel },
+    { label: "메일", name: "email", value: user.email },
+    { label: "etc1", name: "etc1", value: user.etc1 },
+    { label: "etc2", name: "etc2", value: user.etc2 },
+    { label: "etc3", name: "etc3", value: user.etc3 },
   ];
 
+  // const { id, level, name, team, tel, eMail, etc1, etc2, etc3 } = user;
+
+  // 입력 필드 데이터 바인딩
+  const onChange = (e) => {
+    const { value, name } = e.target;
+    setUser({
+      ...user,
+      [name]: value,
+    });
+  };
   const getUserInfo = async () => {
     const resp = await (
       await axios.get(`http://192.168.23.65:5000/userlist/`)
     ).data[idx];
-
-    console.log("resp", resp);
-
     setUser(resp);
   };
 
-  const onChange = (e) => {
-    const { value, name } = e.target;
-    console.log("value", value, "value, name", name);
+  const handleSubmit = async () => {
+    // const index = user.findIndex((item) => item.idx === idx);
+    const index = user.idx;
+console.log('user',index,idx);
 
-    // setBoard({
-    //   ...board,
-    //   [name]: value,
-    // });
-  };
-
-  const handleSubmit = () => {
     setIsUpdate(!isUpdate);
 
     if (isUpdate) {
       // 수정 로직
-      console.log('저장 완료');
-      
+      console.log("저장 완료");
+
+      await axios
+        .patch(`http://192.168.23.65:5000/accountupdate?idx=${index}`, user)
+        .then((res) => {
+          console.log('=========res', res);
+          
+          // alert("수정되었습니다.");
+          navigate("/admin/userlist");
+        });
     } else {
       // 작성 로직
-      console.log('수정 페이지');
-      
+      console.log("수정 페이지");
     }
-
   };
 
   useEffect(() => {
@@ -65,43 +86,22 @@ const UserDetail = () => {
   }, []);
   return (
     <>
-      {/* <User
-        id={user.id}
-        level={user.level}
-        name={user.name}
-        team={user.team}
-        tel={user.tel}
-        eMail={user.eMail}
-        etc1={user.etc1}
-        etc2={user.etc2}
-        etc3={user.etc3}
-        isUpdate={isUpdate}
-      /> */}
-      {isUpdate ? (
-        <>
-          updateMode
-          {fields.map((field, index) => (
-            <p key={index}>
-              {field.label} :{" "}
-              <input type="text" value={field.value} onChange={onChange} />
-            </p>
-          ))}
-        </>
-      ) : (
-        <>
-          updateMode not
-          {fields.map((field, index) => (
-            <p key={index}>
-              {field.label} : <input type="text" value={field.value} readOnly />
-            </p>
-          ))}
-        </>
-      )}
+      {fields.map((field, index) => (
+        <div key={index}>
+          {field.label} :
+          <input
+            type="text"
+            name={field.name}
+            value={field.value || ""}
+            onChange={onChange}
+            readOnly={!isUpdate}
+          />
+        </div>
+      ))}
 
       <button onClick={handleSubmit}>
         {isUpdate ? "저장하기" : "수정하기"}
       </button>
-
     </>
   );
 };
