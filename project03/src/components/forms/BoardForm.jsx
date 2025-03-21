@@ -107,7 +107,7 @@ const BoardForm = ({ isUpdate }) => {
 
   return (
     <>
-      <h1>과정등록</h1>
+      <h1>{isUpdate ? "과정수정" : "과정등록"}</h1>
       <GridContainer>
         <GridItem>
           <div>사업명(과정명) :</div>
@@ -160,19 +160,19 @@ const BoardForm = ({ isUpdate }) => {
         <GridItem $short="true">
           <div>착수시작/완료예정/완료일 :</div>
           <S.Input
-            type="date"
+            type="text"
             name="startAt"
             value={startAt}
             onChange={onChange}
           />
           <S.Input
-            type="date"
+            type="text"
             name="scheduledAt"
             value={scheduledAt}
             onChange={onChange}
           />
           <S.Input
-            type="date"
+            type="text"
             name="completedAt"
             value={completedAt}
             onChange={onChange}
@@ -252,7 +252,7 @@ const BoardForm = ({ isUpdate }) => {
             onChange={onChange}
           />
           <S.Input
-            type="date"
+            type="text"
             name="customerPlan"
             value={customerPlan}
             onChange={onChange}

@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Signup = ({setShowSignup}) => {
-  const navigate = useNavigate();
   const [data, setData] = useState({ id: "", password: "" });
   const [idCheck, setIdCheck] = useState(false);
-
   const { id, password } = data;
 
   const checkUserId = async () => {
@@ -44,55 +41,7 @@ const Signup = ({setShowSignup}) => {
     await axios.post("http://192.168.23.65:5000/signup", data).then(() => {
       alert("회원가입 완료");
       setShowSignup(false);
-      // navigate("/login"); // 회원가입 후 로그인 페이지로 이동
     });
-
-    // if (data.id.length < 1 || data.password.length < 1) return false;
-    // if (!idCheck) {
-    //   alert("아이디 중복 체크 필요");
-    //   return false;
-    // }
-
-    // await axios.post(`http://192.168.23.65:5000/signup`, data).then((res) => {
-    //   console.log(res);
-    //   navigate("/");
-    //   // window.location.reload();
-    // });
-
-    // await axios.post(`http://192.168.23.65:5000/signup`, data).then((res) => {
-    //   console.log("??res.data.msg", res);
-    //   // if (res.data.msg == undefined) {
-    //   //   alert("등록되었습니다.");
-    //   //   navigate("/board");
-    //   // } else {
-    //   //   alert("강조박스의 내용을 모두 작성해주세요.");
-    //   //   console.log("??res.data.msg", res.data.msg);
-    //   // }
-    // });
-
-    // try {
-    //   const response = await fetch("http://192.168.23.65:5000/signup", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(data),
-    //   });
-
-    //   if (response.ok) {
-    //     alert("회원가입 완료");
-    //     setData({
-    //       id: "",
-    //       password: "",
-    //     });
-    //     navigate(0);
-
-    //   } else {
-    //     alert("데이터 전송에 실패했습니다.");
-    //   }
-    // } catch (error) {
-    //   alert("라우터 접근에 문제가 있습니다.");
-    // }
   };
 
   return (

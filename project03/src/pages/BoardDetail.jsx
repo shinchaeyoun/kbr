@@ -26,13 +26,14 @@ const BoardDetail = () => {
 
   return (
     <>
-      <Board
+      {/* <Board 
         idx={board.idx}
         title={board.title}
         customer={board.customer}
         innerUrl={board.innerUrl}
         outerUrl={board.outerUrl}
-      />
+      /> */}
+      <Board {...board}/>
     </>
   );
 };

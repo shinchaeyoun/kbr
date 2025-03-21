@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AuthAlert from '../components/AuthAlert.jsx';
+import AuthAlert from '../pages/AuthAlert.jsx';
 
 
 const PrivateAdminRoute = ({ level, component: Component }) => {

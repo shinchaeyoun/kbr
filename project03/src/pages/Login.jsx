@@ -72,23 +72,12 @@ const Login = ({ isLogin, onSignupClick }) => {
 
   const enterLogin = (e) => {
     if (e.key === "Enter") {
-      console.log(
-        "엔터 == 아이디 인풋 값과 패스워드 인풋 값 채워져있는지 확인"
-      );
-      // getDataList();
-
       if (inputId !== "" && inputPw !== "") {
-        console.log("값 입력 완");
         onClickLogin();
-      } else {
-        console.log("inputId,inputPw===", inputId == "", inputPw == "");
       }
     }
   };
 
-  const moveToSignup = () => {
-    navigate("/signup");
-  };
   return (
     <>
       {isLogin ? (

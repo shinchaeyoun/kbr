@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import axios from "axios";
+import "./App.css";
 
 // pages
 import SendTest from "./SendTest";
@@ -25,19 +26,9 @@ import UserDetail from "./components/UserDetail.jsx";
 import UserMgmt from "./components/UserMgmt.jsx";
 import BoardForm from "./components/forms/BoardForm.jsx";
 
-import "./App.css";
-
-export const AppContext = createContext();
-
 function App(props) {
   const level = props.level;
   const [isLogin, setIsLogin] = useState(false);
-
-  const onLogout = () => {
-    sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_lvl");
-    document.location.href = "/";
-  };
 
   useEffect(() => {
     if (sessionStorage.user_id == null || sessionStorage.user_id == undefined) {
@@ -49,18 +40,12 @@ function App(props) {
 
   return (
     <>
-      <div>
-        ID: {sessionStorage.user_id}, Level: {level}
-        <button onClick={onLogout}>Logout</button>
-      </div>
-
-      <Header />
+      <Header level={level} />
 
       <Routes>
-        {/* <Route path="/" element={<PrivateEnterRoute />} /> */}
-        {/* <Route path="/" element={<Main isLogin={isLogin} isTrue={isLogin} />} /> */}
+        {/* <Route path="/" element={<Main />} /> */}
+        {/* <Route path="/sendtest" element={<SendTest />} /> */}
         <Route path="/" element={<BoardList level={level} />} />
-        <Route path="/sendtest" element={<SendTest />} />
         <Route path="/login" element={<Login isLogin={isLogin} />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -78,8 +63,7 @@ function App(props) {
         <Route path="/admin/userlist/:idx" element={<UserDetail />} />
         <Route path="/admin/usermgmt" element={<UserMgmt />} />
 
-        <Route path="/boardform" element={<BoardForm />} />
-
+        {/* 권한 페이지 */}
         <Route
           path="/public"
           element={<PrivatePublicRoute level={level} component={<Public />} />}
@@ -90,7 +74,6 @@ function App(props) {
             <PrivateManagerRoute level={level} component={<Manager />} />
           }
         />
-
         <Route
           path="/admin"
           element={<PrivateAdminRoute level={level} component={<Admin />} />}

@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import styled, { css } from "styled-components";
-import S from "../styled/GlobalBlock.jsx";
-import axios from "axios";
+import React from "react";
+import styled from "styled-components";
+
+const Wrap = styled.div`
+  align-content: center;
+  height: calc(100vh - 100px);
+  text-align: center;
+  font-weight: bold;
+`;
 
 const ApprovalPendingScreen = () => {
   const onLogout = () => {
@@ -12,13 +16,13 @@ const ApprovalPendingScreen = () => {
   };
 
   return (
-    <>
-      승인 대기중
+    <Wrap>
+      <h2>승인 대기중</h2>
       <br/>
       <button type="button" onClick={onLogout}>
         logout
       </button>
-    </>
+    </Wrap>
   );
 };
 

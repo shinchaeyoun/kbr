@@ -3,25 +3,68 @@ import { Link, useNavigate } from "react-router-dom";
 import styled, { css } from "styled-components";
 import "../styles/header.css";
 
-const Header = () => {
+const Header = (props) => {
+  const level = props.level;
+
   const navigate = useNavigate();
+  const onLogout = () => {
+    sessionStorage.removeItem("user_id");
+    sessionStorage.removeItem("user_lvl");
+    document.location.href = "/";
+  };
 
   return (
-    <header>
-      {/* <div onClick={()=>{navigate("/")}} >main</div> */}
-      <div onClick={()=>{navigate("/")}} >main</div>
-      <div onClick={()=>{navigate("/login")}} >login</div>
-      <div onClick={()=>{navigate("/public")}} >public</div>
-      <div onClick={()=>{navigate("/manager")}} >manager</div>
-      <div onClick={()=>{navigate("/admin")}} >admin</div>
-      <div onClick={()=>{navigate("/")}} >board</div>
-      {/* <Link to="/">main</Link>
-      <Link to="/login">login</Link>
-      <Link to="/public">public</Link>
-      <Link to="/master">master</Link>
-      <Link to="/admin">admin</Link>
-      <Link to="/board">board</Link> */}
-    </header>
+    <>
+      <div className="top">
+        ID: {sessionStorage.user_id}, Level: {level}
+        <button onClick={onLogout}>Logout</button>
+      </div>
+
+      <header>
+        <div
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          main
+        </div>
+        <div
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
+          login
+        </div>
+        <div
+          onClick={() => {
+            navigate("/public");
+          }}
+        >
+          public
+        </div>
+        <div
+          onClick={() => {
+            navigate("/manager");
+          }}
+        >
+          manager
+        </div>
+        <div
+          onClick={() => {
+            navigate("/admin");
+          }}
+        >
+          admin
+        </div>
+        <div
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          board
+        </div>
+      </header>
+    </>
   );
 };
 

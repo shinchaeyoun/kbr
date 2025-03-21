@@ -1,5 +1,5 @@
 import React from "react";
-import AuthAlert from '../components/AuthAlert.jsx';
+import AuthAlert from '../pages/AuthAlert.jsx';
 
 const PrivateManagerRoute = ({ level, component: Component }) => {
   return level >= 3 ? (
