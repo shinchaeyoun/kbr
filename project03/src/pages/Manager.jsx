@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const Master = () => {
+const Manager = () => {
   useEffect(()=>{
     console.log('first');
     
   },[]);
   return (
     <>
-    Master
+    Manager
     </>
   );
 };
 
-export default Master;
+export default Manager;

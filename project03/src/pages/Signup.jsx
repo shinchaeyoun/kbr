@@ -43,7 +43,8 @@ const Signup = ({setShowSignup}) => {
     }
     await axios.post("http://192.168.23.65:5000/signup", data).then(() => {
       alert("회원가입 완료");
-      navigate("/login"); // 회원가입 후 로그인 페이지로 이동
+      setShowSignup(false);
+      // navigate("/login"); // 회원가입 후 로그인 페이지로 이동
     });
 
     // if (data.id.length < 1 || data.password.length < 1) return false;

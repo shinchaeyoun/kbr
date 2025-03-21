@@ -17,18 +17,6 @@ const BoardDetail = () => {
     ).data[idx];
 
     setBoard(resp);
-    // console.log('board',resp);
-
-    // axios.get("http://192.168.23.65:5000/board").then((res) => {
-    //   // console.log("res.data ===", res.data);
-
-    //   const obj = res.data;
-    //   var result = Object.keys(obj)
-
-    //   console.log("obj", obj);
-
-    //   // setBoard(res.data);
-    // });
   };
 
   useEffect(() => {

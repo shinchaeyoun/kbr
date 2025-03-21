@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import styled, { css } from "styled-components";
-import S from "../styled/GlobalBlock.jsx";
+import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
+import S from "../../styled/GlobalBlock.jsx";
 import axios from "axios";
 
 const GridContainer = styled(S.GridContainer)``;
 const GridItem = styled(S.GridItem)``;
 
-const BoardUpdate = () => {
+const BoardForm = ({ isUpdate }) => {
   const navigate = useNavigate();
   const { idx } = useParams();
 
+  // 게시글 정보 상태
   const [board, setBoard] = useState({
     title: null,
     subTitle: null,
@@ -55,6 +56,7 @@ const BoardUpdate = () => {
     etc,
   } = board;
 
+  // 입력 필드 데이터 바인딩
   const onChange = (e) => {
     const { value, name } = e.target;
     setBoard({
@@ -62,24 +64,43 @@ const BoardUpdate = () => {
       [name]: value,
     });
   };
+
+  // 게시글 데이터 가져오기 (수정 모드일 경우)
   const getBoard = async () => {
-    await axios
-      .get(`http://192.168.23.65:5000/board?idx=${idx}`)
-      .then((res) => {
-        setBoard(res.data);
+    if (isUpdate) {
+      await axios
+        .get(`http://192.168.23.65:5000/board?idx=${idx}`)
+        .then((res) => setBoard(res.data));
+    }
+  };
+
+  // 게시글 저장
+  const handleSubmit = async () => {
+    if (isUpdate) {
+      // 수정 로직
+      await axios
+        .patch(`http://192.168.23.65:5000/update?idx=${idx}`, board)
+        .then(() => {
+          alert("수정되었습니다.");
+          navigate("/board");
+        });
+    } else {
+      // 작성 로직
+      await axios.post(`http://192.168.23.65:5000/board`, board).then((res) => {
+        if (res.data.msg === undefined) {
+          alert("등록되었습니다.");
+          navigate("/board");
+        } else {
+          alert("강조박스의 내용을 모두 작성해주세요.");
+        }
       });
-  };
-  const updateBoard = async () => {
-    await axios.patch(`http://192.168.23.65:5000/update?idx=${idx}`, board).then((res) => {
-      alert('수정되었습니다.');
-      navigate('/board');
-    });
-
-  };
-  const backToDetail = () => {
-    navigate('/board');
+    }
   };
 
+  // 취소 버튼 동작
+  const handleCancel = () => navigate("/board");
+
+  // 컴포넌트 로드시 데이터 로드
   useEffect(() => {
     getBoard();
   }, []);
@@ -189,13 +210,13 @@ const BoardUpdate = () => {
         <GridItem $short="true">
           <div>수주/예상/완료비용 :</div>
           <div>
-            <S.Input type="text" onChange={onChange} />원
+            <S.Input type="text" />원
           </div>
           <div>
-            <S.Input type="text" onChange={onChange} />원
+            <S.Input type="text" />원
           </div>
           <div>
-            <S.Input type="text" onChange={onChange} />원
+            <S.Input type="text" />원
           </div>
         </GridItem>
         <GridItem $long="true">
@@ -253,11 +274,11 @@ const BoardUpdate = () => {
       </GridContainer>
 
       <div>
-        <S.Button onClick={updateBoard}>과정수정</S.Button>
-        <S.Button onClick={backToDetail}>취소</S.Button>
+        <S.Button onClick={handleSubmit}>{isUpdate ? "과정수정" : "과정등록"}</S.Button>
+        <S.Button onClick={handleCancel}>취소</S.Button>
       </div>
     </>
   );
 };
 
-export default BoardUpdate;
+export default BoardForm;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import S from "../styled/GlobalBlock.jsx";
 
 const GridContainer = styled(S.GridContainer)``;
@@ -64,20 +64,16 @@ const BoardWrite = () => {
 
   const saveBoard = async () => {
     await axios.post(`http://192.168.23.65:5000/board`, board).then((res) => {
-      console.log("??res.data.msg", res.data.msg);
       if (res.data.msg == undefined) {
         alert("등록되었습니다.");
         navigate("/board");
       } else {
         alert("강조박스의 내용을 모두 작성해주세요.");
-        console.log("??res.data.msg", res.data.msg);
       }
     });
   };
 
-  const backToList = () => {
-    navigate("/board");
-  };
+  const backToList = () => navigate("/board");
 
   return (
     <>
@@ -184,13 +180,13 @@ const BoardWrite = () => {
         <GridItem $short="true">
           <div>수주/예상/완료비용 :</div>
           <div>
-            <S.Input type="text" onChange={onChange} />원
+            <S.Input type="text" />원
           </div>
           <div>
-            <S.Input type="text" onChange={onChange} />원
+            <S.Input type="text" />원
           </div>
           <div>
-            <S.Input type="text" onChange={onChange} />원
+            <S.Input type="text" />원
           </div>
         </GridItem>
         <GridItem $long="true">
@@ -203,7 +199,7 @@ const BoardWrite = () => {
           />
         </GridItem>
         <GridItem $long="true">
-          <div>외부 경로로 :</div>
+          <div>외부 경로 :</div>
           <S.Input
             type="text"
             name="outerUrl"

@@ -12,6 +12,8 @@ const ButtonWrap = styled(S.FlexBox)`
 const Search = styled.div``;
 
 const BoardList = (props) => {
+  console.log('board list props',props);
+  
   const level = props.level;
 
   const navigate = useNavigate();
@@ -35,13 +37,15 @@ const BoardList = (props) => {
   };
 
   const onSearch = async () => {
+    console.log("isSearch val === ", isSearch);
+
     await axios
       .post(`http://192.168.23.65:5000/search`, isSearch)
       .then((res) => setboardList(res.data));
   };
 
   const moveToWrite = () => {
-    navigate("/write");
+    navigate("/board/write");
   };
 
   const linkToBoard = (idx, e) => {
@@ -52,10 +56,8 @@ const BoardList = (props) => {
   const moveToUpdate = (idx, e) => {
     // const index = boardList.findIndex((item) => item.idx === idx);
     if (level > 2) {
-      navigate("/update/" + idx);
+      navigate("/board/update/" + idx);
     } else {
-      console.log(',level',level);
-      
       alert("수정 권한 없음");
     }
   };
@@ -87,14 +89,10 @@ const BoardList = (props) => {
   useEffect(() => {
     getboardList();
     setSearch("");
-    console.log('level',level);
-    
   }, []);
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      onSearch();
-    }
+    if (e.key === "Enter") onSearch();
   };
 
   return (

@@ -3,14 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import styled, { css } from "styled-components";
 import S from "../styled/GlobalBlock.jsx";
 
-const Board = ({ idx, title, customer, innerUrl, outerUrl }) => {
+const Board = (props) => {
   return (
     <div>
-      <h2>{title}</h2>
-      <h5>{customer}</h5>
+      <h2>{props.title}</h2>
+      <h5>{props.customer}</h5>
       <hr />
-      <p>{innerUrl}</p>
-      <p>{outerUrl}</p>
+      <p>{props.innerUrl}</p>
+      <p>{props.outerUrl}</p>
     </div>
   );
 };

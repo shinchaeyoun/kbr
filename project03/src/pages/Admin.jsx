@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const Page03 = () => {
+const Admin = () => {
+  const navigate = useNavigate();
   return (
     <div>
-    only admin page
+      <div onClick={()=>{navigate(`/admin/userlist`)}}>계정관리</div>
+      <div onClick={()=>{navigate(`/admin/usermgmt`)}}>등급관리</div>
     </div>
   );
 };
 
-export default Page03;
+export default Admin;

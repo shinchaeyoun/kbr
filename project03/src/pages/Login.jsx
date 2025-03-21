@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = ({ isLogin, onSignupClick }) => {
+  console.log('login props',isLogin );
+  
   const navigate = useNavigate();
 
   const [inputId, setInputId] = useState("");

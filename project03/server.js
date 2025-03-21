@@ -373,55 +373,58 @@ app.patch("/update", (req, res) => {
 app.get("/signup", (req, res) => {
   const query = `
     SELECT COUNT(*) AS result FROM user WHERE id = ?
-  `
+  `;
   connection.query(query, req.query.id, (err, data, fields) => {
-    let sendMsg = '';
-    data[0].result == 1 ? sendMsg = "중복 아이디" : sendMsg = "생성 가능 아이디";
-    res.send({result: data[0].result, msg: sendMsg});
+    let sendMsg = "";
+    data[0].result == 1
+      ? (sendMsg = "중복 아이디")
+      : (sendMsg = "생성 가능 아이디");
+    res.send({ result: data[0].result, msg: sendMsg });
   });
 });
 // 계정 생성
 app.post("/signup", (req, res) => {
   const { id, password } = req.body;
-  console.log("Received data:", { id, password });
+  console.log("사용자 입력 값 / id: / pw:", { id, password });
 
   const query = `
     INSERT INTO user (id, password, level)
     VALUES (?, ?, 1);
   `;
-  
+
   // 데이터베이스에 데이터를 삽입
   connection.query(query, [id, password], (error, data, fields) => {
-    console.log('~~~~send data /////',data);
-    
     if (error) {
-      console.error("데이터 삽입 실패:", error);
+      console.error("계정 생성 실패:", error);
       res.send({ msg: "전송 실패" });
     } else {
-      console.log("데이터 삽입 성공:", data);
+      console.log("계정 생성 성공:", data);
       res.send(data);
     }
-    // if (error) {
-    //   console.error("전송 실패:", error);
-    //   res.send({ msg: "전송 실패" });
-    // };
-    // res.send(data);
-
   });
-
-
 });
 
-app.post("/authority", (req, res) => {
-  console.log("authority", req.body);
-});
-
-app.get("/userinfo", (req, res) => {
+app.get("/userlist", (req, res) => {
   console.log(`= = = > req.query : ${util.inspect(req.query)}`);
   console.log(`= = = > req.body : ${util.inspect(req.body)}`);
 
   const query = "SELECT * FROM user";
   connection.query(query, (error, data, fields) => {
+    res.send(data);
+  });
+});
+
+// guest to member
+app.patch("/setlevel", (req, res) => {
+  console.log(`= = = > req.query : ${util.inspect(req.query)}`);
+  const index = req.query.idx;
+  const query1 = `UPDATE user SET level = ? WHERE idx = ?`;
+
+  connection.query(query1, [2, index], (err, data, fields) => {
+    if (err) {
+      console.error("수정 실패:", err);
+      res.send({ msg: "수정 실패", err });
+    }
     res.send(data);
   });
 });
