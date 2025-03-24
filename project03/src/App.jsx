@@ -42,9 +42,9 @@ function App(props) {
       <Header level={level} />
 
       <Routes>
-        {/* <Route path="/" element={<Main />} /> */}
+        <Route path="/" element={<Main />} />
         {/* <Route path="/sendtest" element={<SendTest />} /> */}
-        <Route path="/" element={<BoardList level={level} />} />
+        {/* <Route path="/" element={<BoardList level={level} />} /> */}
         <Route path="/login" element={<Login isLogin={isLogin} />} />
         <Route path="/signup" element={<Signup />} />
 

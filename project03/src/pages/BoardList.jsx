@@ -5,11 +5,22 @@ import S from "../styled/GlobalBlock";
 
 import axios from "axios";
 
+const FlexBox = styled(S.FlexBox)`
+  flex-direction: row-reverse;
+  gap: 0 10px;
+  margin-bottom: 10px;
+`;
+
 const ButtonWrap = styled(S.FlexBox)`
   gap: 0 10px;
 `;
 
-const Search = styled.div``;
+const Search = styled.div`
+ input {
+  margin: 0 10px;
+ height: 20px; 
+ }
+`;
 
 const BoardList = (props) => {
   const navigate = useNavigate();
@@ -90,18 +101,21 @@ const BoardList = (props) => {
 
   return (
     <>
-      <S.Button onClick={moveToWrite}>과정등록</S.Button>
+      <FlexBox>
+        <S.Button onClick={moveToWrite}>과정등록</S.Button>
 
-      <Search>
-        <input
-          type="text"
-          name="search"
-          value={search || ""}
-          onChange={onChange}
-          onKeyDown={handleKeyPress}
-        />
-        <S.Button onClick={onSearch}>과정검색</S.Button>
-      </Search>
+        <Search>
+          <input
+            type="text"
+            name="search"
+            value={search || ""}
+            onChange={onChange}
+            onKeyDown={handleKeyPress}
+          />
+          <S.Button onClick={onSearch}>과정검색</S.Button>
+        </Search>
+      </FlexBox>
+
       {boardList.map((board) => (
         <S.BoardItem key={board.idx}>
           <div

@@ -10,8 +10,12 @@ const Block = styled(S.Block)`
 
   button {
     position: absolute;
-        right: 10px;
+    right: 10px;
     bottom: 10px;
+  }
+
+  p {
+    margin: 16px 0;
   }
 `;
 
@@ -45,8 +49,8 @@ const RegisteredCourses = () => {
   };
 
   const moveToList = () => {
-    navigate('/board');
-  }
+    navigate("/board");
+  };
   useEffect(() => {
     getBoard();
   }, []);
@@ -57,14 +61,14 @@ const RegisteredCourses = () => {
 
       <div>
         {boardList.map((item) => (
-          <div
+          <p
             key={item.idx}
             onClick={() => {
               moveToBoard(item.idx);
             }}
           >
             {item.title}
-          </div>
+          </p>
         ))}
       </div>
 

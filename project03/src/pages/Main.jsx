@@ -1,5 +1,7 @@
 import React from "react";
 import Login from "./Login.jsx";
+import RegisteredCourses from "../components/AdminSummary/RegisteredCourses";
+
 
 const Main = (props) => {
   console.log("props", props);
@@ -15,11 +17,7 @@ const Main = (props) => {
 
   return (
     <div>
-      <div>
-        <h2>Main 페이지</h2>
-      </div>
-
-      {isLogin ? <div>Login</div> : <div>Logout</div>}
+      <RegisteredCourses />
     </div>
   );
 };

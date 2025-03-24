@@ -10,8 +10,14 @@ const Block = styled(S.Block)`
 
   button {
     position: absolute;
-        right: 10px;
+    right: 10px;
     bottom: 10px;
+  }
+
+  p::after {
+    content: "|";
+    padding-left: 20px;
+    color: #ccc;
   }
 `;
 const Title = styled.div`
@@ -27,6 +33,15 @@ const Title = styled.div`
     font-size: 12px;
   }
 `;
+
+const Ul = styled.ul`
+  display: flex;
+  margin: 0;
+  padding: 0;
+`;
+// const Li = styled.li`
+
+// `
 
 const NewAccounts = () => {
   const navigate = useNavigate();
@@ -51,8 +66,8 @@ const NewAccounts = () => {
   };
 
   const moveToList = () => {
-    navigate('/admin/userlist');
-  }
+    navigate("/admin/userlist");
+  };
 
   useEffect(() => {
     getAccount();
@@ -63,11 +78,15 @@ const NewAccounts = () => {
       <Title>
         신규가입계정<div>총 계정 수 {totalList.length}개</div>
       </Title>
-
       {list.map((item, idx) => (
-        <li key={idx} onClick={() => moveToDetail(item.idx)}>
-          {idx + 1} 아이디 : {item.id}
-        </li>
+        <Ul key={idx} onClick={() => moveToDetail(item.idx)}>
+          <p>아이디 : {item.id}</p>
+          <p>레벨 : {item.level}</p>
+          <p>이름 : {item.name}</p>
+          <p>팀 : {item.team}</p>
+          <p>번호 : {item.tel}</p>
+          <p>메일 : {item.eMail}</p>
+        </Ul>
       ))}
 
       <button onClick={moveToList}>계정 전체보기</button>
