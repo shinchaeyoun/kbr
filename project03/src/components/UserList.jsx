@@ -24,17 +24,43 @@ const UserList = (props) => {
   const navigate = useNavigate();
 
   const [isUserList, setUserList] = useState([]);
+  const [isSearch, setSearch] = useState("");
+  const { search } = isSearch;
+  const [searchMsg, setSearchMsg] = useState("");
 
   const getUserInfo = async () => {
-    await axios.get("http://192.168.23.65:5000/userlist").then((res) => {
+    await axios.get("http://192.168.23.65:5000/user/list").then((res) => {
       setUserList(res.data);
     });
   };
 
   const moveToDetail = (idx, e) => {
     const index = isUserList.findIndex((item) => item.idx === idx);
-    
+
     navigate(`/admin/userlist/${index}`);
+  };
+
+  const onChange = (e) => {
+    const { value, name } = e.target;
+    setSearch({
+      ...isSearch,
+      [name]: value,
+    });
+  };
+
+  const onSearch = async () => {
+    await axios
+      .post(`http://192.168.23.65:5000/user/search`, isSearch)
+      // .then((res) => setUserList(res.data));
+      .then((res) => {
+        console.log(res.data.msg);
+        setSearchMsg(res.data.msg)
+        setUserList(res.data.result);
+      });
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") onSearch();
   };
 
   useEffect(() => {
@@ -43,6 +69,19 @@ const UserList = (props) => {
 
   return (
     <>
+      <div className="userSearch">
+        <input
+          type="text"
+          name="search"
+          value={search || ""}
+          onChange={onChange}
+          onKeyDown={handleKeyPress}
+        />
+        <button onClick={onSearch}>검색</button>
+      </div>
+
+      <div>{searchMsg}</div>
+
       {isUserList.map((user) => {
         return (
           <Block

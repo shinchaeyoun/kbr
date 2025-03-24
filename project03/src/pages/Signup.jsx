@@ -12,7 +12,7 @@ const Signup = ({setShowSignup}) => {
       return;
     }
     await axios
-      .get(`http://192.168.23.65:5000/signup?id=${data.id}`)
+      .get(`http://192.168.23.65:5000/auth/signup?id=${data.id}`)
       .then((res) => {
         if (res.data.result === 0) {
           setIdCheck(true);
@@ -38,7 +38,7 @@ const Signup = ({setShowSignup}) => {
       alert("모든 입력값을 입력해주세요.");
       return;
     }
-    await axios.post("http://192.168.23.65:5000/signup", data).then(() => {
+    await axios.post("http://192.168.23.65:5000/auth/signup", data).then(() => {
       alert("회원가입 완료");
       setShowSignup(false);
     });

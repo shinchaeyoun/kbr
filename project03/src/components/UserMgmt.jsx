@@ -28,7 +28,7 @@ const UserMgmt = () => {
   // 사용자 목록 가져오기
   const fetchUserList = async () => {
     const resp = await (
-      await axios.get(`http://192.168.23.65:5000/userlist/`)
+      await axios.get(`http://192.168.23.65:5000/user/list`)
     ).data;
 
     const filteredUsers = resp.filter((user) => user.level === 1);
@@ -37,7 +37,7 @@ const UserMgmt = () => {
 
   // 계정 승인
   const acctApproval = async (idx, e) => {
-    await axios.patch(`http://192.168.23.65:5000/setlevel?idx=${idx}`);
+    await axios.patch(`http://192.168.23.65:5000/user/setlevel?idx=${idx}`);
     await fetchUserList();
   };
 

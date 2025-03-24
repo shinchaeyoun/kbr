@@ -8,12 +8,12 @@ import axios from "axios";
 import User from "../components/User.jsx";
 
 const UserDetail = () => {
-    const navigate = useNavigate();
-  
+  const navigate = useNavigate();
+
   const [isUpdate, setIsUpdate] = useState(false);
   const { idx } = useParams();
 
-  // 유저 정보 상태 관리리
+  // 유저 정보 상태 관리
   const [user, setUser] = useState({
     id: null,
     level: null,
@@ -38,7 +38,7 @@ const UserDetail = () => {
     { label: "etc2", name: "etc2", value: user.etc2 },
     { label: "etc3", name: "etc3", value: user.etc3 },
   ];
-
+  const index = user.idx;
   // const { id, level, name, team, tel, eMail, etc1, etc2, etc3 } = user;
 
   // 입력 필드 데이터 바인딩
@@ -51,15 +51,15 @@ const UserDetail = () => {
   };
   const getUserInfo = async () => {
     const resp = await (
-      await axios.get(`http://192.168.23.65:5000/userlist/`)
+      await axios.get(`http://192.168.23.65:5000/user/list/`)
     ).data[idx];
     setUser(resp);
   };
 
   const handleSubmit = async () => {
     // const index = user.findIndex((item) => item.idx === idx);
-    const index = user.idx;
-console.log('user',index,idx);
+
+    console.log("user", index, idx);
 
     setIsUpdate(!isUpdate);
 
@@ -68,16 +68,29 @@ console.log('user',index,idx);
       console.log("저장 완료");
 
       await axios
-        .patch(`http://192.168.23.65:5000/accountupdate?idx=${index}`, user)
+        .patch(`http://192.168.23.65:5000/user/update?idx=${index}`, user)
         .then((res) => {
-          console.log('=========res', res);
-          
+          console.log("=========res", res);
+
           // alert("수정되었습니다.");
-          navigate("/admin/userlist");
+          // navigate("/admin/userlist");
         });
     } else {
       // 작성 로직
       console.log("수정 페이지");
+    }
+  };
+
+  const userDelete = async () => {
+    const deletConfirm = confirm("삭제 하시겠습니까?");
+
+    if (deletConfirm) {
+      await axios
+        .delete(`http://192.168.23.65:5000/user/delete?idx=${index}`, user)
+        .then((res) => {
+          alert("삭제되었습니다.");
+          navigate("/admin/userlist");
+        });
     }
   };
 
@@ -99,9 +112,11 @@ console.log('user',index,idx);
         </div>
       ))}
 
-      <button onClick={handleSubmit}>
+      {/* <button onClick={handleSubmit}>
         {isUpdate ? "저장하기" : "수정하기"}
-      </button>
+      </button> */}
+      <button onClick={handleSubmit}>수정하기</button>
+      <button onClick={userDelete}>계정 삭제</button>
     </>
   );
 };

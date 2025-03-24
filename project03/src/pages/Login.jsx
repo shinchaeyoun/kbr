@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = ({ isLogin, onSignupClick }) => {
-  console.log('login props',isLogin );
-  
   const navigate = useNavigate();
 
   const [inputId, setInputId] = useState("");
@@ -30,7 +28,7 @@ const Login = ({ isLogin, onSignupClick }) => {
     console.log("PW : ", inputPw);
 
     axios
-      .post("http://192.168.23.65:5000/login", {
+      .post("http://192.168.23.65:5000/auth/login", {
         id: inputId,
         password: inputPw,
         level: inputAt,

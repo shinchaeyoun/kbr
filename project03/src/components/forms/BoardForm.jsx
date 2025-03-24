@@ -29,6 +29,7 @@ const BoardForm = ({ isUpdate }) => {
     outerUrl: null,
     customerName: null,
     customerTel: null,
+
     customerPlan: null,
     pottingComp: null,
     etc: null,
@@ -79,7 +80,7 @@ const BoardForm = ({ isUpdate }) => {
     if (isUpdate) {
       // 수정 로직
       await axios
-        .patch(`http://192.168.23.65:5000/update?idx=${idx}`, board)
+        .patch(`http://192.168.23.65:5000/board/update?idx=${idx}`, board)
         .then(() => {
           alert("수정되었습니다.");
           navigate("/board");
@@ -87,6 +88,8 @@ const BoardForm = ({ isUpdate }) => {
     } else {
       // 작성 로직
       await axios.post(`http://192.168.23.65:5000/board`, board).then((res) => {
+        console.log(res.data.msg);
+        
         if (res.data.msg === undefined) {
           alert("등록되었습니다.");
           navigate("/board");

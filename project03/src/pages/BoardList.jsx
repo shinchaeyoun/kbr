@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
-import styled, { css } from "styled-components";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import S from "../styled/GlobalBlock";
 
 import axios from "axios";
@@ -12,19 +12,17 @@ const ButtonWrap = styled(S.FlexBox)`
 const Search = styled.div``;
 
 const BoardList = (props) => {
-  const level = props.level;
-
   const navigate = useNavigate();
+  const level = props.level;
   const [boardList, setboardList] = useState([]);
+  const [isSearch, setSearch] = useState("");
+  const { search } = isSearch;
 
   const getboardList = async () => {
     await axios
       .get("http://192.168.23.65:5000/board")
       .then((res) => setboardList(res.data));
   };
-
-  const [isSearch, setSearch] = useState("");
-  const { search } = isSearch;
 
   const onChange = (e) => {
     const { value, name } = e.target;
@@ -35,10 +33,8 @@ const BoardList = (props) => {
   };
 
   const onSearch = async () => {
-    console.log("isSearch val === ", isSearch);
-
     await axios
-      .post(`http://192.168.23.65:5000/search`, isSearch)
+      .post(`http://192.168.23.65:5000/board/search`, isSearch)
       .then((res) => setboardList(res.data));
   };
 
@@ -52,7 +48,6 @@ const BoardList = (props) => {
   };
 
   const moveToUpdate = (idx, e) => {
-    // const index = boardList.findIndex((item) => item.idx === idx);
     if (level > 2) {
       navigate("/board/update/" + idx);
     } else {
