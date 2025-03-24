@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import axios from "axios";
 import "./App.css";
 
 // pages
@@ -58,10 +57,10 @@ function App(props) {
           element={<BoardForm isUpdate={true} />}
         />
 
-        {/* 계정관련 */}
+        {/* 어드민계정관련 */}
         <Route path="/admin/userlist" element={<UserList />} />
         <Route path="/admin/userlist/:idx" element={<UserDetail />} />
-        <Route path="/admin/usermgmt" element={<UserMgmt />} />
+        {/* <Route path="/admin/usermgmt" element={<UserMgmt />} /> */}
 
         {/* 권한 페이지 */}
         <Route

@@ -118,6 +118,12 @@ const Wrap = styled.div`
   justify-content: center;
 `;
 
+const Block = styled.div`
+  border: 1px solid #ddd;
+  margin: 10px 0;
+  padding: 10px 10px 30px;
+`
+
 const S = {
   BoardItem,
   Button,
@@ -126,6 +132,7 @@ const S = {
   Input,
   FlexBox,
   Wrap,
+  Block
 };
 
 export default S;

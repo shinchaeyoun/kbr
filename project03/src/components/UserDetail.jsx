@@ -9,8 +9,6 @@ import User from "../components/User.jsx";
 
 const UserDetail = () => {
   const navigate = useNavigate();
-
-  const [isUpdate, setIsUpdate] = useState(false);
   const { idx } = useParams();
 
   // 유저 정보 상태 관리
@@ -34,9 +32,9 @@ const UserDetail = () => {
     { label: "팀", name: "team", value: user.team },
     { label: "번호", name: "tel", value: user.tel },
     { label: "메일", name: "email", value: user.email },
-    { label: "etc1", name: "etc1", value: user.etc1 },
-    { label: "etc2", name: "etc2", value: user.etc2 },
-    { label: "etc3", name: "etc3", value: user.etc3 },
+    // { label: "etc1", name: "etc1", value: user.etc1 },
+    // { label: "etc2", name: "etc2", value: user.etc2 },
+    // { label: "etc3", name: "etc3", value: user.etc3 },
   ];
   const index = user.idx;
   // const { id, level, name, team, tel, eMail, etc1, etc2, etc3 } = user;
@@ -57,28 +55,13 @@ const UserDetail = () => {
   };
 
   const handleSubmit = async () => {
-    // const index = user.findIndex((item) => item.idx === idx);
+    await axios
+      .patch(`http://192.168.23.65:5000/user/update?idx=${index}`, user)
+      .then((res) => {
+        console.log("=========res", res);
 
-    console.log("user", index, idx);
-
-    setIsUpdate(!isUpdate);
-
-    if (isUpdate) {
-      // 수정 로직
-      console.log("저장 완료");
-
-      await axios
-        .patch(`http://192.168.23.65:5000/user/update?idx=${index}`, user)
-        .then((res) => {
-          console.log("=========res", res);
-
-          // alert("수정되었습니다.");
-          // navigate("/admin/userlist");
-        });
-    } else {
-      // 작성 로직
-      console.log("수정 페이지");
-    }
+        alert("수정되었습니다.");
+      });
   };
 
   const userDelete = async () => {
@@ -94,12 +77,22 @@ const UserDetail = () => {
     }
   };
 
+  const handleLevelChange = (newLevel, index) => {
+    setUser((user) => ({
+      ...user,
+      level: newLevel,
+    }));
+  };
+
+  const moveToList = () => {
+    navigate("/admin/userlist");
+  };
   useEffect(() => {
     getUserInfo();
   }, []);
   return (
     <>
-      {fields.map((field, index) => (
+      {/* {fields.map((field, index) => (
         <div key={index}>
           {field.label} :
           <input
@@ -107,16 +100,28 @@ const UserDetail = () => {
             name={field.name}
             value={field.value || ""}
             onChange={onChange}
-            readOnly={!isUpdate}
+            // readOnly={!isUpdate}
           />
         </div>
-      ))}
+      ))} */}
+
+      <User
+        {...user}
+        onLevelChange={handleLevelChange}
+      />
 
       {/* <button onClick={handleSubmit}>
         {isUpdate ? "저장하기" : "수정하기"}
       </button> */}
       <button onClick={handleSubmit}>수정하기</button>
       <button onClick={userDelete}>계정 삭제</button>
+      <button
+        onClick={() => {
+          navigate("/admin/userlist");
+        }}
+      >
+        목록보기
+      </button>
     </>
   );
 };

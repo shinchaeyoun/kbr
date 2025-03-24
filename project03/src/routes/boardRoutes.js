@@ -8,8 +8,9 @@ const router = express.Router();
 // 게시판 목록 가져오기
 router.get("/", (req, res) => {
   const index = req.query.idx;
-  const sqlDESC = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10"; // 최신순
-  const sqlASC = "SELECT * FROM board ORDER BY idx ASC LIMIT 0, 10"; // 오래된순
+  const limit = req.query.limit || 10; // 기본값 10
+  const sqlDESC = `SELECT * FROM board ORDER BY idx DESC LIMIT 0, ${limit}`; // 최신순
+  const sqlASC = `SELECT * FROM board ORDER BY idx ASC LIMIT 0, ${limit}`; // 오래된순
   const sql = `SELECT * FROM board WHERE idx = ?`;
 
   if (index == undefined) {
@@ -87,35 +88,21 @@ router.post("/", (req, res) => {
 
 // 게시판 글 검색
 router.post("/search", (req, res) => {
-  // 계정 생성 처리
-  console.log(`= = = > req.query : ${util.inspect(req.query)}`);
-  console.log(`= = = > req.body : ${util.inspect(req.body)}`);
-
-  const searchValue = req.body.search;
-  const params = [`%${searchValue}%`];
-
-  if (searchValue !== undefined) {
-    console.log("검색 값 보여주기");
-    console.log("if =============", searchValue !== undefined);
-    const sql = `
+  const sql1 = `
           SELECT * FROM board 
           WHERE title LIKE ? 
           ORDER BY idx DESC 
           LIMIT 0, 10;
         `;
+  const sql2 = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10";
+  const searchValue = req.body.search;
 
-    query(sql, params, (error, data, fields) => {
-      if (data !== undefined) {
-        res.send(data);
-      }
-    });
+  if (searchValue !== undefined) {
+    query(sql1, [`%${searchValue}%`])
+      .then((data) => res.send(data))
+      .catch((err) => res.send(err));
   } else {
-    console.log("전체 값 보여주기");
-
-    const sqlDESC = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10";
-    query(sqlDESC, (error, data, fields) => {
-      res.send(data);
-    });
+    query(sql2).then((data) => res.send(data));
   }
 });
 

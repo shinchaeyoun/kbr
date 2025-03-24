@@ -5,52 +5,44 @@ import S from "../styled/GlobalBlock.jsx";
 import axios from "axios";
 
 const User = (props) => {
-  console.log("props.isUpdate", props.isUpdate);
-  const updateMode = props.isUpdate;
-
-  const fields = [
-    { label: "아이디", value: props.id },
-    { label: "레벨", value: props.level },
-    { label: "이름", value: props.name },
-    { label: "팀", value: props.team },
-    { label: "번호", value: props.tel },
-    { label: "메일", value: props.eMail },
-    { label: "etc1", value: props.etc1 },
-    { label: "etc2", value: props.etc2 },
-    { label: "etc3", value: props.etc3 },
-  ];
-
+  console.log('user props',props.idx);
+  const idx  = props.idx;
   return (
     <>
-      {updateMode ? (
-        <>
-          updateMode
-          {fields.map((field, index) => (
-            <p key={index}>
-              {field.label} : <input type="text" value={field.value}/>
-            </p>
-          ))}
-        </>
-      ) : (
-        <>
-          updateMode not
-          {fields.map((field, index) => (
-            <p key={index}>
-              {field.label} : <input type="text" value={field.value} readOnly/>
-            </p>
-          ))}
-        </>
-      )}
-      {/* <p>아이디 : {props.id}</p>
-      <p>레벨 : {props.level}</p>
-      <p>이름 : {props.name}</p>
-      <p>팀 : {props.team}</p>
-      <p>번호 : {props.tel}</p>
-      <p>메일 : {props.eMail}</p>
-      <p>etc1 : {props.etc1}</p>
-      <p>etc2 : {props.etc2}</p>
-      <p>etc3 : {props.etc3}</p>
-      {props.isUpdate} */}
+      <p>
+        아이디 :
+        <input type="text" name={props.id} value={props.id} />
+      </p>
+      <p>
+        <label htmlFor="level">레벨 :</label>
+        <select
+          name="level"
+          id="level"
+          value={props.level} // 현재 레벨 값을 선택된 값으로 설정
+          onChange={(e) => props.onLevelChange(e.target.value,props.idx)} // 변경 시 이벤트 핸들링
+        >
+          <option value="1">1 : guest</option>
+          <option value="2">2 : member</option>
+          <option value="3">3 : manager</option>
+          <option value="9">9 : admin</option>
+        </select>
+      </p>
+
+      <p>
+        이름 : <input type="text" name={props.name} value={props.name} />
+      </p>
+      <p>
+        팀 : <input type="text" name={props.team} value={props.team} />
+      </p>
+      <p>
+        전화번호 : <input type="text" name={props.tel} value={props.tel} />
+      </p>
+      <p>
+        메일 : <input type="text" name={props.eMail} value={props.eMail} />
+      </p>
+      {/* <p>etc1 : <input type="text" name={props.etc1} value={props.user.etc1} /></p> */}
+      {/* <p>etc2 : <input type="text" name={props.etc2} value={props.user.etc2} /></p> */}
+      {/* <p>etc3 : <input type="text" name={props.etc3} value={props.user.etc3} /></p> */}
     </>
   );
 };

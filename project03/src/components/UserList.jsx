@@ -7,6 +7,9 @@ import axios from "axios";
 const Block = styled.div`
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
   border: 1px solid #999;
   margin-bottom: 10px;
   padding: 0 10px;
@@ -30,6 +33,8 @@ const UserList = (props) => {
 
   const getUserInfo = async () => {
     await axios.get("http://192.168.23.65:5000/user/list").then((res) => {
+      console.log('res==============',res);
+      
       setUserList(res.data);
     });
   };
@@ -54,7 +59,7 @@ const UserList = (props) => {
       // .then((res) => setUserList(res.data));
       .then((res) => {
         console.log(res.data.msg);
-        setSearchMsg(res.data.msg)
+        setSearchMsg(res.data.msg);
         setUserList(res.data.result);
       });
   };
@@ -63,10 +68,20 @@ const UserList = (props) => {
     if (e.key === "Enter") onSearch();
   };
 
+  // 계정 승인
+  const acctApproval = async (idx, e) => {
+    await axios.patch(`http://192.168.23.65:5000/user/setlevel?idx=${idx}`);
+    // await fetchUserList();
+    // navigate("/admin/userlist");
+    // getUserInfo();
+  };
+
   useEffect(() => {
     getUserInfo();
   }, []);
 
+  console.log('isUserList ------',isUserList);
+  
   return (
     <>
       <div className="userSearch">
@@ -82,7 +97,7 @@ const UserList = (props) => {
 
       <div>{searchMsg}</div>
 
-      {isUserList.map((user) => {
+      {isUserList.map((user, idx) => {
         return (
           <Block
             key={user.idx}
@@ -90,15 +105,29 @@ const UserList = (props) => {
               moveToDetail(user.idx, e);
             }}
           >
-            <p>아이디 : {user.id}</p>
-            <p>레벨 : {user.level}</p>
-            <p>이름 : {user.name}</p>
-            <p>팀 : {user.team}</p>
-            <p>번호 : {user.tel}</p>
-            <p>메일 : {user.eMail}</p>
-            <p>etc1 : {user.etc1}</p>
-            <p>etc2 : {user.etc2}</p>
-            <p>etc3 : {user.etc3}</p>
+            <S.FlexBox>
+              <p>아이디 : {user.id}</p>
+              <p>레벨 : {user.level}</p>
+              <p>이름 : {user.name}</p>
+              <p>팀 : {user.team}</p>
+              <p>번호 : {user.tel}</p>
+              <p>메일 : {user.eMail}</p>
+              {/* <p>etc1 : {user.etc1}</p>
+              <p>etc2 : {user.etc2}</p>
+              <p>etc3 : {user.etc3}</p> */}
+            </S.FlexBox>
+
+            {user.level < 2 ? (
+              <button
+                onClick={() => {
+                  acctApproval(user.idx);
+                }}
+              >
+                계정승인
+              </button>
+            ) : (
+              <></>
+            )}
           </Block>
         );
       })}
