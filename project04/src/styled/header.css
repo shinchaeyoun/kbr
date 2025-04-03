@@ -1,0 +1,15 @@
+header {
+  margin: 20px 0;
+  padding: 20px 0px;
+  border-bottom: 2px solid #ddd;
+  border-top: 2px solid #ddd;
+}
+
+header > div {
+  cursor: pointer;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+}
