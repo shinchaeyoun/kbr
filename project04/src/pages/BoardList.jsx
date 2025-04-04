@@ -25,10 +25,7 @@ const Search = styled.div`
 `;
 
 const BoardList = ({ level }) => {
-  const navigate = useNavigate();
-
   const [boardList, setBoardList] = useState([]);
-  const [isoffset, setIsOffset] = useState(0); // 사라짐짐
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isSearch, setSearch] = useState({ search: "" });
@@ -38,7 +35,7 @@ const BoardList = ({ level }) => {
   const [isType, setType] = useState("card"); // card, list
   const [isGridColumn, setIsGridColumn] = useState(5);
 
-  const { search } = isSearch; // 사라짐짐
+  const { search } = isSearch; // 사라짐
   const limit = 10;
 
   // 서버에서 게시글 목록 가져오기
@@ -109,14 +106,34 @@ const BoardList = ({ level }) => {
     }
   };
 
+  // 보기 타입 변경
+  const setList = (type) => {
+    if (type === "list") {
+      setType("list");
+    } else if (type === "card") {
+      setType("card");
+    }
+  };
+
   // 모달 열기
   const openModal = (idx) => {
     setIsBoardIdx(idx);
     setIsModalOpen(true);
   };
 
-  const onModalClose = () => {
-    getBoardList(); // 데이터를 새로 가져옴
+  const onModalClose = async () => {
+    try {
+      // 새로 등록된 데이터를 가져오기 위해 서버에서 최신 데이터를 요청
+      const response = await axios.get(`http://192.168.23.65:5000/board`, {
+        params: { offset: 0, limit: 1 }, // 최신 데이터 1개만 가져옴
+      });
+      
+      if(response.data[0].idx >= isBoardIdx) return; // 방금 수정된 데이터는 제외
+      const newBoard = response.data[0]; // 새로 등록된 데이터
+      setBoardList((prevList) => [newBoard, ...prevList]); // 새 데이터를 맨 앞에 추가
+    } catch (error) {
+      console.error("새 데이터를 가져오는 중 오류 발생:", error);
+    }
   };
 
   // 더보기 버튼 클릭
@@ -140,11 +157,21 @@ const BoardList = ({ level }) => {
     columns = Math.max(2, Math.min(columns, 5)); // 최소 2, 최대 5
     setIsGridColumn(columns);
   };
+
+  // 팝업창 열기
+  const openPup = (link, title) => {
+    const popup = window.open(
+      `${link}`,
+      `${title}`,
+      "width=1300px,height=800px,scrollbars=yes"
+    );
+  };
+
   // 초기 데이터 로드
   useEffect(() => {
     setBoardList([]); // 상태 초기화
     setOffset(0); // offset 초기화
-    getBoardList();
+    getBoardList(); // 게시글 목록 가져오기
   }, []);
 
   // offset 변경 시 데이터 로드
@@ -186,18 +213,20 @@ const BoardList = ({ level }) => {
       />
 
       <FlexBox>
-        <S.Button
-          onClick={() => {
-            if (level > 2) {
-              setModalMode("write");
-              openModal();
-            } else {
-              alert("글쓰기 권한 없음");
-            }
-          }}
-        >
-          과정등록
-        </S.Button>
+        {level > 2 && (
+          <S.Button
+            onClick={() => {
+              if (level > 2) {
+                setModalMode("write");
+                openModal();
+              } else {
+                alert("글쓰기 권한 없음");
+              }
+            }}
+          >
+            과정등록
+          </S.Button>
+        )}
 
         <Search>
           <input
@@ -234,33 +263,38 @@ const BoardList = ({ level }) => {
             <S.dlatl>{board.idx}</S.dlatl>
             <S.Group>
               {/* <S.Thumb src={`${board.thumb}`}></S.Thumb> */}
-              <S.Thumb src={`${board.thumb}?t=${new Date().getTime()}`} alt={board.title} />
+              <S.Thumb
+                src={`${board.thumb}?t=${new Date().getTime()}`}
+                alt={board.title}
+              />
               <div className="title">{board.title}</div>
             </S.Group>
 
-            <S.ButtonWrap>
-              <S.Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (level > 2) {
-                    setModalMode("update");
-                    openModal(board.idx);
-                  } else {
-                    alert("수정 권한 없음");
-                  }
-                }}
-              >
-                수정하기
-              </S.Button>
-              <S.Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteBoard(board.idx, e);
-                }}
-              >
-                삭제하기
-              </S.Button>
-            </S.ButtonWrap>
+            {level > 2 && (
+              <S.ButtonWrap>
+                <S.Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (level > 2) {
+                      setModalMode("update");
+                      openModal(board.idx);
+                    } else {
+                      alert("수정 권한 없음");
+                    }
+                  }}
+                >
+                  수정하기
+                </S.Button>
+                <S.Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteBoard(board.idx, e);
+                  }}
+                >
+                  삭제하기
+                </S.Button>
+              </S.ButtonWrap>
+            )}
           </S.BoardGridItem>
         ))}
       </S.BoardGridContainer>

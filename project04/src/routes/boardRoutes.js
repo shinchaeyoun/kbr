@@ -13,7 +13,6 @@ router.get("/", (req, res) => {
   const sqlDESC = `SELECT * FROM board ORDER BY idx DESC LIMIT ?, ?`; // 최신순
   const sqlASC = `SELECT * FROM board ORDER BY idx ASC LIMIT ?, ?`; // 오래된순
   const sql = `SELECT * FROM board WHERE idx = ?`;
-  console.log("req.query !!!!!!!!!!!!!", req.query);
 
   if (index == undefined) {
     query(sqlDESC, [offset, limit]).then((data) => res.send(data));
@@ -34,6 +33,12 @@ router.post("/", (req, res) => {
   query(sql, params)
     .then((data) => res.send(data))
     .catch((err) => res.send({ msg: "전송 실패" }));
+});
+
+// 게시판 데이터 총 개수 가져오기
+router.get("/count", async (req, res) => {
+  const sql1 = `SELECT COUNT(*) AS totalCount FROM board`;
+  query(sql1).then((data) => res.send(data[0]));
 });
 
 // 게시판 글 검색
@@ -65,16 +70,38 @@ router.delete("/delete", (req, res) => {
   `;
   query(sql, [idx])
     .then((data) => res.send(data))
-    .catch((err) => res.status(500).send({ msg: "삭제 중 오류가 발생했습니다.", error: err }));
+    .catch((err) =>
+      res.status(500).send({ msg: "삭제 중 오류가 발생했습니다.", error: err })
+    );
 });
 
-// 이미지 업로드 엔드포인트
-router.post("/upload", (req, res) => {
-  const { base64Image, originalName, idx } = req.body;
 
-  // Base64 데이터와 idx 유효성 검사
+// 이미지 업로드 엔드포인트
+router.post("/upload", async (req, res) => {
+  const { base64Image, originalName, idx } = req.body;
+  let index = req.body.idx; // 쿼리 파라미터에서 idx 가져오기
+
+  if (index === undefined) {
+    const sqlDESC = `SELECT * FROM board ORDER BY idx DESC LIMIT 0, 1`;
+
+    try {
+      const data = await query(sqlDESC); // 비동기 작업
+      if (data.length > 0) {
+        console.log("가장 최근 인덱스 값", data[0].idx);
+        index = data[0].idx + 1; // 가장 최근 인덱스 값에 1을 더하여 사용
+      } else {
+        index = 1; // 테이블이 비어 있는 경우 기본값 설정
+      }
+      console.log("index 인덱스 값 재정의", index);
+    } catch (error) {
+      console.error("인덱스 값을 가져오는 중 오류 발생:", error);
+      return res.status(500).send({ msg: "인덱스 값을 가져오는 중 오류 발생" });
+    }
+  };
+
+  // Base64 데이터 유효성 검사
   if (!base64Image) {
-    return res.status(400).send({ msg: "이미지 데이터와 idx가 필요합니다." });
+    return res.status(400).send({ msg: "이미지 데이터가 필요합니다." });
   }
 
   // Base64 데이터에서 파일 정보 추출
@@ -85,7 +112,7 @@ router.post("/upload", (req, res) => {
   }
 
   const base64Data = matches[2]; // Base64 인코딩된 데이터
-  const filePath = `public/images/thumbnail/${originalName}`;
+  const filePath = `public/images/thumbnail/${index}_${originalName}`;
 
   // Base64 데이터를 파일로 저장
   fs.writeFile(filePath, base64Data, { encoding: "base64" }, (err) => {
@@ -96,7 +123,7 @@ router.post("/upload", (req, res) => {
 
     // 파일 경로를 데이터베이스에 저장
     const sql = "UPDATE board SET thumb = ? WHERE idx = ?";
-    query(sql, [filePath, idx])
+    query(sql, [filePath, index])
       .then((data) => {
         res.send({ msg: "이미지 업로드 성공", thumb: filePath });
       })

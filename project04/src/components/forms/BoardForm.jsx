@@ -28,7 +28,13 @@ const GridItem = styled(S.GridItem)`
   }
 `;
 
-const BoardForm = ({ mode, idx, isModalOpen, setIsModalOpen, onModalClose }) => {
+const BoardForm = ({
+  mode,
+  idx,
+  isModalOpen,
+  setIsModalOpen,
+  onModalClose,
+}) => {
   const navigate = useNavigate();
 
   const [isRead, setIsRead] = useState(false);
@@ -110,7 +116,14 @@ const BoardForm = ({ mode, idx, isModalOpen, setIsModalOpen, onModalClose }) => 
     const reader = new FileReader();
     let fileName = file.name;
 
-    if (board.thumb !== null && board.thumb !== "") fileName = board.thumb.split("/").pop();
+    if (board.thumb !== null && board.thumb !== "")
+      fileName = board.thumb.split("/").pop();
+
+    console.log("인덱스 정보 없음? ", idx);
+    if (idx === undefined || idx === null) {
+      console.log("인덱스 값 재정의 해야함");
+      // 인덱스 값 재정의
+    }
 
     return new Promise((resolve, reject) => {
       reader.onload = async () => {
@@ -179,6 +192,7 @@ const BoardForm = ({ mode, idx, isModalOpen, setIsModalOpen, onModalClose }) => 
         );
         alert("등록되었습니다.");
         setIsModalOpen(false);
+        if (onModalClose) onModalClose();
         navigate("/board");
       }
     } catch (error) {
