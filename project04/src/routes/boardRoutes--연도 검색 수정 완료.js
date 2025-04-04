@@ -42,23 +42,32 @@ router.get("/count", async (req, res) => {
 });
 
 // 게시판 글 검색
-router.post("/search", (req, res) => {
-  const sql1 = `
-          SELECT * FROM board
-          WHERE year LIKE ? OR title LIKE ? OR customer LIKE ?
-          ORDER BY idx DESC
-          LIMIT 0, 10;
-        `;
-  const sql2 = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10";
-  const searchValue = req.body.search;
+router.post("/search", async (req, res) => {
+  const { search, year } = req.body;
 
-  if (searchValue !== undefined) {
-    const searchPattern = `%${searchValue}%`;
-    query(sql1, [searchPattern, searchPattern, searchPattern])
-      .then((data) => res.send(data))
-      .catch((err) => res.send(err));
-  } else {
-    query(sql2).then((data) => res.send(data));
+  // 기본 SQL 쿼리
+  let sql = `SELECT * FROM board WHERE 1=1`; // 기본 조건 (항상 참)
+
+  const params = [];
+
+  // search 값이 있는 경우 조건 추가
+  if (search) {
+    sql += ` AND (title LIKE ? OR customer LIKE ?)`;
+    params.push(`%${search}%`, `%${search}%`);
+  }
+
+  // year 값이 "all"이 아닌 경우에만 조건 추가
+  if (year && year !== "all") {
+    sql += ` AND year = ?`;
+    params.push(year);
+  }
+
+  try {
+    const data = await query(sql, params);
+    res.send(data);
+  } catch (error) {
+    console.error("검색 중 오류 발생:", error);
+    res.status(500).send({ msg: "검색 중 오류가 발생했습니다.", error });
   }
 });
 
@@ -74,7 +83,6 @@ router.delete("/delete", (req, res) => {
       res.status(500).send({ msg: "삭제 중 오류가 발생했습니다.", error: err })
     );
 });
-
 
 // 이미지 업로드 엔드포인트
 router.post("/upload", async (req, res) => {
@@ -97,7 +105,7 @@ router.post("/upload", async (req, res) => {
       console.error("인덱스 값을 가져오는 중 오류 발생:", error);
       return res.status(500).send({ msg: "인덱스 값을 가져오는 중 오류 발생" });
     }
-  };
+  }
 
   // Base64 데이터 유효성 검사
   if (!base64Image) {

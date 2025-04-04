@@ -43,6 +43,7 @@ router.get("/count", async (req, res) => {
 
 // 게시판 글 검색
 router.post("/search", (req, res) => {
+  // 검색어가 포함된 게시글을 가져오는 SQL 쿼리
   const sql1 = `
           SELECT * FROM board
           WHERE year LIKE ? OR title LIKE ? OR customer LIKE ?
@@ -50,13 +51,18 @@ router.post("/search", (req, res) => {
           LIMIT 0, 10;
         `;
   const sql2 = "SELECT * FROM board ORDER BY idx DESC LIMIT 0, 10";
-  const searchValue = req.body.search;
+  console.log('검색 년도', searchYear);
+  
 
   if (searchValue !== undefined) {
     const searchPattern = `%${searchValue}%`;
-    query(sql1, [searchPattern, searchPattern, searchPattern])
-      .then((data) => res.send(data))
-      .catch((err) => res.send(err));
+    query(sql1, [searchYear, searchPattern, searchPattern])
+    .then((data) => {
+      console.log('검색결과', data);
+      
+      res.send(data)
+    })
+    .catch((err) => res.send(err));
   } else {
     query(sql2).then((data) => res.send(data));
   }
@@ -75,10 +81,29 @@ router.delete("/delete", (req, res) => {
     );
 });
 
+
 // 이미지 업로드 엔드포인트
-router.post("/upload", (req, res) => {
+router.post("/upload", async (req, res) => {
   const { base64Image, originalName, idx } = req.body;
-  console.log("이미지 업로드 인덱스를 알고 있나", idx);
+  let index = req.body.idx; // 쿼리 파라미터에서 idx 가져오기
+
+  if (index === undefined) {
+    const sqlDESC = `SELECT * FROM board ORDER BY idx DESC LIMIT 0, 1`;
+
+    try {
+      const data = await query(sqlDESC); // 비동기 작업
+      if (data.length > 0) {
+        console.log("가장 최근 인덱스 값", data[0].idx);
+        index = data[0].idx + 1; // 가장 최근 인덱스 값에 1을 더하여 사용
+      } else {
+        index = 1; // 테이블이 비어 있는 경우 기본값 설정
+      }
+      console.log("index 인덱스 값 재정의", index);
+    } catch (error) {
+      console.error("인덱스 값을 가져오는 중 오류 발생:", error);
+      return res.status(500).send({ msg: "인덱스 값을 가져오는 중 오류 발생" });
+    }
+  };
 
   // Base64 데이터 유효성 검사
   if (!base64Image) {
@@ -93,7 +118,7 @@ router.post("/upload", (req, res) => {
   }
 
   const base64Data = matches[2]; // Base64 인코딩된 데이터
-  const filePath = `public/images/thumbnail/${idx}_${originalName}`;
+  const filePath = `public/images/thumbnail/${index}_${originalName}`;
 
   // Base64 데이터를 파일로 저장
   fs.writeFile(filePath, base64Data, { encoding: "base64" }, (err) => {
@@ -104,7 +129,7 @@ router.post("/upload", (req, res) => {
 
     // 파일 경로를 데이터베이스에 저장
     const sql = "UPDATE board SET thumb = ? WHERE idx = ?";
-    query(sql, [filePath, idx])
+    query(sql, [filePath, index])
       .then((data) => {
         res.send({ msg: "이미지 업로드 성공", thumb: filePath });
       })

@@ -34,8 +34,8 @@ const BoardList = ({ level }) => {
   const [modalMode, setModalMode] = useState("view");
   const [isType, setType] = useState("card"); // card, list
   const [isGridColumn, setIsGridColumn] = useState(5);
-
-  const { search } = isSearch; // 사라짐
+  const [selectYear, setSelectYear] = useState("");
+  const { search } = isSearch;
   const limit = 10;
 
   // 서버에서 게시글 목록 가져오기
@@ -97,7 +97,7 @@ const BoardList = ({ level }) => {
 
       const response = await axios.post(
         `http://192.168.23.65:5000/board/search`,
-        isSearch
+        { search: search, year: selectYear }
       );
 
       setBoardList(response.data); // 검색 결과 설정
@@ -127,8 +127,8 @@ const BoardList = ({ level }) => {
       const response = await axios.get(`http://192.168.23.65:5000/board`, {
         params: { offset: 0, limit: 1 }, // 최신 데이터 1개만 가져옴
       });
-      
-      if(response.data[0].idx >= isBoardIdx) return; // 방금 수정된 데이터는 제외
+
+      if (response.data[0].idx >= isBoardIdx) return; // 방금 수정된 데이터는 제외
       const newBoard = response.data[0]; // 새로 등록된 데이터
       setBoardList((prevList) => [newBoard, ...prevList]); // 새 데이터를 맨 앞에 추가
     } catch (error) {
@@ -144,6 +144,7 @@ const BoardList = ({ level }) => {
   // 검색 입력 처리
   const onChange = (e) => {
     const { name, value } = e.target;
+    // setIsYear(() =>)
     setSearch((prevSearch) => ({
       ...prevSearch,
       [name]: value || "",
@@ -229,6 +230,28 @@ const BoardList = ({ level }) => {
         )}
 
         <Search>
+          <select
+            name="year"
+            value={selectYear}
+            onChange={(e) => {
+              setSelectYear(e.target.value);
+              setSearch({ ...isSearch, year: e.target.value });
+            }}
+          >
+            <option 
+              value="all"
+            >전체보기</option>
+            <option 
+              value="2025"
+            >2025</option>
+            <option 
+              value="2024"
+            >2024</option>
+            <option 
+              value="2023"
+            >2023</option>
+          </select>
+
           <input
             type="text"
             name="search"
