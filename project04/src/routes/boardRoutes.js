@@ -70,23 +70,31 @@ router.get("/count", async (req, res) => {
 // 게시판 글 검색
 router.post("/search", async (req, res) => {
   const { search, year } = req.body;
+ console.log('search, year',search, year);
+ 
 
+  console.log('year',year);
+  
   // 기본 SQL 쿼리
-  let sql = `SELECT * FROM board WHERE 1=1 ORDER BY idx DESC`; // 기본 조건 (항상 참)
+  let sql = `SELECT * FROM board WHERE 1=1 `; // 기본 조건 (항상 참)
 
   const params = [];
 
   // search 값이 있는 경우 조건 추가
   if (search) {
-    sql += ` AND (title LIKE ? OR customer LIKE ?)`;
+    sql += ` AND (title LIKE ? OR customer LIKE ?) ORDER BY idx DESC`;
     params.push(`%${search}%`, `%${search}%`);
   }
 
   // year 값이 "all"이 아닌 경우에만 조건 추가
   if (year && year !== "all") {
-    sql += ` AND year = ?`;
-    params.push(year);
+    sql += ` AND year = ? ORDER BY idx DESC`;
+    params.push(Number(year));
   }
+
+  if(search === "" && year === "all"){
+    sql += ` ORDER BY idx DESC`;
+  };
 
   try {
     const data = await query(sql, params);

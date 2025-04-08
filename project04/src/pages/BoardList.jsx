@@ -16,7 +16,10 @@ const BoardList = ({ level }) => {
   const [modalMode, setModalMode] = useState("view");
   const [isType, setType] = useState("card"); // card, list
   const [isGridColumn, setIsGridColumn] = useState(5);
-  const [selectYear, setSelectYear] = useState("");
+
+  const currentYear = new Date().getFullYear(); // 현재 연도 가져오기
+  const [selectYear, setSelectYear] = useState(currentYear);
+
   const { search } = isSearch;
   const limit = 10;
 
@@ -34,17 +37,10 @@ const BoardList = ({ level }) => {
       setBoardList((prevList) => {
         const uniqueItems = new Map();
         [...prevList, ...response.data].forEach((item) => {
-          if (item.thumb == null) {
-            uniqueItems.set(item.idx, {
-              ...item,
-              thumb: "/images/thumbnail/default.png", // 기본 이미지 경로 설정
-            });
-          } else {
             uniqueItems.set(item.idx, {
               ...item,
               thumb: `${item.thumb}?t=${new Date().getTime()}`, // 타임스탬프 추가
             }); // idx를 키로 사용하여 중복 제거
-          }
         });
         return Array.from(uniqueItems.values());
       });
@@ -194,9 +190,14 @@ const BoardList = ({ level }) => {
             }}
           >
             <option value="all">전체보기</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
+            {Array.from({ length: 7 }, (_, i) => {
+                const year = currentYear + 1 - i; // SelectYear부터 이전 5년까지 옵션 생성
+                return (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                );
+              })}
           </S.Select>
 
           <S.Input

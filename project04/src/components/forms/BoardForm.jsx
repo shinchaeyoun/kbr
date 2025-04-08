@@ -27,6 +27,8 @@ const BoardForm = ({
   const currentYear = new Date().getFullYear(); // 현재 연도 가져오기
   const [SelectYear, setSelectYear] = useState(currentYear); // SelectYear 변수에 현재 연도 저장
 
+  const defaultImg = "/images/thumbnail/default.png"; // 기본 이미지 경로 설정
+
   // 게시글 정보 상태
   const [board, setBoard] = useState({
     year: currentYear,
@@ -40,11 +42,9 @@ const BoardForm = ({
   const { year, title, customer, innerUrl, outerUrl, thumb } = board;
 
   const changeTitle = () => {
-    if (mode == "view") {
-      setBoardTitle("사업(과정)정보");
-    } else {
-      setBoardTitle("사업(과정)정보입력");
-    }
+    mode == "view"
+      ? setBoardTitle("사업(과정)정보")
+      : setBoardTitle("사업(과정)정보입력");
   };
 
   // 게시글 데이터 가져오기 (수정 모드일 경우)
@@ -107,12 +107,6 @@ const BoardForm = ({
     if (board.thumb !== null && board.thumb !== "")
       fileName = board.thumb.split("/").pop();
 
-    console.log("인덱스 정보 없음? ", idx);
-    if (idx === undefined || idx === null) {
-      console.log("인덱스 값 재정의 해야함");
-      // 인덱스 값 재정의
-    }
-
     return new Promise((resolve, reject) => {
       reader.onload = async () => {
         const base64Image = reader.result; // Base64 데이터
@@ -168,8 +162,11 @@ const BoardForm = ({
     // 이미지 업로드
     let uploadedFilePath = thumb;
 
-    if (isThumb && previewFile)
-      uploadedFilePath = await handleFileUpload(previewFile);
+
+    isThumb && previewFile
+      ? (uploadedFilePath = await handleFileUpload(previewFile))
+      : (uploadedFilePath = defaultImg);
+
     const updatedBoard = {
       ...board,
       year: SelectYear,
@@ -239,8 +236,6 @@ const BoardForm = ({
 
   // 컴포넌트 로드시 데이터 로드
   useEffect(() => {
-    console.log('previewUrl',previewUrl);
-    
     getBoard();
     changeTitle();
     setPreviewUrl(null);
@@ -342,7 +337,7 @@ const BoardForm = ({
         </M.GridItem>
 
         <M.GridItem>
-          {board.thumb !== null && previewUrl ==null && (
+          {board.thumb !== null && previewUrl == null && (
             <>
               <M.Img src={board.thumb} alt="thumb 미리보기" />
             </>
@@ -352,15 +347,6 @@ const BoardForm = ({
               <M.Img src={previewUrl} alt="previewUrl 미리보기" />
             </>
           )}
-          {/* {previewUrl !== null ? (
-            <>
-              <M.Img src={board.thumb} alt="미리보기" />
-            </>
-          ) : (
-            <>
-              <M.Img src={previewUrl} alt="미리보기" />
-            </>
-          )} */}
         </M.GridItem>
       </M.GridContainer>
 
