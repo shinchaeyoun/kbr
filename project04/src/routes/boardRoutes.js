@@ -148,7 +148,10 @@ router.post("/upload", async (req, res) => {
   }
 
   const base64Data = matches[2]; // Base64 인코딩된 데이터
-  const filePath = `public/images/thumbnail/${index}_${originalName}`;
+  // 기존 파일 이름에서 "index_" 접두사를 제거
+  const cleanedOriginalName = originalName.replace(/^\d+_/, "");
+  // 항상 idx를 기준으로 파일 이름 생성
+  const filePath = `public/images/thumbnail/${index}_${cleanedOriginalName}`;
 
   // Base64 데이터를 파일로 저장
   fs.writeFile(filePath, base64Data, { encoding: "base64" }, (err) => {

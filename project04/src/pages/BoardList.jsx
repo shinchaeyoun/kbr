@@ -34,10 +34,17 @@ const BoardList = ({ level }) => {
       setBoardList((prevList) => {
         const uniqueItems = new Map();
         [...prevList, ...response.data].forEach((item) => {
-          uniqueItems.set(item.idx, {
-            ...item,
-            thumb: `${item.thumb}?t=${new Date().getTime()}`, // 타임스탬프 추가
-          }); // idx를 키로 사용하여 중복 제거
+          if (item.thumb == null) {
+            uniqueItems.set(item.idx, {
+              ...item,
+              thumb: "/images/thumbnail/default.png", // 기본 이미지 경로 설정
+            });
+          } else {
+            uniqueItems.set(item.idx, {
+              ...item,
+              thumb: `${item.thumb}?t=${new Date().getTime()}`, // 타임스탬프 추가
+            }); // idx를 키로 사용하여 중복 제거
+          }
         });
         return Array.from(uniqueItems.values());
       });
@@ -249,11 +256,17 @@ const BoardList = ({ level }) => {
             }}
           >
             <span>{board.idx}</span>
+            {/* {board.thumb} */}
+            {/* {board.thumb == null && (
+              <S.Thumb src="/images/thumbnail/default.png" alt={board.title} />
+            )} */}
+
             <S.Thumb
               src={`${board.thumb}?t=${new Date().getTime()}`}
               alt={board.title}
             />
 
+            
             <B.Group>
               {isType === "list" ? (
                 <B.ListTitle>

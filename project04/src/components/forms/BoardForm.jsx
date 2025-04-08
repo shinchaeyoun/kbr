@@ -160,7 +160,7 @@ const BoardForm = ({
       title: title,
     });
 
-    if (response.data.result) {
+    if (mode == "write" && response.data.result) {
       alert(response.data.msg);
       return;
     }
@@ -239,6 +239,8 @@ const BoardForm = ({
 
   // 컴포넌트 로드시 데이터 로드
   useEffect(() => {
+    console.log('previewUrl',previewUrl);
+    
     getBoard();
     changeTitle();
     setPreviewUrl(null);
@@ -340,16 +342,25 @@ const BoardForm = ({
         </M.GridItem>
 
         <M.GridItem>
-          {board.thumb !== null && (
+          {board.thumb !== null && previewUrl ==null && (
             <>
-              <M.Img src={board.thumb} alt="미리보기" />
+              <M.Img src={board.thumb} alt="thumb 미리보기" />
             </>
           )}
           {previewUrl !== null && (
             <>
-              <M.Img src={previewUrl} alt="미리보기" />
+              <M.Img src={previewUrl} alt="previewUrl 미리보기" />
             </>
           )}
+          {/* {previewUrl !== null ? (
+            <>
+              <M.Img src={board.thumb} alt="미리보기" />
+            </>
+          ) : (
+            <>
+              <M.Img src={previewUrl} alt="미리보기" />
+            </>
+          )} */}
         </M.GridItem>
       </M.GridContainer>
 
