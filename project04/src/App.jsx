@@ -16,7 +16,10 @@ import UserDetail from "./pages/UserDetail.jsx";
 
 // components
 import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
 import BoardForm from "./components/forms/BoardForm.jsx";
+import Pending from "./components/ApprovalPendingScreen.jsx";
+
 
 // route
 import PrivatePublicRoute from "./route/PrivatePublicRoute.jsx";
@@ -34,13 +37,11 @@ function App(props) {
 
   return (
     <>
-      <Header level={level} />
-
       <Routes>
-        {/* <Route path="/sendtest" element={<SendTest />} /> */}
         <Route path="/" element={<BoardList level={level} />} />
         <Route path="/login" element={<Login isLogin={isLogin} />} />
         <Route path="/signup" element={<Signup />} />
+
         {/* 게시판 관련 */}
         <Route path="/board" element={<BoardList level={level} />} />
         <Route path="/board/:idx" element={<BoardDetail />} />
@@ -57,7 +58,11 @@ function App(props) {
         <Route path="/public" element={<PrivatePublicRoute level={level} component={<Public />} />} />
         <Route path="/manager" element={<PrivateManagerRoute level={level} component={<Manager />} />}/>
         <Route path="/admin" element={<PrivateAdminRoute level={level} component={<Admin />} />} />
+        <Route path="/pending" element={<Pending />} />
       </Routes>
+
+      <Footer />
+
     </>
   );
 }

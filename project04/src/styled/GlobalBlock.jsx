@@ -1,8 +1,6 @@
 import styled from "styled-components";
 
-const Notice = styled.span`
-
-`;
+const Notice = styled.span``;
 
 const dlatl = styled.div`
   position: absolute;
@@ -15,53 +13,53 @@ const dlatl = styled.div`
 const Img = styled.img``;
 const Thumb = styled.img``;
 
-const BoardItem = styled.div`
+const Select = styled.select`
   position: relative;
-  margin-bottom: 20px;
-  padding: 20px;
-  border: 1px solid #ddd;
 
-  .buttonWrap {
-    position: absolute;
-    top: 10px;
-    right: 30px;
-  }
+  width: 80px;
+  height: 30px;
+  border: 1px solid #6580ea;
+  border-radius: 5px;
 
-  .title {
-    margin-bottom: 10px;
-    padding: 0 0 10px 0;
-    border-bottom: 1px dotted #ddd;
-
-    cursor: pointer;
-  }
-
-  span {
-    display: inline-block;
-    margin-right: 5px;
-    color: #999;
-  }
-  span::after {
-    content: " :";
+  option {
+    text-align: center;
+    border: 1px solid #6580ea;
   }
 `;
 
 const Button = styled.button`
   border: none;
-  border: 1px solid #66a6ff;
-  background-color: #fff;
+  border: 1px solid #99999999;
+  background-color: ${(props) =>
+    props.theme === "light"
+      ? "#6580EA"
+      : props.theme === "dark"
+      ? "#334CB3"
+      : "#fff"};
+  color: ${(props) =>
+    props.theme === "light"
+      ? "#fff"
+      : props.theme === "dark"
+      ? "#fff"
+      : "#000"};
+
   border-radius: 5px;
-  height: 30px;
-  line-height: 30px;
+  height: 25px;
+  line-height: 25px;
   padding: 0 10px;
+  padding: ${(props) => props.$padding || "0 10px"};
   cursor: pointer;
+  font-size: 12px;
+  font-family: "NanumSquare", sans-serif;
 
   &:focus {
     outline: none;
   }
 
   &.on {
-    background-color: #66a6ff;
+    background-color: #6580ea;
     color: #fff;
+    border-color: #fff;
   }
 `;
 
@@ -90,7 +88,7 @@ const GridItem = styled.div`
       align-content: center;
     }
   }
-  
+
   input[type="file" i]::-webkit-file-upload-button {
     border: none;
     border: 1px solid #66a6ff;
@@ -114,14 +112,6 @@ const GridItem = styled.div`
       else return "300px";
     }};
   }
-  select {
-    padding: 0 5px;
-    margin-left: 10px;
-    height: 30px;
-    border-radius: 5px;
-    border: 1px solid #66a6ff;
-    background-color: #fff;
-  }
 
   button {
     margin-left: 10px;
@@ -144,77 +134,20 @@ const Content = styled.div`
   display: flex;
 `;
 
-const BoardGridItem = styled.div`
-  position: relative;
-  display: flex;
-
-  justify-content: space-between;
-  align-items: center;
-  // gap: 10px;
-  padding: 0 20px;
-
-  border: 1px solid #ddd;
-
-  min-height: 100px;
-
-  ${Thumb} {
-    width: 90px;
-    height: 50px;
-    object-fit: cover;
-  }
-
-  .title {
-    width: 200px;
-    text-align: center;
-  }
-`;
-
-const BoardGridContainer = styled.div`
-  display: grid;
-  justify-content: center;
-  // grid-template-columns: ${(props) => props.type === "card" ? `repeat((props.$cl), 1fr)` : "repeat(2, 1fr)"};
-  grid-template-columns: ${(props) => props.type === "card" ?  `repeat(${(props.$cl)}, 1fr)` : "repeat(2, 1fr)"};
-  gap: 10px;
-
-  /* 부모 영역을 넘어가지 않도록 설정 */
-  max-width: 100%; /* 부모의 너비를 초과하지 않음 */
-  max-height: 100%; /* 부모의 높이를 초과하지 않음 */
-
-  cursor: pointer;
-
-  ${BoardGridItem}, ${Group} {
-    padding: 10px 0;
-    flex-direction: ${(props) => (props.type === "card" ? "column" : "row")};
-  }
-  ${Group} {
-    .title {
-      white-space: nowrap; /* 텍스트를 한 줄로 유지 */
-      overflow: hidden; /* 넘치는 텍스트를 숨김 */
-      text-overflow: ellipsis; /* 넘치는 텍스트를 ...으로 표시 */
-    }
-  }
-
-  ${Thumb} {
-    width: ${(props) => props.type === "card" && `200px`};
-    height: ${(props) => props.type === "card"&& `110px`};
-    object-fit: cover;
-  }
-
-  ${ButtonWrap} {
-    flex-direction: ${(props) => (props.type === "card" ? "row" : "column")};
-  }
-`;
-
 const Input = styled.input`
   cursor: ${(props) => (props.readOnly ? "default" : "text")};
-  background-color: ${(props) => {
-    if (props.$req) return "#ffe19e";
-    else return "#ecf2ff";
-  }};
+
+  // dlatl
+  width: 500px;
+  height: 60px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  outline: none;
 `;
 
 const FlexBox = styled.div`
   display: flex;
+  justify-content: center;
 `;
 
 const Wrap = styled.div`
@@ -238,12 +171,19 @@ const LogoutButton = styled.button``;
 const LoginInput = styled.input``;
 const SignupButton = styled.button``;
 
+const Footer = styled.footer`
+  height: 15vh;
+`;
+
+const CenterBox = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 const S = {
-  ButtonWrap,
-  BoardItem,
+  Select,
   Button,
-  BoardGridContainer,
-  BoardGridItem,
+  ButtonWrap,
   Group,
   Img,
   GridContainer,
@@ -260,6 +200,8 @@ const S = {
   Thumb,
   dlatl,
   Notice,
+  Footer,
+  CenterBox,
 };
 
 export default S;

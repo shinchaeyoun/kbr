@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import S from "../styled/GlobalBlock";
+import L from "../styled/LoginStyled.jsx";
 
 const Login = ({ isLogin, onSignupClick }) => {
   const [inputId, setInputId] = useState("");
@@ -58,38 +60,43 @@ const Login = ({ isLogin, onSignupClick }) => {
           </button>
         </>
       ) : (
-        <>
-          <h1>로그인</h1>
-          <label> ID 입력 :</label>
-          <br />
-          <input
-            type="text"
-            name="id"
-            value={inputId}
-            onChange={handleInputId}
-            onKeyDown={enterLogin}
-          />
-          <br />
-          <br />
-          <label> password 입력 :</label>
-          <br />
-          <input
-            type="password"
-            name="password"
-            value={inputPw}
-            onChange={handleInputPw}
-            onKeyDown={enterLogin}
-          />
-          <br />
-          <br />
-          <button type="button" onClick={onClickLogin}>
-            로그인
-          </button>
+        <L.Container>
+          <L.Logo>
+            <h1>K·Brain</h1>
+            <span>Projects Link & data</span>
+          </L.Logo>
 
-          <button type="button" onClick={onSignupClick}>
-            회원가입
-          </button>
-        </>
+          <L.Group>
+            <L.Input
+              type="text"
+              name="id"
+              value={inputId}
+              placeholder="아이디"
+              onChange={handleInputId}
+              onKeyDown={enterLogin}
+            />
+          </L.Group>
+          <L.Group>
+            <L.Input
+              type="password"
+              name="password"
+              value={inputPw}
+              placeholder="비밀번호"
+              onChange={handleInputPw}
+              onKeyDown={enterLogin}
+            />
+          </L.Group>
+
+          <S.ButtonWrap>
+            <L.LoginBtn theme="light" type="button" onClick={onClickLogin}>
+              로그인
+            </L.LoginBtn>
+
+            <L.SignupBtn $signup="true"type="button" onClick={onSignupClick}>
+              회원가입
+            </L.SignupBtn>
+          </S.ButtonWrap>
+        </L.Container>
       )}
     </>
   );

@@ -2,31 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import S from "../../styled/GlobalBlock.jsx";
+import B from "../../styled/BoardStyled.jsx";
+import M from "../../styled/ModalStyled.jsx";
+
 import axios from "axios";
-
-const Wrap = styled(S.Wrap)`
-  h1 {
-    margin-bottom: 20px;
-    font-size: 20px;
-  }
-`;
-const GridContainer = styled(S.GridContainer)``;
-const GridItem = styled(S.GridItem)`
-  ${S.Notice} {
-    margin-top: 5px;
-    margin-left: 50px;
-    font-size: 14px;
-    color: #999;
-  }
-
-  ${S.Img} {
-    justify-content: center;
-    margin-left: 45px;
-    width: 214px;
-    height: 120px;
-    object-fit: cover;
-  }
-`;
 
 const BoardForm = ({
   mode,
@@ -34,6 +13,7 @@ const BoardForm = ({
   isModalOpen,
   setIsModalOpen,
   onModalClose,
+  level,
 }) => {
   const navigate = useNavigate();
 
@@ -42,6 +22,10 @@ const BoardForm = ({
   const [boardTitle, setBoardTitle] = useState("");
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
+  const [warning, setWarning] = useState(false);
+
+  const currentYear = new Date().getFullYear(); // 현재 연도 가져오기
+  const [SelectYear, setSelectYear] = useState(currentYear); // SelectYear 변수에 현재 연도 저장
 
   // 게시글 정보 상태
   const [board, setBoard] = useState({
@@ -57,17 +41,15 @@ const BoardForm = ({
 
   const changeTitle = () => {
     if (mode == "view") {
-      setBoardTitle("과정상세");
-    } else if (mode == "update") {
-      setBoardTitle("과정수정");
+      setBoardTitle("사업(과정)정보");
     } else {
-      setBoardTitle("과정등록");
+      setBoardTitle("사업(과정)정보입력");
     }
   };
 
   // 게시글 데이터 가져오기 (수정 모드일 경우)
   const getBoard = async () => {
-    if (mode == "update" || mode == "view") {
+    if (mode == "view") {
       await axios
         .get(`http://192.168.23.65:5000/board?idx=${idx}`)
         .then((res) => {
@@ -79,12 +61,19 @@ const BoardForm = ({
 
   // 입력 필드 데이터 바인딩
   const onChange = (e) => {
+    if (level < 3) return e.stopPropagation(); // 권한 없을 시 동작 안함
     const { name, value, files } = e.target;
 
     if (name === "thumb" && files && files[0]) {
       const file = files[0];
       setIsThumb(true);
       handleImageUpload(file); // 파일 업로드 처리
+    } else if (name === "year") {
+      setSelectYear(value);
+      setBoard((prevBoard) => ({
+        ...prevBoard,
+        [name]: value,
+      }));
     } else {
       setBoard((prevBoard) => ({
         ...prevBoard,
@@ -96,7 +85,7 @@ const BoardForm = ({
   // 취소 버튼 동작
   const handleCancel = () => {
     setIsModalOpen(false);
-    if (onModalClose) onModalClose();
+    // if (onModalClose) onModalClose();
   };
 
   // 이미지 등록
@@ -159,15 +148,23 @@ const BoardForm = ({
 
   // 게시글 저장
   const handleSubmit = async () => {
-    if (title === "") return alert("과정명을 입력해주세요.");
+    if (title === "" && year === "") {
+      setWarning(true);
+      alert("사업연도/사업명을 입력하세요.");
+      return;
+    }
     let uploadedFilePath = thumb;
 
     if (isThumb && previewFile)
       uploadedFilePath = await handleFileUpload(previewFile);
-    const updatedBoard = { ...board, thumb: uploadedFilePath };
+    const updatedBoard = {
+      ...board,
+      year: SelectYear,
+      thumb: uploadedFilePath,
+    };
 
     try {
-      if (mode === "update") {
+      if (mode === "view") {
         const response = await axios.patch(
           `http://192.168.23.65:5000/board/update?idx=${idx}`,
           updatedBoard,
@@ -201,12 +198,37 @@ const BoardForm = ({
     }
   };
 
+  // 게시글 삭제
+  const deleteBoard = async () => {
+    if (level < 9) {
+      alert("삭제 권한 없음");
+      return;
+    }
+
+    const deleteCode = "de";
+    const userInput = prompt("삭제 암호를 입력하세요", "");
+
+    if (userInput === deleteCode) {
+      try {
+        await axios.delete(`http://192.168.23.65:5000/board/delete`, {
+          data: { idx },
+        });
+        setIsModalOpen(false);
+        if (onModalClose) onModalClose(); // 부모 컴포넌트에 변경 알림
+      } catch (error) {
+        console.error("삭제 중 오류 발생:", error);
+      }
+    } else {
+      alert("잘못된 비밀번호입니다.");
+    }
+  };
+
   // 컴포넌트 로드시 데이터 로드
   useEffect(() => {
     getBoard();
     changeTitle();
     setPreviewUrl(null);
-    if (mode == "view") setIsRead(true);
+    if (mode == "view" && level < 3) setIsRead(true);
   }, [isModalOpen]);
 
   useEffect(() => {
@@ -216,101 +238,159 @@ const BoardForm = ({
   }, [previewUrl]);
 
   return (
-    <Wrap>
-      <h1>{boardTitle}</h1>
-      <GridContainer>
-        <GridItem>
-          <div>사업년도 :</div>
-          <S.Input
+    <M.Wrap>
+      <M.Title>{boardTitle}</M.Title>
+      <M.GridContainer>
+        {/* <M.GridItem>
+          <div>사업연도/사업명(과정명)</div>
+          <M.Input
             type="text"
             name="year"
             value={year}
             readOnly={isRead}
             onChange={onChange}
           />
-        </GridItem>
-        <GridItem>
-          <div>사업명(과정명) :</div>
-          <S.Input
-            type="text"
-            $req="true"
-            name="title"
-            value={title}
-            readOnly={isRead}
-            onChange={onChange}
-          />
-        </GridItem>
-        <GridItem>
-          <div>고객사 :</div>
-          <S.Input
+        </M.GridItem> */}
+        <M.GridItem>
+          <div>
+            사업연도/사업명(과정명)
+            {mode == "write" && <span>* 필수입력 내용입니다.</span>}
+          </div>
+
+          <M.Group
+            className={warning ? "warning" : ""}
+            onClick={() => setWarning(false)}
+          >
+            <S.Select
+              type="text"
+              name="year"
+              value={year || SelectYear}
+              disabled={level < 3}
+              onChange={onChange}
+            >
+              {Array.from({ length: 7 }, (_, i) => {
+                const year = currentYear + 1 - i; // SelectYear부터 이전 5년까지 옵션 생성
+                return (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                );
+              })}
+            </S.Select>
+            <M.Input
+              type="text"
+              $req="true"
+              name="title"
+              value={title}
+              readOnly={isRead}
+              onChange={onChange}
+            />
+          </M.Group>
+        </M.GridItem>
+        <M.GridItem>
+          <div>고객사</div>
+          <M.Input
             type="text"
             name="customer"
             value={customer}
             readOnly={isRead}
             onChange={onChange}
           />
-        </GridItem>
-        <GridItem $long="true">
-          <div>내부 경로 :</div>
-          <S.Input
+        </M.GridItem>
+        <M.GridItem>
+          <div>과정경로(서버경로)</div>
+          <M.Input
             type="text"
             name="innerUrl"
             value={innerUrl}
             readOnly={isRead}
             onChange={onChange}
           />
-        </GridItem>
-        <GridItem $long="true">
-          <div>외부 경로 :</div>
-          <S.Input
+        </M.GridItem>
+        <M.GridItem>
+          <div>과정URL(검수사이트)</div>
+          <M.Input
             type="text"
             name="outerUrl"
             value={outerUrl}
             readOnly={isRead}
             onChange={onChange}
           />
-        </GridItem>
-        <GridItem direction="column" $long="true">
-          <form>
-            <div>이미지 :</div>
-            <S.Input
+        </M.GridItem>
+        <M.GridItem $margin="0 0 5px 0">
+          <M.Form>
+            <div>썸네일 이미지</div>
+            <M.Input
               type="file"
               id="thumb"
               accept="image/*"
               name="thumb"
               readOnly={isRead}
+              disabled={level < 3}
               onChange={onChange}
             />
-          </form>
-          <S.Notice>*이미지 등록시 기존이미지 삭제 됩니다.</S.Notice>
-        </GridItem>
-
-        <GridItem direction="column">
-          {previewUrl == null ? (
-            <>
-              <S.Img src={board.thumb} alt={board.title} />
-            </>
-          ) : (
-            <div>
-              <S.Img
-                src={previewUrl}
-                alt="미리보기"
-                style={{ maxWidth: "300px", marginTop: "10px" }}
-              />
-            </div>
+          </M.Form>
+          {mode == "view" && level > 2 && (
+            <S.Notice>*이미지 등록시 기존이미지 삭제 됩니다.</S.Notice>
           )}
-        </GridItem>
-      </GridContainer>
+        </M.GridItem>
 
-      <S.ButtonWrap direction="row">
-        {mode !== "view" && (
-          <S.Button onClick={handleSubmit}>
-            {mode == "update" ? "과정수정" : "과정등록"}
-          </S.Button>
-        )}
-        <S.Button onClick={handleCancel}>닫기</S.Button>
-      </S.ButtonWrap>
-    </Wrap>
+        <M.GridItem>
+          {board.thumb !== null && (
+            <>
+              <M.Img src={board.thumb} alt="미리보기" />
+            </>
+          )}
+          {previewUrl !== null && (
+            <>
+              <M.Img src={previewUrl} alt="미리보기" />
+            </>
+          )}
+        </M.GridItem>
+      </M.GridContainer>
+
+      {level > 2 && (
+        <M.Button onClick={handleSubmit}>
+          {mode == "view" ? "사업(과정) 수정" : "사업(과정) 등록"}
+        </M.Button>
+      )}
+      {level == 9 && mode == "view" && (
+        <M.DeleteBtn
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteBoard(board.idx, e);
+          }}
+        >
+          삭제하기
+        </M.DeleteBtn>
+      )}
+      <M.CloseBtn onClick={handleCancel}>
+        <svg
+          width="30"
+          height="32"
+          viewBox="0 0 30 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <line
+            x1="0.707107"
+            y1="1.29289"
+            x2="28.7071"
+            y2="29.2929"
+            stroke="black"
+            strokeWidth="1.5"
+          />
+          <line
+            x1="28.7071"
+            y1="2.70711"
+            x2="0.707107"
+            y2="30.7071"
+            stroke="black"
+            strokeWidth="1.5"
+          />
+        </svg>
+      </M.CloseBtn>
+    </M.Wrap>
   );
 };
 

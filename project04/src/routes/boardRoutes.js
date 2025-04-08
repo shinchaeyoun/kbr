@@ -46,7 +46,7 @@ router.post("/search", async (req, res) => {
   const { search, year } = req.body;
 
   // 기본 SQL 쿼리
-  let sql = `SELECT * FROM board WHERE 1=1`; // 기본 조건 (항상 참)
+  let sql = `SELECT * FROM board WHERE 1=1 ORDER BY idx DESC`; // 기본 조건 (항상 참)
 
   const params = [];
 
@@ -73,6 +73,8 @@ router.post("/search", async (req, res) => {
 
 // 게시판 글 삭제
 router.delete("/delete", (req, res) => {
+  console.log("삭제 요청", req.body.idx);
+  
   const idx = req.body.idx;
   const sql = `
     DELETE FROM board WHERE idx = ?  

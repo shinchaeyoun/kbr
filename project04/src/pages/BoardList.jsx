@@ -1,28 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styled/board.scss";
 import styled from "styled-components";
 import S from "../styled/GlobalBlock";
+import B from "../styled/BoardStyled.jsx";
 import axios from "axios";
 import Modal from "../components/Modal.jsx";
-
-const FlexBox = styled(S.FlexBox)`
-  flex-direction: row-reverse;
-  gap: 0 10px;
-  margin-bottom: 10px;
-`;
-
-const ButtonWrap = styled(S.FlexBox)`
-  gap: 0 10px;
-`;
-
-const Search = styled.div`
-  input {
-    width: 250px;
-    margin: 0 10px;
-    height: 20px;
-  }
-`;
 
 const BoardList = ({ level }) => {
   const [boardList, setBoardList] = useState([]);
@@ -204,33 +186,19 @@ const BoardList = ({ level }) => {
   };
 
   return (
-    <div className="board-list">
+    <B.Container>
       <Modal
         mode={modalMode}
         itemIdx={isBoardIdx}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
         onModalClose={onModalClose}
+        level={level}
       />
 
-      <FlexBox>
-        {level > 2 && (
-          <S.Button
-            onClick={() => {
-              if (level > 2) {
-                setModalMode("write");
-                openModal();
-              } else {
-                alert("글쓰기 권한 없음");
-              }
-            }}
-          >
-            과정등록
-          </S.Button>
-        )}
-
-        <Search>
-          <select
+      <B.SearchContainer>
+        <B.Search>
+          <S.Select
             name="year"
             value={selectYear}
             onChange={(e) => {
@@ -238,96 +206,107 @@ const BoardList = ({ level }) => {
               setSearch({ ...isSearch, year: e.target.value });
             }}
           >
-            <option 
-              value="all"
-            >전체보기</option>
-            <option 
-              value="2025"
-            >2025</option>
-            <option 
-              value="2024"
-            >2024</option>
-            <option 
-              value="2023"
-            >2023</option>
-          </select>
+            <option value="all">전체보기</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+          </S.Select>
 
-          <input
+          <S.Input
             type="text"
             name="search"
             value={search || ""}
             onChange={onChange}
             onKeyDown={handleKeyPress}
           />
-          <S.Button onClick={onSearch}>과정검색</S.Button>
-        </Search>
-      </FlexBox>
+        </B.Search>
 
-      <FlexBox>
+        <S.ButtonWrap direction="row">
+          <B.Button theme="light" onClick={onSearch}>
+            과정검색
+          </B.Button>
+          {level > 2 && (
+            <B.Button
+              theme="dark"
+              onClick={() => {
+                if (level > 2) {
+                  setModalMode("write");
+                  openModal();
+                } else {
+                  alert("글쓰기 권한 없음");
+                }
+              }}
+            >
+              과정등록
+            </B.Button>
+          )}
+        </S.ButtonWrap>
+      </B.SearchContainer>
+
+      <S.ButtonWrap direction="row-reverse">
         {["list", "card"].map((type) => (
           <S.Button
             key={type}
+            $padding="0 6px"
             className={isType === type ? "on" : ""}
             onClick={() => setList(type)}
           >
-            {type === "list" ? "리스트형" : "카드형"}
+            {type === "list" ? (
+              <B.ListIcon></B.ListIcon>
+            ) : (
+              <B.CardIcon></B.CardIcon>
+            )}
           </S.Button>
         ))}
-      </FlexBox>
+      </S.ButtonWrap>
 
-      <S.BoardGridContainer className={isType} type={isType} $cl={isGridColumn}>
+      <B.GridContainer className={isType} type={isType} $cl={isGridColumn}>
         {boardList.map((board) => (
-          <S.BoardGridItem
+          <B.BoardItem
             key={board.idx}
             onClick={() => {
               openPup(board.outerUrl, board.title);
             }}
           >
-            <S.dlatl>{board.idx}</S.dlatl>
-            <S.Group>
-              {/* <S.Thumb src={`${board.thumb}`}></S.Thumb> */}
-              <S.Thumb
-                src={`${board.thumb}?t=${new Date().getTime()}`}
-                alt={board.title}
-              />
-              <div className="title">{board.title}</div>
-            </S.Group>
+            <S.Thumb
+              src={`${board.thumb}?t=${new Date().getTime()}`}
+              alt={board.title}
+            />
 
-            {level > 2 && (
-              <S.ButtonWrap>
-                <S.Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (level > 2) {
-                      setModalMode("update");
-                      openModal(board.idx);
-                    } else {
-                      alert("수정 권한 없음");
-                    }
-                  }}
-                >
-                  수정하기
-                </S.Button>
-                <S.Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteBoard(board.idx, e);
-                  }}
-                >
-                  삭제하기
-                </S.Button>
-              </S.ButtonWrap>
-            )}
-          </S.BoardGridItem>
+            <B.Group>
+              {isType === "list" ? (
+                <B.ListTitle>
+                  <p>{board.title}</p>
+                  {isType === "list" && <span>{board.outerUrl}</span>}
+                </B.ListTitle>
+              ) : (
+                <B.CardTitle>
+                  <p>{board.title}</p>
+                </B.CardTitle>
+              )}
+
+              <S.Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setModalMode("view");
+                  openModal(board.idx);
+                }}
+              >
+                ⁝
+              </S.Button>
+            </B.Group>
+          </B.BoardItem>
         ))}
-      </S.BoardGridContainer>
+      </B.GridContainer>
 
-      {hasMore && (
-        <S.ButtonWrap className="buttonWrap">
-          <S.Button onClick={moreList}>더보기</S.Button>
-        </S.ButtonWrap>
-      )}
-    </div>
+      <B.CenterBox>
+        {hasMore && (
+          <B.Button theme="light" onClick={moreList}>
+            더보기
+          </B.Button>
+        )}
+      </B.CenterBox>
+    </B.Container>
   );
 };
 

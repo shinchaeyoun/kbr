@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import App from "../App.jsx";
+import Header from "../components/Header.jsx";
 import Login from "../pages/Login.jsx";
 import Signup from "../pages/Signup.jsx";
 import ApprovalPendingScreen from "../components/ApprovalPendingScreen.jsx";
 
 const PrivateEnterRoute = () => {
   const level = Number(localStorage.level) || 0;
-  const [showSignup, setShowSignup] = useState(false);
+  const [showSignup, setShowSignup] = useState(true);
+
+  let content;
 
   if (level < 1) {
-    return showSignup ? (
+    content = showSignup ? (
       <>
         <Navigate to="/signup" />
         <Signup setShowSignup={setShowSignup} />
@@ -22,10 +25,22 @@ const PrivateEnterRoute = () => {
       </>
     );
   } else if (level === 1) {
-    return <ApprovalPendingScreen />;
+    content = (
+      <>
+        <Navigate to="/pending" />
+        <ApprovalPendingScreen />
+      </>
+    );
+  } else {
+    content = <App level={level} />;
   }
 
-  return <App level={level} />;
+  return (
+    <>
+      <Header setShowSignup={setShowSignup} />
+      {content}
+    </>
+  );
 };
 
 export default PrivateEnterRoute;

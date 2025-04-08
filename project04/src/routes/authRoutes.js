@@ -59,19 +59,13 @@ router.post("/signup", (req, res) => {
   `;
 
   query(sql, [id, password])
-    .then((error, data) => {
-      if (error) {
-        console.error("계정 생성 실패:", error);
-        res.send({ msg: "전송 실패" });
-      } else {
-        console.log("계정 생성 성공:", data);
-        res.send(data);
-      }
+    .then((data) => {
+      res.send(data);
+      console.log("계정 생성 성공:", data);
     })
     .catch((err) => {
-      console.log("error", err);
-
       res.send(err);
+      console.error("계정 생성 실패:", err);
     });
 });
 
