@@ -46,30 +46,6 @@ const BoardList = ({ level }) => {
     }
   };
 
-  // 게시글 삭제
-  const deleteBoard = async (idx) => {
-    if (level <= 3) {
-      alert("삭제 권한 없음");
-      return;
-    }
-
-    const deleteCode = "de";
-    const userInput = prompt("삭제 암호를 입력하세요", "");
-
-    if (userInput === deleteCode) {
-      try {
-        await axios.delete("http://192.168.23.65:5000/board/delete", {
-          data: { idx },
-        });
-        setBoardList((prevList) => prevList.filter((item) => item.idx !== idx));
-      } catch (error) {
-        console.error("삭제 중 오류 발생:", error);
-      }
-    } else {
-      alert("잘못된 비밀번호입니다.");
-    }
-  };
-
   // 검색
   const onSearch = async () => {
     try {
@@ -103,18 +79,22 @@ const BoardList = ({ level }) => {
     setIsModalOpen(true);
   };
 
-  const onModalClose = async () => {
-    try {
-      // 새로 등록된 데이터를 가져오기 위해 서버에서 최신 데이터를 요청
-      const response = await axios.get(`http://192.168.23.65:5000/board`, {
-        params: { offset: 0, limit: 1 }, // 최신 데이터 1개만 가져옴
-      });
+  const onModalClose = async (val, idx) => {
+    if (val === "delete") {
+      setBoardList((prevList) => prevList.filter((item) => item.idx !== idx));
+    } else {
+      try {
+        // 새로 등록된 데이터를 가져오기 위해 서버에서 최신 데이터를 요청
+        const response = await axios.get(`http://192.168.23.65:5000/board`, {
+          params: { offset: 0, limit: 1 }, // 최신 데이터 1개만 가져옴
+        });
 
-      if (response.data[0].idx >= isBoardIdx) return; // 방금 수정된 데이터는 제외
-      const newBoard = response.data[0]; // 새로 등록된 데이터
-      setBoardList((prevList) => [newBoard, ...prevList]); // 새 데이터를 맨 앞에 추가
-    } catch (error) {
-      console.error("새 데이터를 가져오는 중 오류 발생:", error);
+        if (response.data[0].idx >= isBoardIdx) return; // 방금 수정된 데이터는 제외
+        const newBoard = response.data[0]; // 새로 등록된 데이터
+        setBoardList((prevList) => [newBoard, ...prevList]); // 새 데이터를 맨 앞에 추가
+      } catch (error) {
+        console.error("새 데이터를 가져오는 중 오류 발생:", error);
+      }
     }
   };
 
@@ -268,6 +248,7 @@ const BoardList = ({ level }) => {
               openPup(board.outerUrl, board.title);
             }}
           >
+            <span>{board.idx}</span>
             <S.Thumb
               src={`${board.thumb}?t=${new Date().getTime()}`}
               alt={board.title}

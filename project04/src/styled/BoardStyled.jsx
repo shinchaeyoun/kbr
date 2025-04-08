@@ -129,6 +129,16 @@ const Group = styled.div`
 const BoardItem = styled.div`
   position: relative;
   display: flex;
+
+  >span { // dlatl
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 14px;
+    font-family: "NanumSquareNeoBold", sans-serif;
+    color: #777;
+    background-color: #fff;
+  }
 `;
 
 const GridContainer = styled.div`

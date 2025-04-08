@@ -29,7 +29,7 @@ const BoardForm = ({
 
   // 게시글 정보 상태
   const [board, setBoard] = useState({
-    year: "",
+    year: currentYear,
     title: "",
     customer: "",
     innerUrl: "",
@@ -85,7 +85,6 @@ const BoardForm = ({
   // 취소 버튼 동작
   const handleCancel = () => {
     setIsModalOpen(false);
-    // if (onModalClose) onModalClose();
   };
 
   // 이미지 등록
@@ -148,11 +147,25 @@ const BoardForm = ({
 
   // 게시글 저장
   const handleSubmit = async () => {
+    // 공백 체크
     if (title === "" && year === "") {
       setWarning(true);
       alert("사업연도/사업명을 입력하세요.");
       return;
     }
+
+    // 중복 체크
+    const response = await axios.post(`http://192.168.23.65:5000/board/dup`, {
+      year: year,
+      title: title,
+    });
+
+    if (response.data.result) {
+      alert(response.data.msg);
+      return;
+    }
+
+    // 이미지 업로드
     let uploadedFilePath = thumb;
 
     if (isThumb && previewFile)
@@ -163,6 +176,7 @@ const BoardForm = ({
       thumb: uploadedFilePath,
     };
 
+    // 서버에 데이터 전송
     try {
       if (mode === "view") {
         const response = await axios.patch(
@@ -205,7 +219,7 @@ const BoardForm = ({
       return;
     }
 
-    const deleteCode = "de";
+    const deleteCode = "dd";
     const userInput = prompt("삭제 암호를 입력하세요", "");
 
     if (userInput === deleteCode) {
@@ -214,7 +228,7 @@ const BoardForm = ({
           data: { idx },
         });
         setIsModalOpen(false);
-        if (onModalClose) onModalClose(); // 부모 컴포넌트에 변경 알림
+        if (onModalClose) onModalClose("delete", idx); // 부모 컴포넌트에 변경 알림
       } catch (error) {
         console.error("삭제 중 오류 발생:", error);
       }
@@ -241,16 +255,6 @@ const BoardForm = ({
     <M.Wrap>
       <M.Title>{boardTitle}</M.Title>
       <M.GridContainer>
-        {/* <M.GridItem>
-          <div>사업연도/사업명(과정명)</div>
-          <M.Input
-            type="text"
-            name="year"
-            value={year}
-            readOnly={isRead}
-            onChange={onChange}
-          />
-        </M.GridItem> */}
         <M.GridItem>
           <div>
             사업연도/사업명(과정명)

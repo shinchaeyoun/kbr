@@ -35,6 +35,32 @@ router.post("/", (req, res) => {
     .catch((err) => res.send({ msg: "전송 실패" }));
 });
 
+// 연도 + 과정명 중복 확인
+router.post("/dup", (req, res) => {
+  const { year, title } = req.body;
+
+  const sql = `
+    SELECT * 
+    FROM board
+    WHERE year = ? AND title = ?;
+  `;
+
+  query(sql, [year, title])
+    .then((data) => {
+      console.log('data', data);
+      
+      if (data.length > 0) {
+        res.send({ result: true, msg: "중복된 데이터가 있습니다." });
+      } else {
+        res.send({ result: false, msg: "중복된 데이터가 없습니다." });
+      }
+    })
+    .catch((err) => {
+      console.log("error", err);
+      res.send(err);
+    });
+});
+
 // 게시판 데이터 총 개수 가져오기
 router.get("/count", async (req, res) => {
   const sql1 = `SELECT COUNT(*) AS totalCount FROM board`;
@@ -74,7 +100,7 @@ router.post("/search", async (req, res) => {
 // 게시판 글 삭제
 router.delete("/delete", (req, res) => {
   console.log("삭제 요청", req.body.idx);
-  
+
   const idx = req.body.idx;
   const sql = `
     DELETE FROM board WHERE idx = ?  

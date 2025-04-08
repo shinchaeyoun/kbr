@@ -8,7 +8,7 @@ import ApprovalPendingScreen from "../components/ApprovalPendingScreen.jsx";
 
 const PrivateEnterRoute = () => {
   const level = Number(localStorage.level) || 0;
-  const [showSignup, setShowSignup] = useState(true);
+  const [showSignup, setShowSignup] = useState(false);
 
   let content;
 
