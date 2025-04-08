@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import styled, { css } from "styled-components";
-import "../styled/header.css";
 import H from "../styled/HeaderStyled";
 import S from "../styled/GlobalBlock";
 
 const Header = ({setShowSignup}) => {
-  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
 
   // 로그아웃 함수
@@ -19,12 +15,13 @@ const Header = ({setShowSignup}) => {
 
   // 로그인 함수
   const onLogin = () => {
-    setShowSignup(false);
+    setShowSignup(false)
   };
 
   const onLogo = () => {
-    navigate("/");
+    // navigate("/");
     setShowSignup(false);
+    document.location.href = "/";
   };
 
   // 로그인 상태 확인

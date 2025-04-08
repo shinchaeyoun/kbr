@@ -107,6 +107,11 @@ const BoardForm = ({
     if (board.thumb !== null && board.thumb !== "")
       fileName = board.thumb.split("/").pop();
 
+    if (fileName === 'default.png') {
+      fileName = file.name; // 기본 이미지인 경우 원본 파일 이름 사용
+    };
+    
+
     return new Promise((resolve, reject) => {
       reader.onload = async () => {
         const base64Image = reader.result; // Base64 데이터
@@ -161,7 +166,6 @@ const BoardForm = ({
 
     // 이미지 업로드
     let uploadedFilePath = thumb;
-
 
     isThumb && previewFile
       ? (uploadedFilePath = await handleFileUpload(previewFile))

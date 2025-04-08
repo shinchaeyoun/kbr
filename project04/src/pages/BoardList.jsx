@@ -37,10 +37,10 @@ const BoardList = ({ level }) => {
       setBoardList((prevList) => {
         const uniqueItems = new Map();
         [...prevList, ...response.data].forEach((item) => {
-            uniqueItems.set(item.idx, {
-              ...item,
-              thumb: `${item.thumb}?t=${new Date().getTime()}`, // 타임스탬프 추가
-            }); // idx를 키로 사용하여 중복 제거
+          uniqueItems.set(item.idx, {
+            ...item,
+            thumb: `${item.thumb}?t=${new Date().getTime()}`, // 타임스탬프 추가
+          }); // idx를 키로 사용하여 중복 제거
         });
         return Array.from(uniqueItems.values());
       });
@@ -189,15 +189,24 @@ const BoardList = ({ level }) => {
               setSearch({ ...isSearch, year: e.target.value });
             }}
           >
-            <option value="all">전체보기</option>
+            <option value="all" style={{ backgroundColor: "lightgray" }}>
+              전체보기
+            </option>
             {Array.from({ length: 7 }, (_, i) => {
-                const year = currentYear + 1 - i; // SelectYear부터 이전 5년까지 옵션 생성
-                return (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                );
-              })}
+              const year = currentYear + 1 - i; // SelectYear부터 이전 5년까지 옵션 생성
+              return (
+                <option
+                  key={year}
+                  value={year}
+                  style={{
+                    backgroundColor:
+                      year === selectYear ? "lightblue" : "white",
+                  }}
+                >
+                  {year}
+                </option>
+              );
+            })}
           </S.Select>
 
           <S.Input
@@ -256,18 +265,11 @@ const BoardList = ({ level }) => {
               openPup(board.outerUrl, board.title);
             }}
           >
-            <span>{board.idx}</span>
-            {/* {board.thumb} */}
-            {/* {board.thumb == null && (
-              <S.Thumb src="/images/thumbnail/default.png" alt={board.title} />
-            )} */}
-
             <S.Thumb
               src={`${board.thumb}?t=${new Date().getTime()}`}
               alt={board.title}
             />
 
-            
             <B.Group>
               {isType === "list" ? (
                 <B.ListTitle>

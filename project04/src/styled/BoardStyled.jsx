@@ -15,6 +15,10 @@ const Search = styled.div`
       background-color: initial;
     }
   }
+
+  option:hover {
+    background-color: #ddd;
+  }
 `;
 
 const Button = styled(S.Button)`
