@@ -8,7 +8,17 @@ const connection = mysql.createConnection({
   password: "b@Con122$4",
   database: "mytest",
   port: 3306,
+  connectionLimit: 10,
   // Kbrainc3158!@
+});
+
+connection.query('SELECT * FROM board', (err, results) => {
+  if (err) throw err;
+  // console.log(results);
+});
+connection.query('SELECT * FROM user', (err, results) => {
+  if (err) throw err;
+  // console.log(results);
 });
 
 connection.connect((err) => {

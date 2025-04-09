@@ -16,6 +16,8 @@ const BoardList = ({ level }) => {
   const [modalMode, setModalMode] = useState("view");
   const [isType, setType] = useState("card"); // card, list
   const [isGridColumn, setIsGridColumn] = useState(5);
+  const [modalData, setModalData] = useState(null); // 모달에 전달할 데이터
+  const [isEmptyLink, setIsEmptyLink] = useState(false); // 링크가 없는 경우
 
   const currentYear = new Date().getFullYear(); // 현재 연도 가져오기
   const [selectYear, setSelectYear] = useState(currentYear);
@@ -77,8 +79,9 @@ const BoardList = ({ level }) => {
   };
 
   // 모달 열기
-  const openModal = (idx) => {
+  const openModal = (idx, data = {}) => {
     setIsBoardIdx(idx);
+    setModalData(data); // 추가 데이터 설정
     setIsModalOpen(true);
   };
 
@@ -125,7 +128,13 @@ const BoardList = ({ level }) => {
   };
 
   // 팝업창 열기
-  const openPup = (link, title) => {
+  const openPup = (link, title, idx) => {
+    // 링크가 없으면 상태를 설정하고 모달 열기
+    if(link==="") {
+      setIsEmptyLink(true); 
+      return openModal(idx);
+    }
+
     const popup = window.open(
       `${link}`,
       `${title}`,
@@ -177,6 +186,8 @@ const BoardList = ({ level }) => {
         setIsModalOpen={setIsModalOpen}
         onModalClose={onModalClose}
         level={level}
+        isEmptyLink={isEmptyLink}
+        setIsEmptyLink={setIsEmptyLink}
       />
 
       <B.SearchContainer>
@@ -262,9 +273,10 @@ const BoardList = ({ level }) => {
           <B.BoardItem
             key={board.idx}
             onClick={() => {
-              openPup(board.outerUrl, board.title);
+              openPup(board.outerUrl, board.title, board.idx);
             }}
           >
+            <span>{board.idx}</span>
             <S.Thumb
               src={`${board.thumb}?t=${new Date().getTime()}`}
               alt={board.title}
@@ -274,7 +286,7 @@ const BoardList = ({ level }) => {
               {isType === "list" ? (
                 <B.ListTitle>
                   <p>{board.title}</p>
-                  {isType === "list" && <span>{board.outerUrl}</span>}
+                  <span>{board.outerUrl}</span>
                 </B.ListTitle>
               ) : (
                 <B.CardTitle>

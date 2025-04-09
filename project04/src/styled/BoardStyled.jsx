@@ -1,6 +1,7 @@
 //BoardStyled
 import styled from "styled-components";
 import S from "./GlobalBlock";
+import media from "./media.jsx";
 
 const Search = styled.div`
   ${S.Input} {
@@ -84,11 +85,14 @@ const ListIcon = styled(Icon)`
 const Title = styled.div`
   font-size: 14px;
   font-family: "NanumSquareNeoBold", sans-serif;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ListTitle = styled(Title)`
   padding-left: 10px;
-
   span {
     color: #777777;
     font-family: "NanumSquareNeo", sans-serif;
@@ -96,12 +100,10 @@ const ListTitle = styled(Title)`
 `;
 const CardTitle = styled(Title)`
   width: 200px;
-  P {
+
+  p {
     position: relative;
     padding-left: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     &:after {
       content: "";
       position: absolute;
@@ -133,8 +135,9 @@ const Group = styled.div`
 const BoardItem = styled.div`
   position: relative;
   display: flex;
-
-  >span { // dlatl
+  width: 100%;
+  > span {
+    // dlatl
     position: absolute;
     top: 10px;
     left: 10px;
@@ -149,7 +152,7 @@ const GridContainer = styled.div`
   display: grid;
   justify-content: center;
   grid-template-columns: ${(props) =>
-    props.type === "card" ? `repeat(${props.$cl}, 1fr)` : "repeat(2, 1fr)"};
+    props.type === "card" ? `repeat(5, 1fr)` : "repeat(2, 1fr)"};
   gap: 31px 20px;
 
   max-width: 100%;
@@ -166,7 +169,8 @@ const GridContainer = styled.div`
     padding: ${(props) =>
       (props.type === "card" && `0`) || "10px 3px 10px 10px"};
 
-    width: ${(props) => (props.type === "card" && `100%`) || "620px"};
+    min-width: ${(props) => props.type === "list" && `490px`};
+    width: ${(props) => (props.type === "card" && `100%`) || "100%"};
     height: ${(props) => (props.type === "card" && `210px`) || "70px"};
 
     border: ${(props) =>
@@ -180,14 +184,45 @@ const GridContainer = styled.div`
     object-fit: cover;
     border: 1px solid #aaaaaa;
     border-radius: 5px;
-  }
-
-  ${Title} {
+    flex-shrink: 0;
   }
 
   ${S.ButtonWrap} {
     flex-direction: ${(props) => (props.type === "card" ? "row" : "column")};
   }
+
+  ${media.deskL`
+    // color: green;
+    grid-template-columns: ${(props) =>
+      props.type === "card" ? `repeat(4, 1fr)` : "repeat(2, 49%)"};
+    justify-items: center;
+
+    ${ListTitle} {
+      width: 360px;
+    }
+  `}
+
+  ${media.desk`
+    // color: pink;
+    grid-template-columns: ${(props) =>
+      props.type === "card" ? `repeat(3, 1fr)` : "repeat(1, 1fr)"};
+
+      ${ListTitle} {
+      width: 100%;
+    }
+  `}
+  
+  ${media.tab`
+    // color: red;
+    grid-template-columns: ${(props) =>
+      props.type === "card" && `repeat(2, 1fr)`};
+  `}
+
+  ${media.mbl`
+    // color: blue;
+    grid-template-columns: ${(props) =>
+      props.type === "card" ? `repeat(1, 1fr)` : "repeat(1, 1fr)"};
+  `}
 `;
 
 const CardIcon = styled(Icon)``;

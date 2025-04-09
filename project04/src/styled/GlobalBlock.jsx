@@ -1,15 +1,6 @@
 import styled from "styled-components";
 
 const Notice = styled.span``;
-
-const dlatl = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: #ccc;
-  font-size: 12px;
-`;
-
 const Img = styled.img``;
 const Thumb = styled.img``;
 
@@ -198,7 +189,6 @@ const S = {
   LoginInput,
   SignupButton,
   Thumb,
-  dlatl,
   Notice,
   Footer,
   CenterBox,

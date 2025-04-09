@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
-import styled from "styled-components";
 import BoardForm from "./forms/BoardForm.jsx";
 import M from "../styled/ModalStyled.jsx";
-
 
 const Modal = (props) => {
   const itemIdx = props.itemIdx;
@@ -33,8 +31,8 @@ const Modal = (props) => {
   return (
     <>
       {props.isModalOpen && (
-        <M.ModalWrap className="modal-wrap" onClick={closeModal}>
-          <M.ModalContent className="content" onClick={(e) => e.stopPropagation()}>
+        <M.ModalWrap onClick={closeModal}>
+          <M.ModalContent onClick={(e) => e.stopPropagation()}>
             <BoardForm
               mode={mode}
               idx={itemIdx}
@@ -42,6 +40,8 @@ const Modal = (props) => {
               setIsModalOpen={props.setIsModalOpen}
               onModalClose={props.onModalClose}
               level={props.level}
+              isEmptyLink={props.isEmptyLink}
+              setIsEmptyLink={props.setIsEmptyLink}
             />
           </M.ModalContent>
         </M.ModalWrap>

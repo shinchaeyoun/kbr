@@ -14,6 +14,8 @@ const BoardForm = ({
   setIsModalOpen,
   onModalClose,
   level,
+  isEmptyLink,
+  setIsEmptyLink,
 }) => {
   const navigate = useNavigate();
 
@@ -36,7 +38,7 @@ const BoardForm = ({
     customer: "",
     innerUrl: "",
     outerUrl: "",
-    thumb: isThumb,
+    thumb: "",
   });
 
   const { year, title, customer, innerUrl, outerUrl, thumb } = board;
@@ -97,8 +99,9 @@ const BoardForm = ({
   // 이미지 파일 서버 업로드
   const handleFileUpload = async (file = previewFile) => {
     if (!file) {
-      console.error("파일이 전달되지 않았습니다.");
-      return null;
+      if (board.thumb !== "") {
+        return board.thumb;
+      }
     }
 
     const reader = new FileReader();
@@ -107,10 +110,9 @@ const BoardForm = ({
     if (board.thumb !== null && board.thumb !== "")
       fileName = board.thumb.split("/").pop();
 
-    if (fileName === 'default.png') {
+    if (fileName === "default.png") {
       fileName = file.name; // 기본 이미지인 경우 원본 파일 이름 사용
-    };
-    
+    }
 
     return new Promise((resolve, reject) => {
       reader.onload = async () => {
@@ -147,7 +149,7 @@ const BoardForm = ({
   // 게시글 저장
   const handleSubmit = async () => {
     // 공백 체크
-    if (title === "" && year === "") {
+    if (title === "" || year === "") {
       setWarning(true);
       alert("사업연도/사업명을 입력하세요.");
       return;
@@ -158,8 +160,9 @@ const BoardForm = ({
       year: year,
       title: title,
     });
-
-    if (mode == "write" && response.data.result) {
+    if (response.data.idx !== idx && response.data.result) {
+      // 현재 수정하는 인덱스와 서버에 데이터 중복 체크한 인덱스가 다를 경우
+      // 중복된 데이터가 존재할 경우
       alert(response.data.msg);
       return;
     }
@@ -167,9 +170,15 @@ const BoardForm = ({
     // 이미지 업로드
     let uploadedFilePath = thumb;
 
-    isThumb && previewFile
-      ? (uploadedFilePath = await handleFileUpload(previewFile))
-      : (uploadedFilePath = defaultImg);
+    if (board.thumb !== "") {
+      // 과정 수정
+      uploadedFilePath = await handleFileUpload(previewFile);
+    } else {
+      // 과정 등록
+      isThumb && previewFile
+        ? (uploadedFilePath = await handleFileUpload(previewFile)) // 사용자가 이미지를 올렸을 때
+        : (uploadedFilePath = defaultImg); // 이미지 안올렸을 때
+    }
 
     const updatedBoard = {
       ...board,
@@ -244,6 +253,12 @@ const BoardForm = ({
     changeTitle();
     setPreviewUrl(null);
     if (mode == "view" && level < 3) setIsRead(true);
+    if (isEmptyLink) {
+      const timer = setTimeout(() => {
+        setIsEmptyLink(false);
+      }, 700); // 애니메이션 지속 시간에 맞게 설정 (예: 1초)
+      return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
+    }
   }, [isModalOpen]);
 
   useEffect(() => {
@@ -257,10 +272,10 @@ const BoardForm = ({
       <M.Title>{boardTitle}</M.Title>
       <M.GridContainer>
         <M.GridItem>
-          <div>
+          <M.SubTitle>
             사업연도/사업명(과정명)
             {mode == "write" && <span>* 필수입력 내용입니다.</span>}
-          </div>
+          </M.SubTitle>
 
           <M.Group
             className={warning ? "warning" : ""}
@@ -293,7 +308,7 @@ const BoardForm = ({
           </M.Group>
         </M.GridItem>
         <M.GridItem>
-          <div>고객사</div>
+          <M.SubTitle>고객사</M.SubTitle>
           <M.Input
             type="text"
             name="customer"
@@ -303,7 +318,7 @@ const BoardForm = ({
           />
         </M.GridItem>
         <M.GridItem>
-          <div>과정경로(서버경로)</div>
+          <M.SubTitle>과정경로(서버경로)</M.SubTitle>
           <M.Input
             type="text"
             name="innerUrl"
@@ -312,8 +327,10 @@ const BoardForm = ({
             onChange={onChange}
           />
         </M.GridItem>
-        <M.GridItem>
-          <div>과정URL(검수사이트)</div>
+        <M.GridItem className={isEmptyLink ? "emptyLink" : ""}>
+          <M.SubTitle>
+            과정URL(검수사이트)
+          </M.SubTitle>
           <M.Input
             type="text"
             name="outerUrl"
@@ -324,7 +341,7 @@ const BoardForm = ({
         </M.GridItem>
         <M.GridItem $margin="0 0 5px 0">
           <M.Form>
-            <div>썸네일 이미지</div>
+            <M.SubTitle>썸네일 이미지</M.SubTitle>
             <M.Input
               type="file"
               id="thumb"
@@ -341,11 +358,13 @@ const BoardForm = ({
         </M.GridItem>
 
         <M.GridItem>
-          {board.thumb !== null && previewUrl == null && (
-            <>
-              <M.Img src={board.thumb} alt="thumb 미리보기" />
-            </>
-          )}
+          {board.thumb !== "" &&
+            previewUrl == null &&
+            board.thumb !== defaultImg && (
+              <>
+                <M.Img src={board.thumb} alt="thumb 미리보기" />
+              </>
+            )}
           {previewUrl !== null && (
             <>
               <M.Img src={previewUrl} alt="previewUrl 미리보기" />

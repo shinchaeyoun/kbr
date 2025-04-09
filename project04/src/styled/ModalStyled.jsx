@@ -106,6 +106,10 @@ const Group = styled.div`
   }
 `;
 
+const SubTitle = styled.div`
+  display: inline-block;
+`;
+
 const GridItem = styled.div`
   margin: ${(props) => props.$margin || "0 0 15px 0"};
 
@@ -122,6 +126,32 @@ const GridItem = styled.div`
   > ${S.Notice} {
     font-size: 14px;
     color: #777777;
+  }
+
+  &.emptyLink {
+    ${SubTitle} {
+      animation: shake 0.7s ease-in-out;
+    }
+    ${Input} {
+      border: 1px solid red;
+    }
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      color: red;
+      transform: translateX(0);
+    }
+    25% {
+      transform: rotate(-2deg);
+    }
+    50% {
+      transform: rotate(1deg);
+    }
+    75% {
+      transform: rotate(-2deg);
+    }
   }
 `;
 
@@ -173,6 +203,7 @@ const M = {
   Input,
   Form,
   Group,
+  SubTitle,
   GridItem,
   GridContainer,
   Title,

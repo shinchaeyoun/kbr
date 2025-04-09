@@ -47,10 +47,8 @@ router.post("/dup", (req, res) => {
 
   query(sql, [year, title])
     .then((data) => {
-      console.log('data', data);
-      
       if (data.length > 0) {
-        res.send({ result: true, msg: "중복된 데이터가 있습니다." });
+        res.send({ result: true, msg: "중복된 데이터가 있습니다.", idx: data[0].idx });
       } else {
         res.send({ result: false, msg: "중복된 데이터가 없습니다." });
       }
@@ -107,8 +105,6 @@ router.post("/search", async (req, res) => {
 
 // 게시판 글 삭제
 router.delete("/delete", (req, res) => {
-  console.log("삭제 요청", req.body.idx);
-
   const idx = req.body.idx;
   const sql = `
     DELETE FROM board WHERE idx = ?  
@@ -131,12 +127,10 @@ router.post("/upload", async (req, res) => {
     try {
       const data = await query(sqlDESC); // 비동기 작업
       if (data.length > 0) {
-        console.log("가장 최근 인덱스 값", data[0].idx);
         index = data[0].idx + 1; // 가장 최근 인덱스 값에 1을 더하여 사용
       } else {
         index = 1; // 테이블이 비어 있는 경우 기본값 설정
       }
-      console.log("index 인덱스 값 재정의", index);
     } catch (error) {
       console.error("인덱스 값을 가져오는 중 오류 발생:", error);
       return res.status(500).send({ msg: "인덱스 값을 가져오는 중 오류 발생" });
