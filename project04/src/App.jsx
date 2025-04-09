@@ -13,13 +13,13 @@ import BoardList from "./pages/BoardList.jsx";
 import BoardDetail from "./pages/BoardDetail.jsx";
 import UserList from "./pages/UserList.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
+import Scheduled from "./pages/Scheduled.jsx";
 
 // components
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import BoardForm from "./components/forms/BoardForm.jsx";
 import Pending from "./components/ApprovalPendingScreen.jsx";
-import Calendar from "./components/Calendar.jsx";
 
 
 // route
@@ -51,7 +51,12 @@ function App(props) {
           path="/board/update/:idx"
           element={<BoardForm isUpdate={true} />}
         />
-        <Route path="/calendar" element={<Calendar/>} />
+
+
+        <Route path="/scheduled" element={<Scheduled/>} />
+
+
+
         {/* 어드민계정관련 */}
         <Route path="/admin/userlist" element={<UserList />} />
         <Route path="/admin/userlist/:idx" element={<UserDetail />} />
