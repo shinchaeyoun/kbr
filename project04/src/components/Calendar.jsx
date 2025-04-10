@@ -1,37 +1,32 @@
-import React, { useState } from "react";
-import Calendar from "react-calendar";
-import "../styled/calendar.scss";
-import S from "../styled/GlobalBlock";
-import C from "../styled/CalenderStyle.jsx";
+import React, { useEffect, useState } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
+import "../styled/react-big-calendar.scss";
+import axios from "axios";
 
-const CalendarComponent = () => {
-  const [date, setDate] = useState(new Date());
-  const [isSet, setStartDate] = useState(new Date());
 
-  const title = {
-    marginBottom: "20px",
-    fontSize: "18px",
-  };
+const localizer = momentLocalizer(moment);
 
-  const test = () => {
-    console.log("test");
+const CalendarComponent = ({height, events, onSelectSlot, onSelectEvent}) => {
+  //데이터 입력 함수
+
+  const dataInsert = async () => {
+    console.log('dataInsert click');
+    
   };
 
   return (
-    <C.CalendarContainer>
+    <div style={{ height: height }}>
       <Calendar
-        onClick={test}
-        onChange={setDate}
-        value={date}
-        calendarType="gregory"
-        view="month"
-        prev2Label={null}
-        next2Label={null}
-        // showNeighboringMonth={false}
-        formatDay={(locale, date) => moment(date).format("DD")}
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        selectable // 드래그로 일정 추가 가능
+        onSelectSlot={onSelectSlot} // 빈 공간 클릭/드래그 이벤트
+        onSelectEvent={onSelectEvent} // 일정 클릭 이벤트
       />
-    </C.CalendarContainer>
+    </div>
   );
 };
 

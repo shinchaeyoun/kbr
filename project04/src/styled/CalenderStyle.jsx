@@ -13,13 +13,11 @@ const CalendarContainer = styled.div`
 
 const SideContainer = styled(Container)`
   ${CalendarContainer} {
-    // width: 300px;
   }
 `;
 
 const ContentContainer = styled(Container)`
   ${CalendarContainer} {
-    // width: 1200px;
     height: 100%;
   }
 `;
@@ -40,10 +38,15 @@ const DateContainer = styled.div`
 const CalendarWrap = styled.div`
   display: grid;
   grid-template-columns: 20% 80%;
+
+  grid-template-columns: ${({ $sideCalendar }) =>
+    $sideCalendar ? "20% 80%" : "1fr"};
   grid-template-rows: 1fr;
   align-items: center;
-  border: 1px solid #c8c8c8;
+
   height: calc(100vh - (var(--header-height) + var(--footer-height)));
+  font-family: "OutfitRegular", "Pretendard-Regular" !important;
+
 `;
 
 const C = {

@@ -276,7 +276,6 @@ const BoardList = ({ level }) => {
               openPup(board.outerUrl, board.title, board.idx);
             }}
           >
-            <span>{board.idx}</span>
             <S.Thumb
               src={`${board.thumb}?t=${new Date().getTime()}`}
               alt={board.title}

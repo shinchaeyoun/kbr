@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import H from "../styled/HeaderStyled";
 import S from "../styled/GlobalBlock";
 
-const Header = ({setShowSignup}) => {
+const Header = ({ setShowSignup }) => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
+  const [level, setLevel] = useState(localStorage.getItem("level"));
 
   // 로그아웃 함수
   const onLogout = () => {
@@ -15,7 +18,7 @@ const Header = ({setShowSignup}) => {
 
   // 로그인 함수
   const onLogin = () => {
-    setShowSignup(false)
+    setShowSignup(false);
   };
 
   const onLogo = () => {
@@ -26,8 +29,9 @@ const Header = ({setShowSignup}) => {
 
   // 로그인 상태 확인
   useEffect(() => {
-    const level = localStorage.getItem("level");
+    // const level = localStorage.getItem("level");
     setIsLogin(level !== null); // level 값이 있으면 로그인 상태로 설정
+    console.log("level", level);
   }, []);
 
   return (
@@ -37,9 +41,15 @@ const Header = ({setShowSignup}) => {
       </H.HeaderTitle>
 
       {isLogin ? (
-        <S.Button className="logout" onClick={onLogout}>
-          로그아웃
-        </S.Button>
+        <S.ButtonWrap direction="row">
+          <S.Button className="logout" onClick={onLogout}>
+            로그아웃
+          </S.Button>
+
+          {level === "9" && (
+            <S.Button onClick={() => navigate("/admin")}>관리자</S.Button>
+          )}
+        </S.ButtonWrap>
       ) : (
         <S.Button className="login" onClick={onLogin}>
           로그인
