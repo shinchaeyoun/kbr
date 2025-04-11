@@ -9,6 +9,20 @@ import OutfitRegular from "./font/Outfit-Regular.ttf";
 import OutfitBold from "./font/Outfit-Bold.ttf";
 
 const GlobalStyles = createGlobalStyle`
+  :root {
+    --header-height: 152px; /* 헤더 높이를 60px로 설정 */
+    --footer-height: 15vh; /* 헤더 높이를 60px로 설정 */
+    
+    /* 색상 변수 설정 */  
+    --label-pink: #ffafbd;
+    --label-green: #a2ab58;
+    --label-blue: #66a6ff;
+    --label-yellow: #f7b733;
+    // --secondary-color: #ff7eb3;
+    // --background-color: #f0f4f9;
+    // --text-color: #333333;
+  }
+
   @font-face {
     font-family: 'OutfitRegular';
     src: local('OutfitRegular'), local('OutfitRegular');
@@ -101,11 +115,6 @@ const GlobalStyles = createGlobalStyle`
   }
       
 
-  :root {
-    --header-height: 152px; /* 헤더 높이를 60px로 설정 */
-    --footer-height: 15vh; /* 헤더 높이를 60px로 설정 */
-  }
-    
   body {
     position: relative;
     font-family: 'NanumSquareR';

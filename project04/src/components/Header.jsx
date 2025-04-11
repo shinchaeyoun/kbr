@@ -22,16 +22,13 @@ const Header = ({ setShowSignup }) => {
   };
 
   const onLogo = () => {
-    // navigate("/");
     setShowSignup(false);
     document.location.href = "/";
   };
 
   // 로그인 상태 확인
   useEffect(() => {
-    // const level = localStorage.getItem("level");
     setIsLogin(level !== null); // level 값이 있으면 로그인 상태로 설정
-    console.log("level", level);
   }, []);
 
   return (
