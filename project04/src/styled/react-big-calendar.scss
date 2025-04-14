@@ -560,11 +560,11 @@ button.rbc-input::-moz-focus-inner {
   text-transform: lowercase;
 }
 .rbc-agenda-time-cell .rbc-continues-after:after {
-  content: " 쨩";
+  content: "";
 }
 
 .rbc-agenda-time-cell .rbc-continues-prior:before {
-  content: "짬";
+  content: "";
 }
 
 .rbc-agenda-date-cell,
@@ -875,6 +875,17 @@ button.rbc-input::-moz-focus-inner {
   height: 1px;
   background-color: #74ad31;
   pointer-events: none;
+}
+
+.rbc-current-time-indicator::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: #74ad31;
+  border-radius: 50%;
 }
 
 .rbc-resource-grouping.rbc-time-header-content {

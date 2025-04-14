@@ -80,8 +80,6 @@ const DialogComponent = ({
 
   const handleSave = () => {
     if (mode == "read") {
-      console.log("eventEdit", eventEdit);
-
       // alert("수정하시겠습니까?");
       // handleEdit();
       setEditMode(!editMode);
@@ -94,13 +92,6 @@ const DialogComponent = ({
 
       if (eventEdit) eventEdit(eventId, updateEvent);
     } else if (mode === "write") {
-      console.log(
-        "event.title",
-        event.title,
-        "//",
-        event.title || "(제목 없음)"
-      );
-
       const newEvent = {
         ...event,
         title: event.title || "(제목 없음)",

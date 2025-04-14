@@ -29,11 +29,8 @@ const Scheduled = () => {
     setEventId(id); // 선택된 이벤트 ID 저장
 
     if (box === undefined && bounds === undefined) {
-      console.log("전달될 모드 read");
-
       setMode("read"); // 모달 모드 설정
     } else {
-      console.log("전달될 모드 write");
       setMode("write"); // 모달 모드 설정
     }
     // box === undefined && bounds === undefined ? setMode("read",eventId) : setMode("write"); // 모달 모드 설정
@@ -49,8 +46,6 @@ const Scheduled = () => {
   };
 
   const onCloseDialog = async (val, id) => {
-    console.log("onCloseDialog", val, id);
-
     if (val === "delete") {
       setEvents((prevList) => prevList.filter((item) => item.id !== id));
     } else {
@@ -74,12 +69,10 @@ const Scheduled = () => {
 
   // 일정 저장 이벤트 핸들러
   const eventSave = (event) => {
-    console.log("eventSave", event);
-    
     const newEvent = {
+      title: event.title,
       start: moment(selectedTime.start).toDate(),
       end: moment(selectedTime.end).toDate(),
-      title: event.title,
       label: event.label,
       memo: event.memo,
     };
@@ -127,8 +120,6 @@ const Scheduled = () => {
 
   // 일정 클릭 이벤트 핸들러
   const handleSelectEvent = (event) => {
-    console.log("handleSelectEvent click");
-
     setShowDialog(true);
     // alert(`선택된 일정: ${event.title}`);
   };
@@ -139,7 +130,6 @@ const Scheduled = () => {
   }, []);
 
   useEffect(() => {}, [showDialog]);
-console.log('events',events);
 
   return (
     <C.Wrap $events={events}>
@@ -169,6 +159,7 @@ console.log('events',events);
           <CalendarComponent
             height="100%"
             events={events}
+            setEvents={setEvents}
             onSelectSlot={openDialog} // 일정 추가 핸들러 전달
             onSelectEvent={openDialog} // 일정 클릭 핸들러 전달
           />

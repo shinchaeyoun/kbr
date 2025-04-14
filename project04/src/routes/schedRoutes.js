@@ -27,14 +27,14 @@ router.get("/events", (req, res) => {
 
 // 새로운 이벤트 추가
 router.post("/events", (req, res) => {
-  const { title, start, end, label } = req.body;
+  const { title, start, end, label, memo } = req.body;
 
   // 날짜 형식 변환
   const formattedStart = moment(start).format("YYYY-MM-DD HH:mm:ss");
   const formattedEnd = moment(end).format("YYYY-MM-DD HH:mm:ss");
-  const sql = "INSERT INTO events (title, start, end, label) VALUES (?, ?, ?, ?)";
+  const sql = "INSERT INTO events (title, start, end, label, memo) VALUES (?, ?, ?, ?, ?)";
 
-  query(sql, [title, formattedStart, formattedEnd, label])
+  query(sql, [title, formattedStart, formattedEnd, label, memo])
     .then((data) => res.send(data))
     .catch((err) => res.send(err));
 });

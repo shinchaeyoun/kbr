@@ -4,6 +4,76 @@ import S from "./GlobalBlock";
 import M from "./ModalStyled.jsx";
 import media from "./media.jsx";
 
+// 툴바 스타일 시작
+const Button = styled(S.Button)`
+  font-family: "OutfitRegular", "Pretendard-Regular" !important;
+  font-size: 14px;
+`;
+const Group = styled(S.Group)``;
+const ToolbarComponent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+
+  ${Group} {
+    gap: 0;
+    ${Button} {
+      height: 30px;
+      border-radius: 0;
+
+      color: #373a3c;
+      display: inline-block;
+      margin: 0;
+      text-align: center;
+      vertical-align: middle;
+      background: none;
+      background-image: none;
+      border-right: none;
+      padding: 6px 16px;
+      line-height: normal;
+      white-space: nowrap;
+      text-transform: capitalize;
+
+      &:focus {
+        color: #373a3c;
+        background-color: #e6e6e6;
+        border-color: #adadad;
+      }
+
+      &:hover {
+        color: #373a3c;
+        cursor: pointer;
+        background-color: #e6e6e6;
+        border-color: #adadad;
+      }
+
+      &:active,
+      &.active {
+        background-image: none;
+        -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        background-color: #e6e6e6;
+        border-color: #adadad;
+      }
+
+      &:active:hover,
+      &:active:focus,
+      &.active:hover,
+      &.active:focus {
+        color: #373a3c;
+        background-color: #d4d4d4;
+        border-color: #8c8c8c;
+      }
+
+
+      &:first-child {border-radius: 4px 0 0 4px;}
+      &:last-child {border-radius: 0 4px 4px 0; border-right: 1px solid #99999999;}
+    }
+  }
+`;
+
 // 모달 스타일 시작
 const DialogButton = styled(S.Button)`
   border-radius: 25px;
@@ -154,6 +224,9 @@ const Wrap = styled.div`
 `;
 
 const C = {
+  ToolbarComponent,
+  Group,
+  Button,
   DialogButton,
   CloseBtn,
   DialogButtonWrap,
