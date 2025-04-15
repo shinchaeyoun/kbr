@@ -6,6 +6,7 @@ import B from "../../styled/BoardStyled.jsx";
 import M from "../../styled/ModalStyled.jsx";
 
 import axios from "axios";
+import Xicon from "../../assets/x-icon.svg?react"; // X 아이콘 경로
 
 const BoardForm = ({
   mode,
@@ -328,9 +329,7 @@ const BoardForm = ({
           />
         </M.GridItem>
         <M.GridItem className={isEmptyLink ? "emptyLink" : ""}>
-          <M.SubTitle>
-            과정URL(검수사이트)
-          </M.SubTitle>
+          <M.SubTitle>과정URL(검수사이트)</M.SubTitle>
           <M.Input
             type="text"
             name="outerUrl"
@@ -389,29 +388,17 @@ const BoardForm = ({
         </M.DeleteBtn>
       )}
       <M.CloseBtn onClick={handleCancel}>
+        {/* <Xicon width="50" height="50"/> */}
         <svg
           width="30"
-          height="32"
-          viewBox="0 0 30 32"
+          height="30"
+          viewBox="0 0 30 30"
           fill="none"
+          strokeWidth={2}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <line
-            x1="0.707107"
-            y1="1.29289"
-            x2="28.7071"
-            y2="29.2929"
-            stroke="black"
-            strokeWidth="1.5"
-          />
-          <line
-            x1="28.7071"
-            y1="2.70711"
-            x2="0.707107"
-            y2="30.7071"
-            stroke="black"
-            strokeWidth="1.5"
-          />
+          <path d="M1 1L29 29" stroke="black" />
+          <path d="M29 1L1 29" stroke="black" />
         </svg>
       </M.CloseBtn>
     </M.Wrap>

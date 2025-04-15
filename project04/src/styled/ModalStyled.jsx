@@ -168,6 +168,9 @@ const Title = styled.h1`
 const Wrap = styled.div`
   position: relative;
   padding: 60px 80px 0 80px;
+
+  height: 100%;
+  overflow-y: scroll;
 `;
 
 const ModalContent = styled.div`
@@ -178,6 +181,8 @@ const ModalContent = styled.div`
   transform: translate(-50%, -50%);
   width: 660px;
   height: 800px;
+  height: 90%;
+  overflow: hidden;
 
   border-radius: 10px;
 `;
