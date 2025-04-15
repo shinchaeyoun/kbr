@@ -728,7 +728,7 @@ button.rbc-input::-moz-focus-inner {
 .rbc-slot-selection {
   z-index: 10;
   position: absolute;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.2);
   color: white;
   font-size: 75%;
   width: 100%;
@@ -872,19 +872,19 @@ button.rbc-input::-moz-focus-inner {
   z-index: 3;
   left: 0;
   right: 0;
-  height: 1px;
-  background-color: #74ad31;
+  height: 2px;
+  background-color: #db372d;
   pointer-events: none;
 }
 
 .rbc-current-time-indicator::after {
   content: "";
   position: absolute;
-  top: -5px;
+  top: -4px;
   left: -5px;
   width: 10px;
   height: 10px;
-  background-color: #74ad31;
+  background-color: #db372d;
   border-radius: 50%;
 }
 

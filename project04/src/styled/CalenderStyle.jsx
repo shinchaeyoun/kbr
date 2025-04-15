@@ -10,6 +10,7 @@ const Button = styled(S.Button)`
   font-size: 14px;
 `;
 const Group = styled(S.Group)``;
+
 const ToolbarComponent = styled.div`
   display: flex;
   justify-content: space-between;
@@ -67,10 +68,42 @@ const ToolbarComponent = styled.div`
         border-color: #8c8c8c;
       }
 
-
-      &:first-child {border-radius: 4px 0 0 4px;}
-      &:last-child {border-radius: 0 4px 4px 0; border-right: 1px solid #99999999;}
+      &:first-child {
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-child {
+        border-radius: 0 4px 4px 0;
+        border-right: 1px solid #99999999;
+      }
     }
+  }
+`;
+
+// 미니 툴바 스타일 시작
+const ButtonMini = styled.button`
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #0000001a;
+    border-radius: 50%;
+  }
+`;
+const ToolbarMiniComponent = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  font-size: 14px;
+  margin-bottom: 10px;
+
+  ${Group} {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 `;
 
@@ -197,15 +230,40 @@ const DateContainer = styled.div`
 
 const CalendarWrap = styled.div`
   display: grid;
-  grid-template-columns: 20% 80%;
+  grid-template-columns: 0.2fr 0.8fr;
 
   grid-template-columns: ${({ $sideCalendar }) =>
-    $sideCalendar ? "20% 80%" : "1fr"};
+    $sideCalendar ? "0.2fr 0.8fr" : "1fr"};
   grid-template-rows: 1fr;
   align-items: center;
 
+  gap: 0 30px;
+
+  width: 100%;
   height: calc(100vh - (var(--header-height) + var(--footer-height)));
   font-family: "OutfitRegular", "Pretendard-Regular" !important;
+
+  ${({ $sideCalendar }) => {
+    return `
+        ${SideContainer} {
+          font-size: 12px;
+          
+          .rbc-day-bg {
+          }
+
+          .rbc-button-link {
+            font-size: 12px;
+              width: 24px;
+              height: 24px;
+
+            &:hover {
+              border-radius: 50%;
+              background-color:rgba(175, 175, 175, 0.32);
+            }
+          }
+        }
+      `;
+  }};
 `;
 
 const Wrap = styled.div`
@@ -224,9 +282,11 @@ const Wrap = styled.div`
 `;
 
 const C = {
-  ToolbarComponent,
-  Group,
+  ButtonMini,
+  ToolbarMiniComponent,
   Button,
+  Group,
+  ToolbarComponent,
   DialogButton,
   CloseBtn,
   DialogButtonWrap,

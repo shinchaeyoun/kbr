@@ -1,11 +1,18 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+
+import { Link, useNavigate } from "react-router-dom";
 import CalendarComponent from "../components/CalendarComponent.jsx";
+import styled, { css } from "styled-components";
+import S from "../styled/GlobalBlock.jsx";
 import C from "../styled/CalenderStyle.jsx";
 import axios from "axios";
 import moment from "moment";
 import DialogComponent from "../components/DialogComponent"; // 모달 컴포넌트
 import ToolbarComponent from "../components/ToolbarComponent.jsx";
 import ToolbarMini from "../components/ToolbarMiniComponent.jsx";
+
+const localizer = momentLocalizer(moment);
 
 const Scheduled = () => {
   // EventModal / CalendarEventPopup / DraggableDialog
@@ -20,19 +27,10 @@ const Scheduled = () => {
   const [selectedTime, setSelectedTime] = useState({ start: null, end: null }); // 선택된 시간 범위 상태
   const [labelColor, setLabelColor] = useState("pink"); // 라벨 색상 상태
   const [handleDate, setHandleDate] = useState();
-  const [viewDate, setViewDate] = useState();
   const [currentView, setCurrentView] = useState();
 
   //클릭한 날짜의 정보를 받아옴
-  const handleDateChange_side = (date) => {
-    setViewDate(date);
-  };
-  //클릭한 view의 정보를 받아옴
-  const handleViewChange_side = (newView) => setCurrentView(newView);
-
-  const handleDateChange = (date) => {
-    setHandleDate(date);
-  };
+  const handleDateChange = (date) => setHandleDate(date);
   //클릭한 view의 정보를 받아옴
   const handleViewChange = (newView) => setCurrentView(newView);
 
@@ -161,7 +159,7 @@ const Scheduled = () => {
     end: new Date(event.end),
   }));
 
-  const eventPropGetter = (event) => {
+  const eventPropGetter = (event, currentView) => {
     const className = `${event.label}`;
     return { className };
   };
@@ -179,41 +177,74 @@ const Scheduled = () => {
       <DialogComponent
         mode={mode}
         eventId={eventId}
+        // events={events}
         showDialog={showDialog}
         setShowDialog={setShowDialog}
         pos={isPos}
+        // selectedTime={selectedTime} // 선택된 시간 범위
         eventSave={eventSave}
         eventEdit={eventEdit}
-        onCloseDialog={onCloseDialog}
+        onCloseDialog={onCloseDialog} // 모달 닫기 핸들러
       />
 
       <C.CalendarWrap $sideCalendar={sideCalendar}>
         {sideCalendar && (
-          <C.SideContainer className="side-container">
-            <CalendarComponent
+          <C.SideContainer>
+            {/* <CalendarComponent
               height="300px"
               events={emptyEvents}
-              date={viewDate}
-              view="month"
+              onNavigate={handleDateChange}
+              onView={handleViewChange}
               toolbar={ToolbarMini}
-              onSelectSlot={() => {}} // 날짜 클릭 시 아무 동작도 하지 않음
-              onSelectEvent={() => {}} // 이벤트 클릭 시 아무 동작도 하지 않음
-            />
+            /> */}
+
+            <C.CalendarComponent style={{ height: "300px" }}>
+              <Calendar
+                localizer={localizer} // 시간 현지화
+                events={emptyEvents} // 가져올 이벤트 데이터
+                onNavigate={handleDateChange} // 날짜 변경 이벤트
+                onView={handleViewChange} // 뷰 변경 이벤트 toolbar에 있는 모든 값을 받을 수 있다.
+                components={{ toolbar: ToolbarMini }}
+                view="month" // 보여질 화면
+              />
+            </C.CalendarComponent>
           </C.SideContainer>
         )}
 
         <C.ContentContainer>
-          <CalendarComponent
+          {/* <CalendarComponent
             height="100%"
             events={events}
             setEvents={setEvents}
-            onSelectSlot={openDialog}
-            onSelectEvent={openDialog}
+            onSelectSlot={openDialog} // 일정 추가 핸들러 전달
+            onSelectEvent={openDialog} // 일정 클릭 핸들러 전달
             date={handleDate}
+            onNavigate={handleDateChange}
+            onView={handleViewChange}
             view={currentView}
             toolbar={ToolbarComponent}
-            popup={true}
-          />
+
+            // components={{ toolbar: ToolbarComponent }}
+          /> */}
+
+          <C.CalendarComponent style={{ height: "100%" }}>
+            <Calendar
+              localizer={localizer} // 시간 현지화
+              events={validatedEvents} // 가져올 이벤트 데이터
+              startAccessor="start" // 시작 시간
+              endAccessor="end" // 종료 시간
+              onSelectSlot={openDialog} // 일정 추가 핸들러 전달
+              onSelectEvent={openDialog} // 일정 클릭 핸들러 전달
+              eventPropGetter={eventPropGetter} // 클래스 설정
+              onEventDrop={moveEvent} //위치 재정의
+              date={handleDate} // onNavigate 에서 가져온 값으로 현재 날짜를 바꿈
+              onNavigate={handleDateChange} // 날짜 변경 이벤트
+              onView={handleViewChange} // 뷰 변경 이벤트 toolbar에 있는 모든 값을 받을 수 있다.
+              view={currentView} //보여질 화면
+              selectable // 드래그로 일정 추가 가능
+              components={{ toolbar: ToolbarComponent }}
+            />
+          </C.CalendarComponent>
         </C.ContentContainer>
       </C.CalendarWrap>
     </C.Wrap>
