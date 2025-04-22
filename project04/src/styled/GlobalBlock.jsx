@@ -1,5 +1,10 @@
 import styled from "styled-components";
 
+const AbsoluteBtn = styled.button`
+  position: absolute;
+  border: none;
+  background-color: transparent;
+`;
 const Notice = styled.span``;
 const Img = styled.img``;
 const Thumb = styled.img``;
@@ -172,6 +177,7 @@ const CenterBox = styled.div`
 `;
 
 const S = {
+  AbsoluteBtn,
   Select,
   Button,
   ButtonWrap,

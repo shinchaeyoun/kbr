@@ -115,10 +115,8 @@ const UserList = (props) => {
   };
 
   const onSearch = async () => {
-    
     setSearchMode(true);
     setOffset(0); // 검색 시 offset 초기화
-    console.log(limit, offset, isSearch);
     await axios
       .post(`http://192.168.23.65:5000/user/search`, {
         limit,
@@ -126,8 +124,6 @@ const UserList = (props) => {
         isSearch,
       })
       .then((res) => {
-        console.log(res.data.totalCount, res.data.totalCount/limit);
-        
         setSearchMsg(res.data.msg);
         setIsSearchList(res.data.searchResult);
         setPage(Math.ceil(res.data.totalCount / limit));
@@ -242,7 +238,6 @@ const UserList = (props) => {
           {isUserList.length} / {limit}
         </>
       )}
-      {isPage}
       {isPage > 1 && (
         <U.PageContainer>
           <DoublePrev onClick={handlePageBtn("doublePrev")} />

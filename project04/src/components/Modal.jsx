@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import BoardForm from "./forms/BoardForm.jsx";
+import UserDetail from "../pages/UserDetail_test.jsx";
+import User from "../components/User.jsx";
+
 import M from "../styled/ModalStyled.jsx";
 
 const Modal = (props) => {
@@ -33,7 +36,7 @@ const Modal = (props) => {
       {props.isModalOpen && (
         <M.ModalWrap onClick={closeModal}>
           <M.ModalContent onClick={(e) => e.stopPropagation()}>
-            <BoardForm
+            {/* <BoardForm
               mode={mode}
               idx={itemIdx}
               isModalOpen={props.isModalOpen}
@@ -42,7 +45,31 @@ const Modal = (props) => {
               level={props.level}
               isEmptyLink={props.isEmptyLink}
               setIsEmptyLink={props.setIsEmptyLink}
-            />
+            /> */}
+            {props.type === "userList" ? (
+              // <UserDetail
+              //   mode={mode}
+              //   isModalOpen={props.isModalOpen}
+              //   setIsModalOpen={props.setIsModalOpen}
+              //   userIdx={props.userIdx}
+              // />
+              <User
+                idx={props.userIdx}
+                isModalOpen={props.isModalOpen}
+                setIsModalOpen={props.setIsModalOpen}
+              />
+            ) : (
+              <BoardForm
+                mode={mode}
+                idx={itemIdx}
+                isModalOpen={props.isModalOpen}
+                setIsModalOpen={props.setIsModalOpen}
+                onModalClose={props.onModalClose}
+                level={props.level}
+                isEmptyLink={props.isEmptyLink}
+                setIsEmptyLink={props.setIsEmptyLink}
+              />
+            )}
           </M.ModalContent>
         </M.ModalWrap>
       )}

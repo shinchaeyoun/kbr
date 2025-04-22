@@ -25,6 +25,7 @@ const UserList = (props) => {
   const { search } = isSearch;
   const limit = 10; // 한 번에 가져올 데이터 수
   const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [isPage, setPage] = useState(0);
   const [userIdx, setUserIdx] = useState(0);
 
@@ -38,6 +39,7 @@ const UserList = (props) => {
         setTotalUser(res.data.totalCount);
         setNewUser(res.data.lowLevelCount);
 
+        // setHasMore(res.data.totalCount > offset + limit); // 더 가져올 데이터가 있는지 확인
         setIsUserList(res.data.userList); // 기존 데이터에 추가
         setPage(Math.ceil(res.data.totalCount / limit)); // 페이지 수 계산
         // offset === 0 && setOffset(limit);
@@ -48,29 +50,16 @@ const UserList = (props) => {
   };
 
   const getUserInfo = async () => {
-    if (!isSearchMode) {
-      await axios
-        .get(`http://192.168.23.65:5000/user/list`, {
-          params: { limit, offset },
-        })
-        .then((res) => {
-          setIsUserList(res.data.userList); // 기존 데이터에 추가
-        })
-        .catch((err) => {
-          console.error("데이터를 가져오는 중 오류 발생:", err);
-        });
-    } else {
-      await axios
-        .post(`http://192.168.23.65:5000/user/search`, {
-          limit,
-          offset,
-          isSearch,
-        })
-        .then((res) => {
-          setSearchMsg(res.data.msg);
-          setIsSearchList(res.data.searchResult);
-        });
-    }
+    await axios
+      .get(`http://192.168.23.65:5000/user/list`, { params: { limit, offset } })
+      .then((res) => {
+        // setHasMore(res.data.totalCount > offset + limit); // 더 가져올 데이터가 있는지 확인
+        setIsUserList(res.data.userList); // 기존 데이터에 추가
+        // offset === 0 && setOffset(limit);
+      })
+      .catch((err) => {
+        console.error("데이터를 가져오는 중 오류 발생:", err);
+      });
   };
 
   // 더보기 버튼 클릭
@@ -115,22 +104,25 @@ const UserList = (props) => {
   };
 
   const onSearch = async () => {
-    
     setSearchMode(true);
-    setOffset(0); // 검색 시 offset 초기화
-    console.log(limit, offset, isSearch);
     await axios
+      // .post(`http://192.168.23.65:5000/user/search`, isSearch)
       .post(`http://192.168.23.65:5000/user/search`, {
         limit,
         offset,
         isSearch,
       })
       .then((res) => {
-        console.log(res.data.totalCount, res.data.totalCount/limit);
-        
+        console.log(
+          "res.data.result.length",
+          res.data.totalCount,
+          offset + limit
+        );
+
+        setHasMore(res.data.totalCount > offset + limit);
         setSearchMsg(res.data.msg);
         setIsSearchList(res.data.searchResult);
-        setPage(Math.ceil(res.data.totalCount / limit));
+        // setListLength(res.data.result.length);
       });
   };
 
@@ -140,6 +132,7 @@ const UserList = (props) => {
 
   // 계정 승인
   const acctApproval = async (idx) => {
+    // 클릭 이벤트 전파 방지
     await axios.patch(`http://192.168.23.65:5000/user/setlevel?idx=${idx}`);
     // await fetchUserList();
     // navigate("/admin/userlist");
@@ -148,7 +141,6 @@ const UserList = (props) => {
 
   useEffect(() => {
     getUserInfo();
-    // onSearch();
   }, [offset]);
 
   useEffect(() => {
@@ -194,75 +186,84 @@ const UserList = (props) => {
         />
         <button onClick={onSearch}>계정검색</button>
       </U.SearchBox>
-      <U.BlockTitle>
-        <p>아이디</p>
-        <p>이름</p>
-        <p>소속</p>
-        <p>권한레벨</p>
-        <p>연락처</p>
-        <p>메일</p>
-      </U.BlockTitle>
-      <U.Content $limit={limit}>
-        {(isSearchMode ? isSearchList : isUserList).length > 0 ? (
-          (isSearchMode ? isSearchList : isUserList).map((user, idx) => (
-            <U.Block
-              key={user.idx}
-              onClick={(e) => {
-                setUserIdx(user.idx);
-                setIsModalOpen(true);
-              }}
-            >
-              <p>{user.id}</p>
-              <p>{user.name || "이름"}</p>
-              <p>{user.team || "소속팀"}</p>
-              <p>
-                {user.level < 2 ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      acctApproval(user.idx);
-                    }}
-                  >
-                    계정승인
-                  </button>
-                ) : (
-                  <>{user.level}</>
-                )}
-              </p>
-              <p>{user.tel || "010-0000-0000"}</p>
-              <p>{user.eMail || "---@kbrainc.com"}</p>
-            </U.Block>
-          ))
-        ) : (
-          <p>검색 결과가 없습니다.</p>
-        )}
-      </U.Content>
-      {isUserList.length > limit && (
+      <div>{searchMsg}</div>
+      {searchMsg == "" && (
         <>
-          {isUserList.length} / {limit}
-        </>
-      )}
-      {isPage}
-      {isPage > 1 && (
-        <U.PageContainer>
-          <DoublePrev onClick={handlePageBtn("doublePrev")} />
-          <Prev onClick={handlePageBtn("prev")} />
-          {Array.from({ length: isPage }, (_, i) => i + 1).map(
-            (pageNumber, index) => (
-              <button
-                key={pageNumber}
-                onClick={() => {
-                  setOffset(limit * (pageNumber - 1));
-                }}
-                className={offset / limit === index ? "active" : ""}
-              >
-                {pageNumber}
-              </button>
-            )
+          <U.BlockTitle>
+            <p>아이디</p>
+            <p>이름</p>
+            <p>소속</p>
+            <p>권한레벨</p>
+            <p>연락처</p>
+            <p>메일</p>
+          </U.BlockTitle>
+          <U.Content $limit={limit}>
+            {isUserList.map((user, idx) => {
+              return (
+                <U.Block
+                  key={user.idx}
+                  onClick={(e) => {
+                    setUserIdx(user.idx);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  <p>{user.id}</p>
+                  <p>{user.name || "이름"}</p>
+                  <p>{user.team || "소속팀"}</p>
+                  <p>
+                    {user.level < 2 ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          acctApproval(user.idx);
+                        }}
+                      >
+                        계정승인
+                      </button>
+                    ) : (
+                      <>{user.level}</>
+                    )}
+                  </p>
+                  <p>{user.tel || "010-0000-0000"}</p>
+                  <p>{user.eMail || "---@kbrainc.com"}</p>
+                  {/* <p>etc1 : {user.etc1}</p>
+              <p>etc2 : {user.etc2}</p>
+              <p>etc3 : {user.etc3}</p> */}
+                </U.Block>
+              );
+            })}
+          </U.Content>
+          {totalUser} / {limit}
+          {isUserList.length > limit && (
+            <>
+              {isUserList.length} / {limit}
+            </>
           )}
-          <Next onClick={handlePageBtn("next")} />
-          <DoubleNext onClick={handlePageBtn("doubleNext")} />
-        </U.PageContainer>
+          <U.PageContainer>
+            <DoublePrev onClick={handlePageBtn("doublePrev")} />
+            <Prev onClick={handlePageBtn("prev")} />
+            {Array.from({ length: isPage }, (_, i) => i + 1).map(
+              (pageNumber, index) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => {
+                    setOffset(limit * (pageNumber - 1));
+                  }}
+                  className={offset / limit === index ? "active" : ""}
+                >
+                  {pageNumber} / {limit}
+                </button>
+              )
+            )}
+            <Next onClick={handlePageBtn("next")} />
+            <DoubleNext onClick={handlePageBtn("doubleNext")} />
+          </U.PageContainer>
+          {hasMore && (
+            <button theme="light" onClick={moreList}>
+              더보기
+            </button>
+          )}
+        </>
       )}
     </U.UserWrap>
   );
