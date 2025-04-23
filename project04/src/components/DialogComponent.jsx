@@ -1,8 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Draggable, { DraggableCore } from "react-draggable"; // Both at the same time
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import Draggable from "react-draggable";
+import TextareaAutosize from "react-textarea-autosize";
+
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
 import C from "../styled/CalenderStyle.jsx";
 import axios from "axios";
+
+const localizer = momentLocalizer(moment);
 
 const DialogComponent = ({
   mode,
@@ -13,8 +18,11 @@ const DialogComponent = ({
   eventSave,
   eventEdit,
   onCloseDialog,
+  selectedTime,
 }) => {
   const nodeRef = useRef(null);
+  const textareaRef = useRef(null); // textarea ref
+
   const INITIAL_EVENT = {
     id: null,
     title: "",
@@ -33,6 +41,7 @@ const DialogComponent = ({
     { name: "yellow", color: "#f7b733" },
   ];
   const [labelColor, setLabelColor] = useState("pink");
+  const [active, setActive] = useState(false);
 
   const getEvent = async () => {
     if (mode == "read") {
@@ -40,56 +49,50 @@ const DialogComponent = ({
         .get(`http://192.168.23.65:5000/sched/events?id=${eventId}`)
         .then((res) => {
           setEvent(res.data[0] || INITIAL_EVENT); // 데이터가 없을 때 초기값으로 설정
+          setLabelColor(res.data[0]?.label || "pink"); // 라벨 색상 설정
         })
         .catch((err) => {
           console.error("Error fetching event data:", err);
           setEvent(INITIAL_EVENT); // 에러 발생 시 초기값으로 설정
         });
     } else if (mode == "write") {
+      console.log(selectedTime);
+
       setEvent(INITIAL_EVENT); // 초기값으로 리셋
+      setEvent((INITIAL_EVENT) => ({
+        ...INITIAL_EVENT,
+        start: selectedTime.start,
+        end: selectedTime.end,
+      })); // 초기값으로 리셋
     }
+  };
+
+  const formatIsoDate = (value) => {
+    const parsedDate = new Date(value); // 입력된 값을 Date 객체로 변환
+    const isoDate = parsedDate.toISOString();
+    return isoDate;
   };
 
   const onChange = (e) => {
     const { name, value } = e.target;
-    setEvent((event) => ({ ...event, [name]: value }));
+    if (name === "start" || name === "end") {
+      setEvent((event) => ({ ...event, [name]: formatIsoDate(value) }));
+    } else {
+      setEvent((event) => ({ ...event, [name]: value }));
+    }
   };
 
   const closeDialog = (e) => {
     setShowDialog(false);
-  };
-
-  const handleEdit = async () => {
-    // console.log("수정모드", event);
-    // setEditMode(!editMode);
-    // setEvent({ ...event, color: labelColor });
-    // const updateEvent = {
-    //   ...event,
-    //   color: labelColor,
-    // };
-    // const response = await axios.patch(
-    //   `http://192.168.23.65:5000/sched/update?id=${eventId}`,
-    //   updateEvent,
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
+    setActive(false);
+    
   };
 
   const handleSave = () => {
     if (mode == "read") {
-      // alert("수정하시겠습니까?");
-      // handleEdit();
       setEditMode(!editMode);
       setEvent({ ...event, label: labelColor });
-
-      const updateEvent = {
-        ...event,
-        label: labelColor,
-      };
-
+      const updateEvent = { ...event, label: labelColor };
       if (eventEdit) eventEdit(eventId, updateEvent);
     } else if (mode === "write") {
       const newEvent = {
@@ -97,8 +100,6 @@ const DialogComponent = ({
         title: event.title || "(제목 없음)",
         label: labelColor,
       };
-
-      // if (eventSave) eventSave(event.title || "제목 없음", labelColor); // 제목이 없을 경우 기본값 설정
       if (eventSave) eventSave(newEvent); // 제목이 없을 경우 기본값 설정
     }
     setShowDialog(false);
@@ -117,6 +118,14 @@ const DialogComponent = ({
     }
   };
 
+  const handleResizeHeight = useCallback(() => {
+    textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    console.log(
+      "textareaRef.current.scrollHeight",
+      textareaRef.current.scrollHeight
+    );
+  }, []);
+
   useEffect(() => {
     if (showDialog) {
       getEvent();
@@ -126,6 +135,53 @@ const DialogComponent = ({
   useEffect(() => {
     getEvent();
   }, []);
+
+  const formatDate = (date) => {
+    if (date === "") return ""; // 빈 문자열 처리
+    return new Date(date).toISOString().split("T")[0];
+  };
+
+  const [onCalendar, setOnCalendar] = useState(0);
+  const [onMiniCalendar, setOnMiniCalendar] = useState('');
+  const onOpenCalendar = (e) => {
+    console.log("onOpenCalendar ==",e.currentTarget.name);
+    setOnMiniCalendar(e.currentTarget.name)
+    if (onCalendar === 0) setOnCalendar(230);
+    else setOnCalendar(0);
+  };
+
+  const formatToShowDate = (jsDateStr) => {
+    const date = new Date(jsDateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const weekday = date.getDay();
+    let hours = "";
+    const minutes = date.getMinutes();
+    let pmAm = "PM";
+    date.getHours() > 12
+      ? (hours = date.getHours() - 12)
+      : (hours = date.getHours());
+    date.getHours() > 12 ? (pmAm = "PM") : (pmAm = "AM");
+    const week = ["일", "월", "화", "수", "목", "금", "토"];
+    const formattedDate = (
+      <div>
+        <span>
+          {month}월 {day}일 ({week[weekday]}요일)
+        </span>
+        {/* <br />
+        <span className="hoursMinutes">
+          {pmAm} {hours} : {minutes}
+        </span> */}
+      </div>
+    );
+    return formattedDate;
+  };
+
+  const handleMiniCalendar = (date) => {
+    console.log("onMiniCalendar",onMiniCalendar);
+    console.log("handleMiniCalendar //",formatIsoDate(date));
+    setEvent((event) => ({ ...event, [onMiniCalendar]: formatIsoDate(date) }));
+  };
 
   return (
     <>
@@ -168,18 +224,69 @@ const DialogComponent = ({
 
               <C.DialogBody>
                 <C.Content $labels={labels}>
-                  {/* {event && ( */}
-                    <C.DialogInput
-                      type="text"
-                      name="title"
-                      value={event.title}
-                      placeholder="제목 및 시간 추가"
-                      onChange={onChange}
+                  <C.DialogInput
+                    type="text"
+                    name="title"
+                    value={event.title}
+                    placeholder="제목 및 시간 추가"
+                    onChange={onChange}
+                  />
+                  {/* <C.DialogInput
+                    type="date"
+                    name="start"
+                    value={formatDate(event.start) || ""}
+                    onChange={onChange}
+                    placeholder="날짜"
+                  />
+                  <C.DialogInput
+                    type="date"
+                    name="end"
+                    value={formatDate(event.end) || ""}
+                    onChange={onChange}
+                    placeholder="날짜"
+                  /> */}
+
+                  {/* <div className="changeDate">
+                    <button className="setDate" onClick={onOpenCalendar}>
+                      {newEventData && formatToShowDate(newEventData.slots[0])}
+                    </button>
+                    <button className="setDate" onClick={onOpenCalendar}>
+                      {newEventData &&
+                        formatToShowDate(
+                          newEventData.slots[newEventData.slots.length - 1]
+                        )}
+                    </button>
+                  </div> */}
+
+                  <button
+                    onClick={onOpenCalendar}
+                    name="start"
+                    onChange={onChange}
+                  >
+                    {event.start && formatToShowDate(event.start)}
+                    {/* {newEventData && formatToShowDate(newEventData.slots[0])} */}
+                  </button>
+                  <button name="end" onClick={onOpenCalendar}>
+                    {event.end && formatToShowDate(event.end)}
+                    {/* {newEventData && formatToShowDate(newEventData.slots[0])} */}
+                  </button>
+                  <C.InputCalendar style={{ height: onCalendar }}>
+                    <C.MiniCalendar
+                      localizer={momentLocalizer(moment)}
+                      // events={event}
+                      selectable
+                      // onSelectSlot={handleMiniCalendar}
+                      onDrillDown={handleMiniCalendar}
+                      toolbar={false}
                     />
-                  {/* )} */}
-                  {/* <C.DialogInput type="text" placeholder="내용" />
-                  <C.DialogInput type="text" placeholder="날짜" />
-                  <C.DialogInput type="text" placeholder="시간" /> */}
+                  </C.InputCalendar>
+
+                  <C.DialogInput type="text" placeholder="참석자" />
+                  <C.DialogTextarea
+                    className="textarea"
+                    rows={1}
+                    placeholder="설명"
+                  />
 
                   <div className="label">
                     <ul>
@@ -196,7 +303,6 @@ const DialogComponent = ({
                               setLabelColor(label.name);
                             }}
                           >
-                            {/* <input type="checkbox" id={label.name} /> */}
                             <label htmlFor={label.name}></label>
                           </li>
                         );
@@ -204,21 +310,21 @@ const DialogComponent = ({
                     </ul>
                   </div>
                 </C.Content>
+              </C.DialogBody>
 
-                <C.DialogButtonWrap>
-                  {/* <C.DialogButton theme="light" onClick={handleEdit}>
+              <C.DialogButtonWrap>
+                {/* <C.DialogButton theme="light" onClick={handleEdit}>
                     수정모드
                   </C.DialogButton> */}
 
-                  <C.DialogButton theme="dark" onClick={handleSave}>
-                    저장
-                  </C.DialogButton>
+                <C.DialogButton theme="dark" onClick={handleSave}>
+                  저장
+                </C.DialogButton>
 
-                  <C.DialogButton theme="light" onClick={handleDelete}>
-                    삭제
-                  </C.DialogButton>
-                </C.DialogButtonWrap>
-              </C.DialogBody>
+                <C.DialogButton theme="light" onClick={handleDelete}>
+                  삭제
+                </C.DialogButton>
+              </C.DialogButtonWrap>
             </C.DialogContent>
           </Draggable>
         </C.DialogWrap>

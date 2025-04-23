@@ -46,7 +46,6 @@ const RegisteredCourses = () => {
 
   const openModal = (idx) => {
     const index = boardList.findIndex((item) => item.idx === idx);
-    console.log("idx", idx, index);
     setIsBoardIdx(idx);
     setIsModalOpen(!isModalOpen);
   };
@@ -85,7 +84,6 @@ const RegisteredCourses = () => {
             <p
               key={item.idx}
               onClick={() => {
-                // moveToBoard(item.idx);
                 openModal(item.idx);
               }}
             >

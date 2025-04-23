@@ -27,12 +27,19 @@ router.post("/", (req, res) => {
   const params = [year, title, customer, innerUrl, outerUrl, thumb];
   const sql = `
     INSERT INTO board
-    VALUES (NULL,?,?,?,?,?,?);
+    VALUES (NULL,?,?,?,?,?,?,NULL);
   `;
 
   query(sql, params)
-    .then((data) => res.send(data))
-    .catch((err) => res.send({ msg: "전송 실패" }));
+    .then((data) => {
+      console.log("게시글 추가 성공");
+
+      res.send(data);
+    })
+    .catch((err) => {
+      console.log("게시글 추가 실패", err);
+      res.send({ msg: "전송 실패" });
+    });
 });
 
 // 연도 + 과정명 중복 확인
@@ -48,7 +55,11 @@ router.post("/dup", (req, res) => {
   query(sql, [year, title])
     .then((data) => {
       if (data.length > 0) {
-        res.send({ result: true, msg: "중복된 데이터가 있습니다.", idx: data[0].idx });
+        res.send({
+          result: true,
+          msg: "중복된 데이터가 있습니다.",
+          idx: data[0].idx,
+        });
       } else {
         res.send({ result: false, msg: "중복된 데이터가 없습니다." });
       }
@@ -68,31 +79,29 @@ router.get("/count", async (req, res) => {
 // 게시판 글 검색
 router.post("/search", async (req, res) => {
   const { search, year } = req.body;
- console.log('search, year',search, year);
- 
+  console.log("search, year", search, year);
 
-  console.log('year',year);
-  
   // 기본 SQL 쿼리
   let sql = `SELECT * FROM board WHERE 1=1 `; // 기본 조건 (항상 참)
-
   const params = [];
 
   // search 값이 있는 경우 조건 추가
   if (search) {
-    sql += ` AND (title LIKE ? OR customer LIKE ?) ORDER BY idx DESC`;
+    sql += ` AND (title LIKE ? OR customer LIKE ?)`;
     params.push(`%${search}%`, `%${search}%`);
   }
 
   // year 값이 "all"이 아닌 경우에만 조건 추가
   if (year && year !== "all") {
-    sql += ` AND year = ? ORDER BY idx DESC`;
+    sql += ` AND year = ?`;
     params.push(Number(year));
   }
 
-  if(search === "" && year === "all"){
-    sql += ` ORDER BY idx DESC`;
-  };
+  // if (search === "" && year === "all") {
+  //   sql += ` ORDER BY idx DESC`;
+  // }
+
+  sql += ` ORDER BY idx DESC`;
 
   try {
     const data = await query(sql, params);

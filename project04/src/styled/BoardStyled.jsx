@@ -104,6 +104,11 @@ const CardTitle = styled(Title)`
   p {
     position: relative;
     padding-left: 5px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
     &:after {
       content: "";
       position: absolute;
@@ -153,7 +158,7 @@ const GridContainer = styled.div`
   justify-content: center;
   grid-template-columns: ${(props) =>
     props.type === "card" ? `repeat(5, 1fr)` : "repeat(2, 1fr)"};
-  gap: ${(props) => props.type === "card" ? `30px 20px` : "10px"};
+  gap: ${(props) => (props.type === "card" ? `30px 20px` : "10px")};
 
   max-width: 100%;
   max-height: 100%;

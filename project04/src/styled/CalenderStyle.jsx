@@ -3,6 +3,8 @@ import styled from "styled-components";
 import S from "./GlobalBlock";
 import M from "./ModalStyled.jsx";
 import media from "./media.jsx";
+import TextareaAutosize from "react-textarea-autosize";
+import { Calendar } from "react-big-calendar";
 
 // 툴바 스타일 시작
 const Button = styled(S.Button)`
@@ -108,31 +110,52 @@ const ToolbarMiniComponent = styled.div`
 `;
 
 // 모달 스타일 시작
-const DialogButton = styled(S.Button)`
-  border-radius: 25px;
-`;
-const CloseBtn = styled(DialogButton)`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background-color: initial;
+
+const DialogTextarea = styled(TextareaAutosize)`
+  margin-top: 20px;
+  padding: 3px 5px;
+  width: 100%;
+  font-size: 18px;
+  background-color: transparent;
   border: none;
+  border-bottom: 1px solid #c3c7c9;
+
+  resize: none;
+
+  outline: none;
+  font-weight: 500;
+  font-family: "NanumSquareR" !important;
+  scrollbar-width: none;
+
+  box-sizing: border-box;
+
+  &:focus {
+    background-color: #0000001a;
+    border-bottom: 2px solid #6580ea;
+  }
 `;
-const DialogButtonWrap = styled(S.ButtonWrap)`
-  text-align: right;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
+
 const DialogInput = styled.input`
   width: 100%;
   font-size: 22px;
+  margin-top: 20px;
   padding: 3px 5px;
   background-color: transparent;
   border: none;
   border-bottom: 1px solid #c3c7c9;
+  box-sizing: border-box;
+
+  &:focus {
+    padding: 3px 5px 2px;
+    border-bottom: 2px solid #6580ea;
+  }
 `;
 
 const Content = styled.div`
+  position: relative;
+  * {
+    margin-bottom: 5px;
+  }
   .label {
     display: flex;
     gap: 10px;
@@ -166,7 +189,29 @@ const Content = styled.div`
 `;
 const DialogBody = styled.div`
   padding: 0 30px 30px;
+  overflow-y: scroll;
+  height: calc(100% - 100px);
+  scrollbar-width: thin;
+  scrollbar-color: #c3c7c9 transparent;
 `;
+
+const DialogButton = styled(S.Button)`
+  border-radius: 25px;
+`;
+const CloseBtn = styled(DialogButton)`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: initial;
+  border: none;
+`;
+const DialogButtonWrap = styled(S.ButtonWrap)`
+  text-align: right;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 0 30px;
+`;
+
 const DialogHeader = styled.div`
   height: 50px;
   margin-bottom: 10px;
@@ -281,6 +326,26 @@ const Wrap = styled.div`
   }
 `;
 
+const MiniCalendar = styled(Calendar)`
+  background-color: #ffffff;
+  // width: 280px;
+  // height: 230px;
+  border-radius: 0px;
+
+  .rbc-date-cell.rbc-now .rbc-button-link {
+    background-color: #ffffff;
+    color: #000;
+  }
+`;
+const InputCalendar = styled.div`
+  position: absolute;
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: 0px 0px 5px rgb(0 0 0 / 44%);
+
+  
+`;
+
 const C = {
   ButtonMini,
   ToolbarMiniComponent,
@@ -290,6 +355,7 @@ const C = {
   DialogButton,
   CloseBtn,
   DialogButtonWrap,
+  DialogTextarea,
   DialogInput,
   Content,
   DialogBody,
@@ -303,6 +369,8 @@ const C = {
   DateContainer,
   CalendarWrap,
   Wrap,
+  MiniCalendar,
+  InputCalendar,
 };
 
 export default C;

@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import styled, { css } from "styled-components";
 import S from "../styled/GlobalBlock.jsx";
 import M from "../styled/ModalStyled.jsx";
 import U from "../styled/UserStyle.jsx";
 import axios from "axios";
 
+// svg
 import PasswordShow from "../assets/icon/password-show.svg?react";
 import PasswordHide from "../assets/icon/password-hide.svg?react";
 
 const User = (props) => {
-  const idx = props.idx;
-  const [notMatch, setNotMatch] = useState(false);
+  const { idx, setIsModalOpen } = props;
   const [user, setUser] = useState({
     id: null,
     password: null,
@@ -24,8 +22,11 @@ const User = (props) => {
     etc2: null,
     etc3: null,
   });
-  const { id, password, level, name, team, tel, email, etc1, etc2, etc3 } = user;
+  const { id, password, level, name, team, tel, email, etc1, etc2, etc3 } =
+    user;
+
   const [pwCheck, setPwCheck] = useState("");
+  const [notMatch, setNotMatch] = useState(false);
   const [passwordInputType, setPasswordInputType] = useState("password"); // 비밀번호 입력 타입 상태
 
   const getUserInfo = async () => {
@@ -40,11 +41,6 @@ const User = (props) => {
       setPwCheck(value); // pwCheck 상태 업데이트
       setNotMatch(value !== user.password); // 비밀번호와 일치 여부 확인
     } else {
-      // const nextData = {
-      //   ...user,
-      //   [name]: value,
-      // };
-      // setUser(nextData);
       setUser((prevUser) => ({
         ...prevUser,
         [name]: value,
@@ -63,8 +59,6 @@ const User = (props) => {
   };
 
   const handleSubmit = async () => {
-    console.log("notMatch", notMatch);
-
     if (notMatch) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
@@ -72,10 +66,8 @@ const User = (props) => {
     await axios
       .patch(`http://192.168.23.65:5000/user/update?idx=${idx}`, user)
       .then((res) => {
-        console.log("=========res", res);
-
         alert("수정되었습니다.");
-        props.setIsModalOpen(false);
+        setIsModalOpen(false);
       });
   };
 
@@ -87,10 +79,12 @@ const User = (props) => {
         .delete(`http://192.168.23.65:5000/user/delete?idx=${idx}`, user)
         .then((res) => {
           alert("삭제되었습니다.");
-          props.setIsModalOpen(false);
+          setIsModalOpen(false);
         });
     }
   };
+
+  const handleCancel = () => setIsModalOpen(false);
 
   useEffect(() => {
     getUserInfo();
@@ -101,20 +95,25 @@ const User = (props) => {
       <M.Title>계정정보</M.Title>
       <M.GridItem>
         <M.SubTitle>아이디</M.SubTitle>
+        <M.Input type="text" name="id" value={id || ""} onChange={onChange} />
+      </M.GridItem>
+      <M.GridItem>
+        <M.SubTitle>이름</M.SubTitle>
         <M.Input
           type="text"
-          name="id"
-          value={id || ""}
+          name="name"
+          value={name || ""}
           onChange={onChange}
         />
       </M.GridItem>
       <M.GridItem>
-        <M.SubTitle>이름</M.SubTitle>
-        <M.Input type="text" name="name" value={name || ""} onChange={onChange} />
-      </M.GridItem>
-      <M.GridItem>
         <M.SubTitle>소속팀</M.SubTitle>
-        <M.Input type="text" name="team" value={team || ""} onChange={onChange} />
+        <M.Input
+          type="text"
+          name="team"
+          value={team || ""}
+          onChange={onChange}
+        />
       </M.GridItem>
       <M.GridItem>
         <M.SubTitle>권한레벨</M.SubTitle>
@@ -148,14 +147,18 @@ const User = (props) => {
           onChange={onChange}
         />
         <S.AbsoluteBtn
-          style={{right:0, top: "31px"}}
+          style={{ right: 0, top: "31px" }}
           onClick={() =>
             setPasswordInputType((prevType) =>
               prevType === "password" ? "text" : "password"
             )
           }
         >
-          {passwordInputType === "password" ? <PasswordShow width="25px" height="25px"/> : <PasswordHide width="25px" height="25px"/>}
+          {passwordInputType === "password" ? (
+            <PasswordShow width="25px" height="25px" />
+          ) : (
+            <PasswordHide width="25px" height="25px" />
+          )}
         </S.AbsoluteBtn>
       </M.GridItem>
       <M.GridItem>
@@ -172,11 +175,20 @@ const User = (props) => {
       </M.GridItem>
 
       <M.Button onClick={handleSubmit}>계정수정</M.Button>
-      <M.DeleteBtn
-        onClick={userDelete}
-      >
-        삭제하기
-      </M.DeleteBtn>
+      <M.DeleteBtn onClick={userDelete}>삭제하기</M.DeleteBtn>
+      <M.CloseBtn onClick={handleCancel}>
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 30 30"
+          fill="none"
+          strokeWidth={2}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M1 1L29 29" stroke="black" />
+          <path d="M29 1L1 29" stroke="black" />
+        </svg>
+      </M.CloseBtn>
     </U.Wrap>
   );
 };

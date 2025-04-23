@@ -6,7 +6,7 @@ import B from "../../styled/BoardStyled.jsx";
 import M from "../../styled/ModalStyled.jsx";
 
 import axios from "axios";
-import Xicon from "../../assets/x-icon.svg?react"; // X 아이콘 경로
+import Xicon from "../../assets/icon/x-icon.svg?react"; // X 아이콘 경로
 
 const BoardForm = ({
   mode,
@@ -183,7 +183,7 @@ const BoardForm = ({
 
     const updatedBoard = {
       ...board,
-      year: SelectYear,
+      year: year || SelectYear,
       thumb: uploadedFilePath,
     };
 
@@ -215,7 +215,7 @@ const BoardForm = ({
         alert("등록되었습니다.");
         setIsModalOpen(false);
         if (onModalClose) onModalClose();
-        navigate("/board");
+        // navigate("/board");
       }
     } catch (error) {
       console.error("저장 실패:", error);
@@ -333,7 +333,7 @@ const BoardForm = ({
           <M.Input
             type="text"
             name="outerUrl"
-            value={outerUrl}
+            value={outerUrl || ""}
             readOnly={isRead}
             onChange={onChange}
           />

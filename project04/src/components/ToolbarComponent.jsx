@@ -8,21 +8,11 @@ const ToolbarComponent = ({ viewClass, ...props }) => {
   const { date } = props;
 
   const navigate = (action) => {
-    console.log('props.onNavigate',action);
-    
     props.onNavigate(action);
   };
   const onViews = (action) => {
     props.onView(action);
     setIsView(action);
-  };
-
-  const Test = () => {
-    console.log('date', date);
-    console.log('props', props);
-    console.log('viewClass', viewClass);
-    console.log('navigate.bind(null, "NEXT"),', navigate.bind(null, "NEXT"));
-    
   };
 
   return (
@@ -31,7 +21,6 @@ const ToolbarComponent = ({ viewClass, ...props }) => {
         <C.Button onClick={navigate.bind(null, "TODAY")}>Today</C.Button>
         <C.Button onClick={navigate.bind(null, "PREV")}>Back</C.Button>
         <C.Button onClick={navigate.bind(null, "NEXT")}>Next</C.Button>
-        <C.Button onClick={Test}>test</C.Button>
       </C.Group>
       <C.Group>
         {props.view === "month" &&

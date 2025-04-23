@@ -9,7 +9,7 @@ import ToolbarMini from "../components/ToolbarMiniComponent.jsx";
 
 const Scheduled = () => {
   const [showDialog, setShowDialog] = useState(false);
-  const [sideCalendar, setSideCalendar] = useState(true);
+  const [sideCalendar, setSideCalendar] = useState(false);
   const [mode, setMode] = useState("write"); // write, read, edit
   const [emptyEvents, setEmptyEvents] = useState([]);
   const [events, setEvents] = useState([]);
@@ -68,6 +68,8 @@ const Scheduled = () => {
 
   // 일정 저장 이벤트 핸들러
   const eventSave = (event) => {
+    console.log("save Event", event);
+    
     const newEvent = {
       title: event.title,
       start: moment(selectedTime.start).toDate(),
@@ -83,6 +85,8 @@ const Scheduled = () => {
 
   // 일정 수정 이벤트 핸들러
   const eventEdit = async (id, updateEvent) => {
+    console.log("update Event", updateEvent.start);
+    
     await axios.patch(
       `http://192.168.23.65:5000/sched/update?id=${id}`,
       updateEvent
@@ -111,6 +115,7 @@ const Scheduled = () => {
         eventSave={eventSave}
         eventEdit={eventEdit}
         onCloseDialog={onCloseDialog}
+        selectedTime={selectedTime}
       />
 
       <C.CalendarWrap $sideCalendar={sideCalendar}>

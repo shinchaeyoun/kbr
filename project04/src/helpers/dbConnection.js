@@ -14,11 +14,9 @@ const connection = mysql.createConnection({
 
 connection.query('SELECT * FROM board', (err, results) => {
   if (err) throw err;
-  // console.log(results);
 });
 connection.query('SELECT * FROM user', (err, results) => {
   if (err) throw err;
-  // console.log(results);
 });
 
 connection.connect((err) => {

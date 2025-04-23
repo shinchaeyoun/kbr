@@ -32,9 +32,7 @@ const BoardList = ({ level }) => {
         params: { offset, limit },
       });
 
-      if (response.data.length < limit) {
-        setHasMore(false); // 더 이상 데이터가 없으면 false로 설정
-      }
+      if (response.data.length < limit) setHasMore(false);
 
       setBoardList((prevList) => {
         const uniqueItems = new Map();
@@ -70,13 +68,7 @@ const BoardList = ({ level }) => {
   };
 
   // 보기 타입 변경
-  const setList = (type) => {
-    if (type === "list") {
-      setType("list");
-    } else if (type === "card") {
-      setType("card");
-    }
-  };
+  const setList = (type) => setType(type);
 
   // 모달 열기
   const openModal = (idx, data = {}) => {
@@ -85,34 +77,39 @@ const BoardList = ({ level }) => {
     setIsModalOpen(true);
   };
 
+  // 모달 닫기 및 데이터 갱신
   const onModalClose = async (val, idx) => {
     if (val === "delete") {
       setBoardList((prevList) => prevList.filter((item) => item.idx !== idx));
     } else {
       try {
-        // 새로 등록된 데이터를 가져오기 위해 서버에서 최신 데이터를 요청
-        const response = await axios.get(`http://192.168.23.65:5000/board`, {
-          params: { offset: 0, limit: 1 }, // 최신 데이터 1개만 가져옴
-        });
-
-        if (response.data[0].idx >= isBoardIdx) return; // 방금 수정된 데이터는 제외
-        const newBoard = response.data[0]; // 새로 등록된 데이터
-        setBoardList((prevList) => [newBoard, ...prevList]); // 새 데이터를 맨 앞에 추가
+        // 검색어가 있을 경우 검색 결과를 유지
+        // if (search || year) {
+        if (search || selectYear !== currentYear) {
+          const response = await axios.post(
+            `http://192.168.23.65:5000/board/search`,
+            { search: search, year: selectYear }
+          );
+          setBoardList(response.data); // 검색 결과 유지
+        } else {
+          // 검색어가 없을 경우 최신 데이터 가져오기
+          const response = await axios.get(`http://192.168.23.65:5000/board`, {
+            params: { offset: 0, limit: limit },
+          });
+          setBoardList(response.data);
+        }
       } catch (error) {
-        console.error("새 데이터를 가져오는 중 오류 발생:", error);
+        console.error("데이터 갱신 중 오류 발생:", error);
       }
     }
   };
 
   // 더보기 버튼 클릭
-  const moreList = () => {
-    setOffset((prevOffset) => prevOffset + limit); // offset 증가
-  };
+  const moreList = () => setOffset((prevOffset) => prevOffset + limit);
 
   // 검색 입력 처리
   const onChange = (e) => {
     const { name, value } = e.target;
-    // setIsYear(() =>)
     setSearch((prevSearch) => ({
       ...prevSearch,
       [name]: value || "",
@@ -130,14 +127,24 @@ const BoardList = ({ level }) => {
   // 팝업창 열기
   const openPup = (link, title, idx) => {
     // 링크가 없으면 상태를 설정하고 모달 열기
-    if(link==="") {
-      setIsEmptyLink(true); 
+    // if (link === "" || link === null) {
+    //   setIsEmptyLink(true);
+    //   return openModal(idx);
+    // }
+
+    // const popup = window.open(
+    //   `${link}`,
+    //   `${title}`,
+    //   "width=1300px,height=800px,scrollbars=yes"
+    // );
+    if (!link) {
+      setIsEmptyLink(true);
       return openModal(idx);
     }
 
-    const popup = window.open(
-      `${link}`,
-      `${title}`,
+    window.open(
+      link,
+      title,
       "width=1300px,height=800px,scrollbars=yes"
     );
   };
@@ -155,9 +162,14 @@ const BoardList = ({ level }) => {
   }, [offset]);
 
   // 모달 상태 변경 시 데이터 로드
-  useEffect(() => {
+  useEffect(() => {    
+    // if (!isModalOpen) getBoardList();
     if (!isModalOpen) {
-      getBoardList();
+      if (search || selectYear !== currentYear) {
+        onSearch(); // 검색 결과 유지
+      } else {
+        getBoardList(); // 전체 목록 갱신
+      }
     }
   }, [isModalOpen]);
 

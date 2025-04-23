@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import styled, { css } from "styled-components";
-import S from "../styled/GlobalBlock.jsx";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 //components
