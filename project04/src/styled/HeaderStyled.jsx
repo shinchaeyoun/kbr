@@ -2,7 +2,7 @@
 import styled from "styled-components";
 
 const HeaderContainer = styled.header`
-  padding-top: 97px;
+  padding-top: 20px;
   padding-bottom: 30px;
 `;
 

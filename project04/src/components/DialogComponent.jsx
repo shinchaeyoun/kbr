@@ -56,8 +56,6 @@ const DialogComponent = ({
           setEvent(INITIAL_EVENT); // 에러 발생 시 초기값으로 설정
         });
     } else if (mode == "write") {
-      console.log(selectedTime);
-
       setEvent(INITIAL_EVENT); // 초기값으로 리셋
       setEvent((INITIAL_EVENT) => ({
         ...INITIAL_EVENT,
@@ -120,10 +118,6 @@ const DialogComponent = ({
 
   const handleResizeHeight = useCallback(() => {
     textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
-    console.log(
-      "textareaRef.current.scrollHeight",
-      textareaRef.current.scrollHeight
-    );
   }, []);
 
   useEffect(() => {

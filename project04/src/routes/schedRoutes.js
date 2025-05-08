@@ -5,10 +5,6 @@ import { query } from "../helpers/dbHelper.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.send("auth");
-});
-
 // 이벤트 목록 가져오기
 router.get("/events", (req, res) => {
   const id = req.query.id;
@@ -43,15 +39,12 @@ router.post("/events", (req, res) => {
 router.patch("/update", (req, res) => {
   const id = Number(req.query.id); // req.query.id를 숫자로 변환
 
-  if (!id) {
-    return res.status(400).send({ msg: "수정할 이벤트의 id가 필요합니다." });
-  }
+  if (!id) return res.status(400).send({ msg: "수정할 이벤트의 id가 필요합니다." });
 
   const { title, start, end, label, memo } = req.body;
   const formattedStart = moment(start).format("YYYY-MM-DD HH:mm:ss");
   const formattedEnd = moment(end).format("YYYY-MM-DD HH:mm:ss");
   const params = [title, formattedStart, formattedEnd, label, memo, id];
-
 
   const sql = `
     UPDATE events SET 
@@ -63,14 +56,10 @@ router.patch("/update", (req, res) => {
     WHERE id = ?
   `;
 
-  // //   const sql = 'DELETE FROM events WHERE id = ?';
-  // // console.log('req.query.id', req.query.id);
-
     query(sql, params)
       .then((data) => {
         res.send(data);
         console.log("수정 완료", data);
-        
       })
       .catch((err) => {
         res.send(err)

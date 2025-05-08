@@ -17,19 +17,14 @@ const Header = ({ setShowSignup }) => {
   };
 
   // 로그인 함수
-  const onLogin = () => {
-    setShowSignup(false);
-  };
-
+  const onLogin = () => setShowSignup(false);
   const onLogo = () => {
     setShowSignup(false);
     document.location.href = "/";
   };
 
   // 로그인 상태 확인
-  useEffect(() => {
-    setIsLogin(level !== null); // level 값이 있으면 로그인 상태로 설정
-  }, []);
+  useEffect(() => setIsLogin(level !== null), []);
 
   return (
     <H.HeaderContainer>

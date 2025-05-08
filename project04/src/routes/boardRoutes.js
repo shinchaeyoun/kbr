@@ -33,7 +33,6 @@ router.post("/", (req, res) => {
   query(sql, params)
     .then((data) => {
       console.log("게시글 추가 성공");
-
       res.send(data);
     })
     .catch((err) => {
@@ -97,10 +96,6 @@ router.post("/search", async (req, res) => {
     params.push(Number(year));
   }
 
-  // if (search === "" && year === "all") {
-  //   sql += ` ORDER BY idx DESC`;
-  // }
-
   sql += ` ORDER BY idx DESC`;
 
   try {
@@ -114,6 +109,8 @@ router.post("/search", async (req, res) => {
 
 // 게시판 글 삭제
 router.delete("/delete", (req, res) => {
+  console.log("삭제 요청", req.body);
+  
   const idx = req.body.idx;
   const sql = `
     DELETE FROM board WHERE idx = ?  
@@ -127,6 +124,8 @@ router.delete("/delete", (req, res) => {
 
 // 이미지 업로드 엔드포인트
 router.post("/upload", async (req, res) => {
+  console.log("이미지 업로드 요청");
+
   const { base64Image, originalName, idx } = req.body;
   let index = req.body.idx; // 쿼리 파라미터에서 idx 가져오기
 
@@ -188,6 +187,7 @@ router.post("/upload", async (req, res) => {
 
 // 게시판 글 수정
 router.patch("/update", (req, res) => {
+  console.log("게시글 수정 요청", req.body);
   const index = req.query.idx;
   if (!index) {
     return res.status(400).send({ msg: "수정할 게시글의 idx가 필요합니다." });

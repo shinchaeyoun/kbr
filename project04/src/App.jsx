@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
 // pages
-// import Main from "./pages/Main.jsx";
 import Admin from "./pages/Admin.jsx";
 import Manager from "./pages/Manager.jsx";
 import Public from "./pages/Public.jsx";
@@ -16,11 +15,9 @@ import UserDetail from "./pages/UserDetail.jsx";
 import Scheduled from "./pages/Scheduled.jsx";
 
 // components
-import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import BoardForm from "./components/forms/BoardForm.jsx";
 import Pending from "./components/ApprovalPendingScreen.jsx";
-
 
 // route
 import PrivatePublicRoute from "./route/PrivatePublicRoute.jsx";

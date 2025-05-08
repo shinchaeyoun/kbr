@@ -1,6 +1,7 @@
 //LoginStyled
 import styled from "styled-components";
 import S from "./GlobalBlock";
+import media from "./media.jsx";
 
 const Button = styled(S.Button)`
   width: 500px;
@@ -89,6 +90,14 @@ const Container = styled.div`
   align-items: center;
 
   gap: 18px;
+
+  ${media.tab`
+    margin-bottom: 50px;
+    ${Group}, ${Input}, ${S.ButtonWrap}, ${Button}, ${Inner} {
+      width: 100%;
+    }
+
+  `}
 `;
 
 const L = {

@@ -11,7 +11,7 @@ import Prev from "../assets/icon/prev-arrow.svg?react";
 import Next from "../assets/icon/next-arrow.svg?react";
 import DoubleNext from "../assets/icon/double-next-arrow.svg?react";
 
-const UserList = (props) => {
+const UserList = () => {
   const [totalUser, setTotalUser] = useState([]);
   const [newUser, setNewUser] = useState(0);
   const [isUserList, setIsUserList] = useState([]);
@@ -20,8 +20,10 @@ const UserList = (props) => {
   const [isSearch, setSearch] = useState({ search: "" });
   const [offset, setOffset] = useState(0);
   const [isPage, setPage] = useState(0);
-  const [userIdx, setUserIdx] = useState(0);``
+  const [userIdx, setUserIdx] = useState(0);
+  const [key, setKey] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTab, setIsTab] = useState(false); // 모달 숨기기 상태
 
   const limit = 10; // 한 번에 가져올 데이터 수
 
@@ -48,18 +50,26 @@ const UserList = (props) => {
         setIsUserList(res.data.userList);
         setPage(Math.ceil(res.data.totalCount / limit));
       }
+      setPage(Math.ceil(res.data.totalCount / limit));
     } catch (err) {
       console.error("데이터를 가져오는 중 오류 발생:", err);
     }
   };
 
+  // 검색 초기화
+  const onReset = () => {
+    setSearchMode(false);
+    setSearch({ search: "" });
+    setOffset(0);
+    setKey(0);
+    getUserInfo();
+  };
+
   // 검색
   const onSearch = async () => {
-    console.log('isSearch',isSearch);
-    
     setSearchMode(true);
-    setOffset(0); // 검색 시 offset 초기화
-    await getUserInfo();
+    setOffset(0);
+    setKey((prevKey) => prevKey + 1);
   };
 
   // 검색 입력 핸들러
@@ -91,14 +101,28 @@ const UserList = (props) => {
 
   // 초기 데이터 로드
   useEffect(() => {
-    getUserInfo();
-  }, [offset]);
-
-  useEffect(() => {
     if (!isModalOpen) {
       getUserInfo();
     }
-  }, [isModalOpen]);
+  }, [key, offset, isModalOpen]);
+
+  useEffect(() => {
+    // 창 크기 감지 함수
+    const handleResize = () => {
+      setIsTab(window.innerWidth < 768);
+    };
+
+    // 초기 실행
+    handleResize();
+
+    // 이벤트 리스너 등록
+    window.addEventListener("resize", handleResize);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <U.UserWrap>
@@ -110,7 +134,7 @@ const UserList = (props) => {
         setIsModalOpen={setIsModalOpen}
       />
       <U.Title>
-        <h2>계정관리</h2>
+        <h2 onClick={onReset}>계정관리</h2>
         <div>
           총 {totalUser}명, 승인대기 {newUser}명
         </div>
@@ -125,13 +149,23 @@ const UserList = (props) => {
         />
         <button onClick={onSearch}>계정검색</button>
       </U.SearchBox>
-      <U.BlockTitle>
-        <p>아이디</p>
-        <p>이름</p>
-        <p>소속</p>
-        <p>권한레벨</p>
-        <p>연락처</p>
-        <p>메일</p>
+      <U.BlockTitle $isTab={isTab}>
+        {isTab ? (
+          <>
+            <p>이름</p>
+            <p>소속</p>
+            <p>권한레벨</p>
+          </>
+        ) : (
+          <>
+            <p>아이디</p>
+            <p>이름</p>
+            <p>소속</p>
+            <p>권한레벨</p>
+            <p>연락처</p>
+            <p>메일</p>
+          </>
+        )}
       </U.BlockTitle>
       <U.Content $limit={limit}>
         {(isSearchMode ? isSearchList : isUserList).length > 0 ? (
@@ -142,30 +176,56 @@ const UserList = (props) => {
                 setUserIdx(user.idx);
                 setIsModalOpen(true);
               }}
+              $isTab={isTab}
             >
-              <p>{user.id}</p>
-              <p>{user.name || "이름"}</p>
-              <p>{user.team || "소속팀"}</p>
-              <p>
-                {user.level < 2 ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      acctApproval(user.idx);
-                    }}
-                  >
-                    계정승인
-                  </button>
-                ) : (
-                  <>{user.level}</>
-                )}
-              </p>
-              <p>{user.tel || "010-0000-0000"}</p>
-              <p>{user.eMail || "---@kbrainc.com"}</p>
+              {isTab ? (
+                <>
+                  <p>{user.name || "이름"}</p>
+                  <p>{user.team || "소속팀"}</p>
+                  <p>
+                    {user.level < 2 ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          acctApproval(user.idx);
+                        }}
+                      >
+                        계정승인
+                      </button>
+                    ) : (
+                      <>{user.level}</>
+                    )}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p>{user.id}</p>
+                  <p>{user.name || "이름"}</p>
+                  <p>{user.team || "소속팀"}</p>
+                  <p>
+                    {user.level < 2 ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          acctApproval(user.idx);
+                        }}
+                      >
+                        계정승인
+                      </button>
+                    ) : (
+                      <>{user.level}</>
+                    )}
+                  </p>
+                  <p>{user.tel || "010-0000-0000"}</p>
+                  <p>{user.eMail || "---@kbrainc.com"}</p>
+                </>
+              )}
             </U.Block>
           ))
         ) : (
-          <p>검색 결과가 없습니다.</p>
+          <U.Box>
+            <p>검색 결과가 없습니다.</p>
+          </U.Box>
         )}
       </U.Content>
       {isPage > 1 && (

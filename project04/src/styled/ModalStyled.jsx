@@ -1,6 +1,7 @@
 //ModalStyled
 import styled from "styled-components";
 import S from "./GlobalBlock";
+import media from "./media.jsx";
 
 const DeleteBtn = styled.button`
   font-weight: 600;
@@ -185,6 +186,37 @@ const ModalContent = styled.div`
   overflow: hidden;
 
   border-radius: 10px;
+
+  ${media.tab`
+    width: 90%;
+
+    ${Wrap} {
+      padding: 40px 30px 60px 30px;
+
+      ${S.Select} {
+        // width: 100%;
+        // height: 40px;
+        // border-radius: 5px;
+        // border: 1px solid #d9d9d9;
+        // padding-left: 12px;
+      }
+
+      ${Group}, ${Input}, ${Button} {
+        width: 100%;
+      }
+    }
+  `}
+
+  ${media.mbl`
+    ${Title} {
+      margin-bottom: 30px;
+    }
+    ${SubTitle} {
+      span {
+        display: inline-block;
+      }
+    }
+  `}
 `;
 
 const ModalWrap = styled.div`

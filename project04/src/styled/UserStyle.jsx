@@ -40,7 +40,7 @@ const PageContainer = styled.div`
 
 const SearchBox = styled.div`
   position: absolute;
-  top: 0;
+  top: -5px;
   right: 0;
 
   width: 252px;
@@ -98,11 +98,17 @@ const Title = styled.div`
   }
 `;
 
+const Box = styled.div`
+  height: 100%;
+  text-align: center;
+  align-content: center;
+`;
+
 const Block = styled.div`
   min-height: 45px;
 
   display: grid;
-  grid-template-columns: 160px 110px 110px 90px 160px 314px;
+  grid-template-columns: repeat(5, 1fr) 2fr;
   align-items: center;
   text-align: center;
 
@@ -116,6 +122,16 @@ const Block = styled.div`
   }
   p {
     padding: 8px 0;
+
+    &:last-child {
+      
+    }
+
+    &.hide {
+      display: none;
+    }
+    
+
   }
 
   button {
@@ -125,14 +141,24 @@ const Block = styled.div`
     color: #fff;
     padding: 3px 10px;
   }
+
+
+  ${({ $isTab }) =>
+    $isTab &&
+    `
+      grid-template-columns: repeat(3, 1fr);
+    `}
+
+
+
+
+
+
+
 `;
 
 const Content = styled.div`
-  ${({ $limit }) =>
-    $limit &&
-    `
-      height: calc( ${$limit} * 45px);
-    `}
+  
 `;
 
 const BlockTitle = styled(Block)`
@@ -143,6 +169,10 @@ const BlockTitle = styled(Block)`
   p {
     padding: 7px 0;
     border-right: 1px solid #aaaaaa;
+
+    &:last-child {
+      border: none;
+    }
   }
 `;
 
@@ -161,6 +191,24 @@ const UserWrap = styled.div`
   position: relative;
   width: 945px;
   margin: 0 auto;
+
+  ${media.tab`
+    width: 100%;
+  `}
+
+  ${media.mbl`
+    width: 100%;
+
+    ${Title} {
+      margin-bottom: 50px;
+    }
+    ${SearchBox} {
+      position: absolute;
+      top: 35px;
+      left: 0;
+      width: 100%;
+    }
+  `}
 `;
 
 const U = {
@@ -168,6 +216,7 @@ const U = {
   PageContainer,
   SearchBox,
   Title,
+  Box,
   Block,
   Content,
   BlockTitle,

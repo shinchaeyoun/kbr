@@ -33,10 +33,7 @@ const Signup = ({ setShowSignup }) => {
       setPwCheck(value); // pwCheck 상태 업데이트
       setNotMatch(value !== data.password); // 비밀번호와 일치 여부 확인
     } else {
-      const nextData = {
-        ...data,
-        [name]: value,
-      };
+      const nextData = { ...data, [name]: value };
       setData(nextData);
 
       // 비밀번호를 수정할 경우, 비밀번호 확인 상태 초기화
@@ -62,7 +59,6 @@ const Signup = ({ setShowSignup }) => {
       return;
     }
     await axios.post("http://192.168.23.65:5000/auth/signup", data).then(() => {
-      console.log("data", data);
       alert("회원가입 완료");
       setShowSignup(false);
     });
@@ -71,7 +67,7 @@ const Signup = ({ setShowSignup }) => {
 
   return (
     <L.Container>
-      <L.Logo>
+      <L.Logo onClick={() => document.location.href = "/"}>
         <h1>K·Brain</h1>
         <span>Projects Link & data</span>
       </L.Logo>

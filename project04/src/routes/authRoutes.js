@@ -1,26 +1,18 @@
 // 로그인 및 회원가입 관련 라우트
-
 import express from "express";
 import util from "util";
 import { query } from "../helpers/dbHelper.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.send("auth");
-});
-
 // 로그인 처리
 router.post("/login", (req, res) => {
-  console.log(`로그인 처리 = = = > req : ${util.inspect(req.body)}`);
   const userId = req.body.id;
   const userPw = req.body.password;
-  const userAuth = req.body.level;
   const sql1 = "SELECT COUNT(*) AS result FROM user WHERE id = ?";
 
   query(sql1, [userId])
     .then((data) => {
-      console.log("query sql1 ===!! ");
       // 동일한 id가 없다면
       if (data[0].result < 1) {
         console.log("동일한 id가 없다면", data, req.body);
@@ -35,7 +27,7 @@ router.post("/login", (req, res) => {
 
         query(sql2, params)
           .then((data) => {
-            console.log("server : 로그인 성공 //////", data[0]);
+            console.log("로그인 성공", data[0]);
             res.send(data[0]);
           })
           .catch((err) => {

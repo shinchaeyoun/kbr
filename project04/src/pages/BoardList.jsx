@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import S from "../styled/GlobalBlock";
 import B from "../styled/BoardStyled.jsx";
 import axios from "axios";
@@ -52,7 +50,7 @@ const BoardList = ({ level }) => {
   // 검색
   const onSearch = async () => {
     try {
-      setBoardList([]); // 상태 초기화
+      // setBoardList([]); // 상태 초기화
       setOffset(0); // offset 초기화
       setHasMore(false); // 검색 결과는 더보기 버튼 숨김
 
@@ -83,16 +81,13 @@ const BoardList = ({ level }) => {
       setBoardList((prevList) => prevList.filter((item) => item.idx !== idx));
     } else {
       try {
-        // 검색어가 있을 경우 검색 결과를 유지
-        // if (search || year) {
-        if (search || selectYear !== currentYear) {
+        if (search || selectYear) {
           const response = await axios.post(
             `http://192.168.23.65:5000/board/search`,
             { search: search, year: selectYear }
           );
-          setBoardList(response.data); // 검색 결과 유지
+          setBoardList(response.data);
         } else {
-          // 검색어가 없을 경우 최신 데이터 가져오기
           const response = await axios.get(`http://192.168.23.65:5000/board`, {
             params: { offset: 0, limit: limit },
           });
@@ -138,15 +133,12 @@ const BoardList = ({ level }) => {
     //   "width=1300px,height=800px,scrollbars=yes"
     // );
     if (!link) {
+      setModalMode("view");
       setIsEmptyLink(true);
       return openModal(idx);
     }
 
-    window.open(
-      link,
-      title,
-      "width=1300px,height=800px,scrollbars=yes"
-    );
+    window.open(link, title, "width=1300px,height=800px,scrollbars=yes");
   };
 
   // 초기 데이터 로드
@@ -162,7 +154,7 @@ const BoardList = ({ level }) => {
   }, [offset]);
 
   // 모달 상태 변경 시 데이터 로드
-  useEffect(() => {    
+  useEffect(() => {
     // if (!isModalOpen) getBoardList();
     if (!isModalOpen) {
       if (search || selectYear !== currentYear) {
@@ -207,6 +199,10 @@ const BoardList = ({ level }) => {
           <S.Select
             name="year"
             value={selectYear}
+            onKeyDown={(e) => {
+              handleKeyPress(e)
+              e.preventDefault();
+            }}
             onChange={(e) => {
               setSelectYear(e.target.value);
               setSearch({ ...isSearch, year: e.target.value });
@@ -293,14 +289,17 @@ const BoardList = ({ level }) => {
               alt={board.title}
             />
 
-            <B.Group>
+            <B.Group className="group" isType={isType}>
               {isType === "list" ? (
-                <B.ListTitle>
+                <B.ListTitle className="ListTitle">
                   <p>{board.title}</p>
-                  <span>{board.outerUrl}</span>
+                  {board.outerUrl && (
+                    <span>{board.outerUrl}</span>
+                  )}
+                  
                 </B.ListTitle>
               ) : (
-                <B.CardTitle>
+                <B.CardTitle className="CardTitle">
                   <p>{board.title}</p>
                 </B.CardTitle>
               )}

@@ -1,11 +1,12 @@
 // 사용자 정보 관리 관련 라우트
-
 import express from "express";
 import { query } from "../helpers/dbHelper.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
+  console.log("사용자 정보 조회 요청", req.query);
+
   const index = req.query.idx;
   const sql = `SELECT * FROM user WHERE idx = ?`;
 
@@ -15,7 +16,7 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error("쿼리 실행 중 오류 발생:", err);
     res.status(500).send({ msg: "쿼리 실행 실패", error: err });
-  };
+  }
 });
 
 // 사용자 목록 조회
@@ -74,7 +75,8 @@ router.post("/search", async (req, res) => {
   const { search } = req.body.params.isSearch;
   const limit = req.body.params.limit;
   const offset = req.body.params.offset;
-  console.log("searchVal", searchVal);
+
+  console.log("search", search);
 
   try {
     const totalCountSql = `
@@ -83,6 +85,7 @@ router.post("/search", async (req, res) => {
     `;
     const totalCountResult = await query(totalCountSql, [`%${search}%`]);
     const totalCount = totalCountResult[0].totalCount;
+    const allUsersSql = `SELECT * FROM user LIMIT ${limit} OFFSET ${offset}`;
 
     const sql = `
       SELECT * FROM user 
@@ -90,12 +93,8 @@ router.post("/search", async (req, res) => {
       ORDER BY level ASC, idx ASC 
       LIMIT ${limit} OFFSET ${offset}
     `;
-    const allUsersSql = `SELECT * FROM user LIMIT ${limit} OFFSET ${offset}`;
-
     const searchResult = await query(sql, [`%${search}%`]);
     const allResult = await query(allUsersSql, [`%${search}%`]);
-
-    console.log("searchResult", searchResult.length);
 
     if (searchResult.length === 0) {
       return res.send({
@@ -130,6 +129,7 @@ router.patch("/update", (req, res) => {
     etc1 = ?, etc2 = ?, etc3 = ? 
     WHERE idx = ?
   `;
+
   const params = [
     id,
     password,

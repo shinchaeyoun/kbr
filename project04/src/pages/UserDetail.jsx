@@ -56,8 +56,6 @@ const UserDetail = () => {
     await axios
       .patch(`http://192.168.23.65:5000/user/update?idx=${index}`, user)
       .then((res) => {
-        console.log("=========res", res);
-
         alert("수정되었습니다.");
       });
   };

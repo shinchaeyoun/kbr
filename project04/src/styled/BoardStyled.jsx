@@ -9,6 +9,7 @@ const Search = styled.div`
     margin: 0 10px;
     height: 20px;
     background-color: initial;
+
     border: none;
     font-size: 14px;
 
@@ -50,6 +51,34 @@ const SearchContainer = styled.div`
     height: 30px;
     border: 1px solid #6580ea;
   }
+
+  ${media.tab`
+    position: relative;
+    margin-top: 30px;
+    width: 100%;
+
+    ${S.SearchContainer} {
+
+    }
+
+    ${S.ButtonWrap} {
+      position: absolute;
+      top: -40px; right: 0;
+    }
+    
+    ${Search} {
+      width: 100%;
+      ${S.Input} {
+        width: calc(100% - 100px);
+      }
+    }
+  `}
+
+  ${media.mbl`
+    input {
+      background-color: #fff;
+    }
+  `}
 `;
 
 const SearchContent = styled.div`
@@ -86,14 +115,19 @@ const Title = styled.div`
   font-size: 14px;
   font-family: "NanumSquareNeoBold", sans-serif;
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  p, span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const ListTitle = styled(Title)`
+  width: calc(100% - 30px);
   padding-left: 10px;
   span {
+    display: inline-block;
+    width: 100%;
     color: #777777;
     font-family: "NanumSquareNeo", sans-serif;
   }
@@ -104,10 +138,6 @@ const CardTitle = styled(Title)`
   p {
     position: relative;
     padding-left: 5px;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 
     &:after {
       content: "";
@@ -127,6 +157,8 @@ const Group = styled.div`
   justify-content: space-between;
 
   width: 100%;
+
+  ${(props) => props.isType === "list" && `width: calc(100% - 90px)`};
 
   ${S.Button} {
     border: none;
@@ -203,7 +235,7 @@ const GridContainer = styled.div`
     justify-items: center;
 
     ${ListTitle} {
-      width: 360px;
+      // width: 360px;
     }
   `}
 
@@ -213,7 +245,7 @@ const GridContainer = styled.div`
       props.type === "card" ? `repeat(3, 1fr)` : "repeat(1, 1fr)"};
 
       ${ListTitle} {
-      width: 100%;
+      // width: 100%;
     }
   `}
   
@@ -221,12 +253,20 @@ const GridContainer = styled.div`
     // color: red;
     grid-template-columns: ${(props) =>
       props.type === "card" && `repeat(2, 1fr)`};
+
+    ${BoardItem} {
+      min-width: 100px;
+    }
   `}
 
   ${media.mbl`
     // color: blue;
     grid-template-columns: ${(props) =>
       props.type === "card" ? `repeat(1, 1fr)` : "repeat(1, 1fr)"};
+
+      ${CardTitle} {
+        width: 300px;
+      }
   `}
 `;
 
