@@ -13,7 +13,7 @@ const GridContainer = styled.div`
 const Button = styled(S.Button)``;
 
 const Title = styled(S.Title)`
-  margin-bottom: 20px;
+  // margin-bottom: 20px;
 `;
 
 const Container = styled.div``;
@@ -21,9 +21,13 @@ const Container = styled.div``;
 const Group = styled.div`
   display: flex;
   gap: 5px;
+  width: 100%;
 `;
 
-const BarTitle = styled(Title)``;
+const BarTitle = styled(Title)`
+  width: 75px;
+  flex-shrink: 0;
+`;
 const CheckTitle = styled(Title)`
   margin-bottom: 7px;
 `;
@@ -33,22 +37,46 @@ const BarContainer = styled(Container)`
   flex-wrap: wrap;
   gap: 10px 50px;
 
+  margin-top: 20px;
   margin-bottom: 30px;
 `;
 const BarContent = styled.div`
   display: flex;
   gap: 5px;
+  width: 90%;
 `;
 const Bar = styled.div`
-  width: 200px;
-  height: 15px;
+  display: flex;
+  width: 100%;
+  height: 20px;
   background-color: #f5f5f5;
+  border-radius: 20px;
 `;
 const BarProgress = styled.div`
   width: ${(props) => props.$per || "0%"};
   height: 100%;
-  background-color: #d0021b;
+  background-color:rgb(63, 197, 250);
   transition: width 0.3s ease-in-out;
+  border-radius: 20px;
+  text-align: right;
+
+  span {
+    color: #fff;
+    padding: 0 8px;
+  }
+`;
+const BarProgress2 = styled.div`
+  width: ${(props) => props.$per || "0%"};
+  height: 100%;
+  background-color:rgb(255, 230, 146);
+  transition: width 0.3s ease-in-out;
+  border-radius: 20px;
+  text-align: right;
+
+  span {
+    color: #fff;
+    padding: 0 8px;
+  }
 `;
 
 const NumCate = styled.div`
@@ -145,6 +173,7 @@ const P = {
   BarContent,
   Bar,
   BarProgress,
+  BarProgress2,
   NumCate,
   Num,
   CheckContainer,

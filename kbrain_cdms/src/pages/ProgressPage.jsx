@@ -34,44 +34,7 @@ const ProgressPage = () => {
 
   const optionArr = ["진행전", "진행중", "수정중", "1차 완료", "완료"];
   const optionCss = ["before", "ing", "edit", "firstDone", "done"];
-
-  // progress 데이터 파싱 및 percent 계산 함수 분리
-  const parseProgressData = (progressValues, progressCate, setArray) => {
-    const progressData = {};
-    const percentName = {};
-    const inprogress = {};
-
-    if (progressValues && Object.keys(progressValues).length > 0) {
-      Object.entries(progressValues).forEach(([key, value]) => {
-        let perNum = 0;
-        let inproNum = 0;
-        let arr = [];
-        if (typeof value === "string") {
-          arr = value.split(",").map(Number);
-        } else if (Array.isArray(value)) {
-          arr = value.map(Number);
-        } else {
-          arr = setArray;
-        }
-
-        arr.forEach((val) => {
-          if (val === 4) perNum++;
-          if (val !== 0 && val !== 4) inproNum++;
-        });
-        percentName[key] = perNum;
-        progressData[key] = arr;
-        inprogress[key] = inproNum;
-      });
-    } else {
-      progressCate.forEach((key) => {
-        percentName[key] = 0;
-        progressData[key] = setArray;
-        inprogress[key] = 0;
-      });
-    }
-
-    return { progressData, percentName, inprogress };
-  };
+  const [changeData, setChangeData] = useState({});
 
   const fetchData = async () => {
     const getChasiTotal = await axios.get(`${API_SUB}/chasiTotal`, {
@@ -94,13 +57,41 @@ const ProgressPage = () => {
       { length: getChasiTotal.data.chasiTotal },
       () => 0
     );
+    const progressData = {};
+    const percentName = {};
+    const inprogress = {};
 
-    // 파싱 함수 사용
-    const { progressData, percentName, inprogress } = parseProgressData(
-      getProgressValues.data,
-      progressCate,
-      setArray
-    );
+    if (
+      getProgressValues.data &&
+      Object.keys(getProgressValues.data).length > 0
+    ) {
+      Object.entries(getProgressValues.data).forEach(([key, value]) => {
+        let perNum = 0;
+        let inproNum = 0;
+        let arr = [];
+        if (typeof value === "string") {
+          arr = value.split(",").map(Number);
+        } else if (Array.isArray(value)) {
+          arr = value.map(Number);
+        } else {
+          arr = setArray;
+        }
+
+        arr.forEach((val) => {
+          if (val === 4) perNum++;
+          if (val !== 0 && val !== 4) inproNum++;
+        });
+        percentName[key] = perNum;
+        progressData[key] = arr;
+        inprogress[key] = inproNum;
+      });
+    } else {
+      // 데이터가 없을 때 기본값 세팅
+      progressCate.forEach((key) => {
+        percentName[key] = 0;
+        progressData[key] = setArray;
+      });
+    }
 
     setProgressValues(progressData);
     setProgressPercent(percentName);
@@ -172,12 +163,20 @@ const ProgressPage = () => {
 
     if (response.data.msg === "전송 성공") {
       alert("진행률이 저장되었습니다.");
-      // progressPercent 갱신 (파싱 함수 사용)
-      const setArray = Array.from({ length: chasiTotal }, () => 0);
-      const { percentName: newPercent, inprogress: newInprogress } =
-        parseProgressData(progressValues, progressCate, setArray);
+      // progressPercent 갱신
+      const newPercent = {};
+      Object.entries(progressValues).forEach(([key, value]) => {
+        let perNum = 0;
+        if (Array.isArray(value)) {
+          value.forEach((val) => {
+            if (val === 4) perNum++;
+          });
+        }
+        newPercent[key] = perNum;
+      });
       setProgressPercent(newPercent);
-      setInProgress(newInprogress);
+
+      setChangeData(newPercent);
     }
   };
 
@@ -193,54 +192,8 @@ const ProgressPage = () => {
     <>
       <div>
         <P.Title>과목1101 진행률</P.Title>
-        {/* <PercentBar /> */}
-        <P.BarContainer>
-          <P.Group>
-            <P.BarTitle>전체</P.BarTitle>
-            <P.BarContent>
-              <P.Bar>
-                <P.BarProgress
-                  $per={
-                    Math.round((totalPrecent / chasiTotal) * 100) / 2 +
-                    Math.round((totalInPrecent / chasiTotal) * 100) / 2 +
-                    "%"
-                  }
-                ></P.BarProgress>
-              </P.Bar>
-              <P.NumCate>
-                <P.Num>
-                  완료 : {totalPrecent} /{" "}
-                  {Math.round((totalPrecent / chasiTotal) * 100) + "%"}
-                  <br />
-                  진행 : {totalInPrecent} /{" "}
-                  {Math.round((totalInPrecent / chasiTotal) * 100) + "%"}
-                </P.Num>
-              </P.NumCate>
-            </P.BarContent>
-          </P.Group>
 
-          {progressItem.map((item, index) => {
-            const percent = Object.values(progressPercent)[index];
-            const inPer = Object.values(inProgress)[index];
-            const percentValue =
-              chasiTotal > 0 ? Math.round((percent / chasiTotal) * 100) : 0;
-            return (
-              <P.Group key={index}>
-                <P.BarTitle>{item}</P.BarTitle>
-                <P.BarContent>
-                  <P.Bar>
-                    <P.BarProgress $per={percentValue + "%"}></P.BarProgress>
-                  </P.Bar>
-                  <P.NumCate>
-                    <P.Num>
-                      {percent} / {chasiTotal} (진행중 : {inPer})
-                    </P.Num>
-                  </P.NumCate>
-                </P.BarContent>
-              </P.Group>
-            );
-          })}
-        </P.BarContainer>
+        <PercentBar changeData={changeData} setChangeData={setChangeData} />
 
         <P.CheckContainer>
           <P.Button onClick={saveBtn}>저장하기</P.Button>
