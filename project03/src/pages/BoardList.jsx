@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import "../styles/board.scss";
 import styled from "styled-components";
 import S from "../styled/GlobalBlock";
 
 import axios from "axios";
+
+import Modal from "../components/Modal.jsx";
 
 const FlexBox = styled(S.FlexBox)`
   flex-direction: row-reverse;
@@ -16,18 +19,32 @@ const ButtonWrap = styled(S.FlexBox)`
 `;
 
 const Search = styled.div`
- input {
-  margin: 0 10px;
- height: 20px; 
- }
+  input {
+    width: 250px;
+    margin: 0 10px;
+    height: 20px;
+  }
 `;
 
 const BoardList = (props) => {
   const navigate = useNavigate();
+
   const level = props.level;
+
   const [boardList, setboardList] = useState([]);
-  const [isSearch, setSearch] = useState("");
+  const [isSearch, setSearch] = useState({ search: "" });
   const { search } = isSearch;
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBoardIdx, setIsBoardIdx] = useState();
+  const [modalMode, setModalMode] = useState("view");
+
+  const openModal = (idx) => {
+    const index = boardList.findIndex((item) => item.idx === idx);
+    console.log("idx", idx, index);
+    setIsBoardIdx(idx);
+    setIsModalOpen(!isModalOpen);
+  };
 
   const getboardList = async () => {
     await axios
@@ -39,7 +56,7 @@ const BoardList = (props) => {
     const { value, name } = e.target;
     setSearch({
       ...isSearch,
-      [name]: value,
+      [name]: value || "",
     });
   };
 
@@ -47,23 +64,6 @@ const BoardList = (props) => {
     await axios
       .post(`http://192.168.23.65:5000/board/search`, isSearch)
       .then((res) => setboardList(res.data));
-  };
-
-  const moveToWrite = () => {
-    navigate("/board/write");
-  };
-
-  const linkToBoard = (idx, e) => {
-    const index = boardList.findIndex((item) => item.idx === idx);
-    navigate(`/board/${index}`);
-  };
-
-  const moveToUpdate = (idx, e) => {
-    if (level > 2) {
-      navigate("/board/update/" + idx);
-    } else {
-      alert("수정 권한 없음");
-    }
   };
 
   const deleteBoard = async (idx, e) => {
@@ -90,19 +90,45 @@ const BoardList = (props) => {
     }
   };
 
+  const openPup = (link, title) => {
+    const popup = window.open(
+      `${link}`,
+      `${title}`,
+      "width=1300px,height=800px,scrollbars=yes"
+    );
+  };
+
   useEffect(() => {
     getboardList();
-    setSearch("");
-  }, []);
+    setSearch({ search: "" });
+  }, [isModalOpen]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") onSearch();
   };
 
   return (
-    <>
+    <div className="board-list">
+      <Modal
+        mode={modalMode}
+        itemIdx={isBoardIdx}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+      />
+
       <FlexBox>
-        <S.Button onClick={moveToWrite}>과정등록</S.Button>
+        <S.Button
+          onClick={() => {
+            if (level > 2) {
+              setModalMode("write");
+              openModal();
+            } else {
+              alert("글쓰기 권한 없음");
+            }
+          }}
+        >
+          과정등록
+        </S.Button>
 
         <Search>
           <input
@@ -120,8 +146,12 @@ const BoardList = (props) => {
         <S.BoardItem key={board.idx}>
           <div
             className="title"
-            onClick={(e) => {
-              linkToBoard(board.idx, e);
+            // onClick={(e) => {
+            //   linkToBoard(board.idx, e);
+            // }}
+            onClick={() => {
+              setModalMode("view");
+              openModal(board.idx);
             }}
           >
             {board.title}
@@ -134,15 +164,25 @@ const BoardList = (props) => {
             <span>과정경로</span>
             {board.innerUrl}
           </div>
-          <div className="outerUrl">
+          <div
+            className="outerUrl"
+            onClick={() => {
+              openPup(board.outerUrl, board.title);
+            }}
+          >
             <span>URL</span>
             {board.outerUrl}
           </div>
 
           <ButtonWrap className="buttonWrap">
             <S.Button
-              onClick={(e) => {
-                moveToUpdate(board.idx, e);
+              onClick={() => {
+                if (level > 2) {
+                  setModalMode("update");
+                  openModal(board.idx);
+                } else {
+                  alert("수정 권한 없음");
+                }
               }}
             >
               수정하기
@@ -157,7 +197,7 @@ const BoardList = (props) => {
           </ButtonWrap>
         </S.BoardItem>
       ))}
-    </>
+    </div>
   );
 };
 

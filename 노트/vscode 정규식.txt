@@ -1,0 +1,4 @@
+<p style="font-family: NotoKrR; font-size: 11pt;
+
+
+(?<=<p [^>]*>.*?)[^\S\r\n]+(?=.*?</p>)

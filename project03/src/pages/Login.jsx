@@ -18,8 +18,8 @@ const Login = ({ isLogin, onSignupClick }) => {
   };
 
   const onLogout = () => {
-    sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_lvl");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_lvl");
     document.location.href = "/";
   };
 
@@ -52,12 +52,12 @@ const Login = ({ isLogin, onSignupClick }) => {
         } else if (res.data.userId === inputId) {
           // id, pw 모두 일치 userId = userId1, msg = undefined
           console.log("======================", "로그인 성공", res.data);
-          sessionStorage.setItem("user_id", inputId);
+          localStorage.setItem("user_id", inputId);
 
-          console.log("sessionStorage.user_id :", sessionStorage.user_id);
+          console.log("localStorage.user_id :", localStorage.user_id);
 
           if (res.data.userAuth !== null) {
-            sessionStorage.setItem("user_lvl", res.data.userAuth);
+            localStorage.setItem("user_lvl", res.data.userAuth);
           }
           // 작업 완료 되면 페이지 이동(새로고침)
           document.location.href = "/";

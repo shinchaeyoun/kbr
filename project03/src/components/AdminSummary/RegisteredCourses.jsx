@@ -5,6 +5,8 @@ import styled, { css } from "styled-components";
 import S from "../../styled/GlobalBlock.jsx";
 import axios from "axios";
 
+import Modal from "../../components/Modal.jsx";
+
 const Block = styled(S.Block)`
   position: relative;
 
@@ -37,9 +39,21 @@ const RegisteredCourses = () => {
   const navigate = useNavigate();
   const [boardList, setBoardList] = useState([]);
 
+  // 모달 관련
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBoardIdx, setIsBoardIdx] = useState();
+  const [modalMode, setModalMode] = useState("view");
+
+  const openModal = (idx) => {
+    const index = boardList.findIndex((item) => item.idx === idx);
+    console.log("idx", idx, index);
+    setIsBoardIdx(idx);
+    setIsModalOpen(!isModalOpen);
+  };
+  // 모달 관련 끝
+
   const getBoard = () => {
     axios.get("http://192.168.23.65:5000/board?limit=5").then((res) => {
-      console.log(res.data, "data");
       setBoardList(res.data);
     });
   };
@@ -56,24 +70,35 @@ const RegisteredCourses = () => {
   }, []);
 
   return (
-    <Block>
-      <Title>등록된 과정</Title>
+    <>
+      <Modal
+        mode={modalMode}
+        itemIdx={isBoardIdx}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+      />
+      <Block>
+        <Title>등록된 과정</Title>
 
-      <div>
-        {boardList.map((item) => (
-          <p
-            key={item.idx}
-            onClick={() => {
-              moveToBoard(item.idx);
-            }}
-          >
-            {item.title}
-          </p>
-        ))}
-      </div>
+        <div>
+          {boardList.map((item) => (
+            <p
+              key={item.idx}
+              onClick={() => {
+                // moveToBoard(item.idx);
+                openModal(item.idx);
+              }}
+            >
+              {item.title}
+            </p>
+          ))}
+        </div>
 
-      <button onClick={moveToList}>과정 전체보기</button>
-    </Block>
+        <div className="grid-container"></div>
+
+        <button onClick={moveToList}>과정 전체보기</button>
+      </Block>
+    </>
   );
 };
 

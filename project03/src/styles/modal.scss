@@ -1,0 +1,22 @@
+.modal-wrap {
+  h2 {
+    border-bottom: 2px solid pink;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  h3 {
+  }
+
+  content {
+    div {
+      display: flex;
+
+      > p {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+

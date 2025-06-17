@@ -5,7 +5,7 @@ header {
   border-top: 2px solid #ddd;
 }
 
-div {
+header > div {
   cursor: pointer;
 }
 

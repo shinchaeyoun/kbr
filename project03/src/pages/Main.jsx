@@ -10,8 +10,8 @@ const Main = (props) => {
   console.log("here is main page : isLogin", isLogin);
 
   const onLogout = () => {
-    sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_lvl");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_lvl");
     document.location.href = "/main";
   };
 

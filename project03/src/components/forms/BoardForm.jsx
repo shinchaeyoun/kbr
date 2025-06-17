@@ -4,35 +4,41 @@ import styled from "styled-components";
 import S from "../../styled/GlobalBlock.jsx";
 import axios from "axios";
 
+const Wrap = styled(S.Wrap)`
+  h1 {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+`;
 const GridContainer = styled(S.GridContainer)``;
 const GridItem = styled(S.GridItem)``;
 
-const BoardForm = ({ isUpdate }) => {
+const BoardForm = ({ mode, idx, isModalOpen, setIsModalOpen }) => {
   const navigate = useNavigate();
-  const { idx } = useParams();
+  const [isRead, setIsRead] = useState(false);
 
   // 게시글 정보 상태
   const [board, setBoard] = useState({
-    title: null,
-    subTitle: null,
-    customer: null,
-    pm1: null,
-    pm2: null,
-    pm3: null,
-    startAt: null,
-    scheduledAt: null,
-    completedAt: null,
-    totalCha: null,
-    lmsTime: null,
-    lmsCode: null,
-    innerUrl: null,
-    outerUrl: null,
-    customerName: null,
-    customerTel: null,
+    title: '',
+    subTitle: '',
+    customer: '',
+    pm1: '',
+    pm2: '',
+    pm3: '',
+    startAt: '',
+    scheduledAt: '',
+    completedAt: '',
+    totalCha: '',
+    lmsTime: '',
+    lmsCode: '',
+    innerUrl: '',
+    outerUrl: '',
+    customerName: '',
+    customerTel: '',
 
-    customerPlan: null,
-    pottingComp: null,
-    etc: null,
+    customerPlan: '',
+    pottingComp: '',
+    etc: '',
   });
 
   const {
@@ -68,7 +74,7 @@ const BoardForm = ({ isUpdate }) => {
 
   // 게시글 데이터 가져오기 (수정 모드일 경우)
   const getBoard = async () => {
-    if (isUpdate) {
+    if (mode == "update" || mode == "view") {
       await axios
         .get(`http://192.168.23.65:5000/board?idx=${idx}`)
         .then((res) => setBoard(res.data));
@@ -77,22 +83,22 @@ const BoardForm = ({ isUpdate }) => {
 
   // 게시글 저장
   const handleSubmit = async () => {
-    if (isUpdate) {
+    if (mode == "update") {
       // 수정 로직
       await axios
         .patch(`http://192.168.23.65:5000/board/update?idx=${idx}`, board)
         .then(() => {
           alert("수정되었습니다.");
-          navigate("/board");
+          setIsModalOpen(false);
         });
-    } else {
+    } else if (mode == "write") {
       // 작성 로직
       await axios.post(`http://192.168.23.65:5000/board`, board).then((res) => {
-        console.log(res.data.msg);
-        
         if (res.data.msg === undefined) {
           alert("등록되었습니다.");
+          setIsModalOpen(false);
           navigate("/board");
+          getBoard();
         } else {
           alert("강조박스의 내용을 모두 작성해주세요.");
         }
@@ -101,16 +107,36 @@ const BoardForm = ({ isUpdate }) => {
   };
 
   // 취소 버튼 동작
-  const handleCancel = () => navigate("/board");
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+
+
+  const [boardTitle, setBoardTitle] = useState('');
+  const changeTitle = () => {
+    if (mode == "view") {
+      setBoardTitle("과정상세")
+    } else if (mode == "update") {
+      setBoardTitle("과정수정")
+    } else {
+      setBoardTitle("과정등록")
+    }
+  };
 
   // 컴포넌트 로드시 데이터 로드
   useEffect(() => {
     getBoard();
-  }, []);
+    changeTitle();
+    if (mode == "view") setIsRead(true);
+  }, [isModalOpen]);
+
+
 
   return (
-    <>
-      <h1>{isUpdate ? "과정수정" : "과정등록"}</h1>
+    <Wrap>
+      {/* <h1>{mode == "update" ? "과정수정" : "과정등록"}</h1> */}
+      <h1>{boardTitle}</h1>
       <GridContainer>
         <GridItem>
           <div>사업명(과정명) :</div>
@@ -119,6 +145,7 @@ const BoardForm = ({ isUpdate }) => {
             $req="true"
             name="title"
             value={title}
+            readOnly={isRead}
             onChange={onChange}
           />
 
@@ -130,6 +157,7 @@ const BoardForm = ({ isUpdate }) => {
             type="text"
             name="subTitle"
             value={subTitle}
+            readOnly={isRead}
             onChange={onChange}
           />
 
@@ -145,6 +173,7 @@ const BoardForm = ({ isUpdate }) => {
             type="text"
             name="customer"
             value={customer}
+            readOnly={isRead}
             onChange={onChange}
           />
         </GridItem>
@@ -155,10 +184,23 @@ const BoardForm = ({ isUpdate }) => {
             $req="true"
             name="pm1"
             value={pm1}
+            readOnly={isRead}
             onChange={onChange}
           />
-          <S.Input type="text" name="pm2" value={pm2} onChange={onChange} />
-          <S.Input type="text" name="pm3" value={pm3} onChange={onChange} />
+          <S.Input
+            type="text"
+            name="pm2"
+            value={pm2}
+            readOnly={isRead}
+            onChange={onChange}
+          />
+          <S.Input
+            type="text"
+            name="pm3"
+            value={pm3}
+            readOnly={isRead}
+            onChange={onChange}
+          />
         </GridItem>
         <GridItem $short="true">
           <div>착수시작/완료예정/완료일 :</div>
@@ -166,18 +208,21 @@ const BoardForm = ({ isUpdate }) => {
             type="text"
             name="startAt"
             value={startAt}
+            readOnly={isRead}
             onChange={onChange}
           />
           <S.Input
             type="text"
             name="scheduledAt"
             value={scheduledAt}
+            readOnly={isRead}
             onChange={onChange}
           />
           <S.Input
             type="text"
             name="completedAt"
             value={completedAt}
+            readOnly={isRead}
             onChange={onChange}
           />
         </GridItem>
@@ -188,6 +233,7 @@ const BoardForm = ({ isUpdate }) => {
               type="text"
               name="totalCha"
               value={totalCha}
+              readOnly={isRead}
               onChange={onChange}
             />
             차시
@@ -197,6 +243,7 @@ const BoardForm = ({ isUpdate }) => {
               type="text"
               name="lmsTime"
               value={lmsTime}
+              readOnly={isRead}
               onChange={onChange}
             />
             시간
@@ -206,28 +253,30 @@ const BoardForm = ({ isUpdate }) => {
               type="text"
               name="lmsCode"
               value={lmsCode}
+              readOnly={isRead}
               onChange={onChange}
             />
           </div>
         </GridItem>
-        <GridItem $short="true">
+        {/* <GridItem $short="true">
           <div>수주/예상/완료비용 :</div>
           <div>
-            <S.Input type="text" />원
+            <S.Input type="text" readOnly={isRead} />원
           </div>
           <div>
-            <S.Input type="text" />원
+            <S.Input type="text" readOnly={isRead} />원
           </div>
           <div>
-            <S.Input type="text" />원
+            <S.Input type="text" readOnly={isRead} />원
           </div>
-        </GridItem>
+        </GridItem> */}
         <GridItem $long="true">
           <div>내부 경로 :</div>
           <S.Input
             type="text"
             name="innerUrl"
             value={innerUrl}
+            readOnly={isRead}
             onChange={onChange}
           />
         </GridItem>
@@ -237,6 +286,7 @@ const BoardForm = ({ isUpdate }) => {
             type="text"
             name="outerUrl"
             value={outerUrl}
+            readOnly={isRead}
             onChange={onChange}
           />
         </GridItem>
@@ -246,18 +296,21 @@ const BoardForm = ({ isUpdate }) => {
             type="text"
             name="customerName"
             value={customerName}
+            readOnly={isRead}
             onChange={onChange}
           />
           <S.Input
             type="text"
             name="customerTel"
             value={customerTel}
+            readOnly={isRead}
             onChange={onChange}
           />
           <S.Input
             type="text"
             name="customerPlan"
             value={customerPlan}
+            readOnly={isRead}
             onChange={onChange}
           />
         </GridItem>
@@ -267,20 +320,33 @@ const BoardForm = ({ isUpdate }) => {
             type="text"
             name="pottingComp"
             value={pottingComp}
+            readOnly={isRead}
             onChange={onChange}
           />
         </GridItem>
         <GridItem $long="true">
           <div>기타사항 :</div>
-          <S.Input type="text" name="etc" value={etc} onChange={onChange} />
+          <S.Input
+            type="text"
+            name="etc"
+            value={etc}
+            readOnly={isRead}
+            onChange={onChange}
+          />
         </GridItem>
       </GridContainer>
 
       <div>
-        <S.Button onClick={handleSubmit}>{isUpdate ? "과정수정" : "과정등록"}</S.Button>
-        <S.Button onClick={handleCancel}>취소</S.Button>
+        {
+          mode !== "view" && (
+            <S.Button onClick={handleSubmit}>
+              {mode == "update" ? "과정수정" : "과정등록"}
+            </S.Button>
+          )
+        }
+        <S.Button onClick={handleCancel}>닫기</S.Button>
       </div>
-    </>
+    </Wrap>
   );
 };
 

@@ -10,20 +10,14 @@ const BoardItem = styled.div`
     position: absolute;
     top: 10px;
     right: 30px;
-
-    // color: #999;
-    // font-size: 14px;
-    // border: 1px solid #999;
-    // padding: 3px 5px;
-    // border-radius: 5px;
-    // height: initial;
-    // line-height: initial;
   }
 
   .title {
     margin-bottom: 10px;
     padding: 0 0 10px 0;
     border-bottom: 1px dotted #ddd;
+
+    cursor: pointer;
   }
 
   span {
@@ -38,15 +32,13 @@ const BoardItem = styled.div`
 
 const Button = styled.button`
   border: none;
-  // background-color: #66a6ff;
   border: 1px solid #66a6ff;
   background-color: #fff;
-  // color: #fff;
-  // font-weight: 600;
   border-radius: 5px;
   height: 30px;
   line-height: 30px;
   padding: 0 10px;
+  cursor: pointer;
 
   &:focus {
     outline: none;
@@ -76,7 +68,6 @@ const GridItem = styled.div`
     height: 30px;
     border-radius: 5px;
     border: none;
-    // background-color: #ecf2ff;
     width: ${(props) => {
       if (props.$short) return "100px";
       else if (props.$long) return "400px";
@@ -90,7 +81,6 @@ const GridItem = styled.div`
     border-radius: 5px;
     border: 1px solid #66a6ff;
     background-color: #fff;
-    // width: 300px;
   }
 
   button {
@@ -99,6 +89,7 @@ const GridItem = styled.div`
 `;
 
 const Input = styled.input`
+cursor: ${(props) => (props.readOnly ? "default" : "text")};
   background-color: ${(props) => {
     if (props.$req) return "#ffe19e";
     else return "#ecf2ff";

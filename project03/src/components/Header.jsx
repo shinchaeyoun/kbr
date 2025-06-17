@@ -1,22 +1,22 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import styled, { css } from "styled-components";
 import "../styles/header.css";
 
 const Header = (props) => {
-  const level = props.level;
-
   const navigate = useNavigate();
+
+  const level = props.level;
   const onLogout = () => {
-    sessionStorage.removeItem("user_id");
-    sessionStorage.removeItem("user_lvl");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_lvl");
     document.location.href = "/";
   };
-
+  
   return (
     <>
       <div className="top">
-        ID: {sessionStorage.user_id}, Level: {level}
+        ID: {localStorage.user_id}, Level: {level}
         <button onClick={onLogout}>Logout</button>
       </div>
 
@@ -58,7 +58,7 @@ const Header = (props) => {
         </div>
         <div
           onClick={() => {
-            navigate("/");
+            navigate("/board");
           }}
         >
           board

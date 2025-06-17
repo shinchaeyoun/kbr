@@ -1,0 +1,338 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import S from "../styled/GlobalBlock";
+import B from "../styled/BoardStyled.jsx";
+import L from "../styled/ListStyled.jsx";
+import Modal from "../components/Modal.jsx";
+import axios from "axios";
+
+const BoardList = ({ level }) => {
+  const API_URL = "http://192.168.23.2:5001/project"; // API URL 상수화
+
+  const navigate = useNavigate();
+
+  const [boardList, setBoardList] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isSearch, setSearch] = useState({ search: "" });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBoardIdx, setIsBoardIdx] = useState();
+  const [modalMode, setModalMode] = useState("view");
+  const [isType, setType] = useState("list"); // card, list
+  const [isGridColumn, setIsGridColumn] = useState(5);
+  const [modalData, setModalData] = useState(null); // 모달에 전달할 데이터
+  const [isEmptyLink, setIsEmptyLink] = useState(false); // 링크가 없는 경우
+
+  const currentYear = new Date().getFullYear(); // 현재 연도 가져오기
+  const [selectYear, setSelectYear] = useState(currentYear);
+
+  const { search } = isSearch;
+  const limit = 10;
+
+  const hide = false;
+
+  // 서버에서 게시글 목록 가져오기
+  const getBoardList = async () => {
+    try {
+      const response = await axios.get(API_URL, {
+        params: { offset, limit },
+      });
+
+      if (response.data.length < limit) {
+        setHasMore(false); // 더 이상 데이터가 없으면 false로 설정
+      }
+
+      setBoardList((prevList) => {
+        const uniqueItems = new Map();
+        [...prevList, ...response.data].forEach((item) => {
+          uniqueItems.set(item.code, {
+            ...item,
+            thumb: `${item.thumb}?t=${new Date().getTime()}`, // 타임스탬프 추가
+          }); // idx를 키로 사용하여 중복 제거
+        });
+        return Array.from(uniqueItems.values());
+      });
+    } catch (error) {
+      console.error("데이터를 가져오는 중 오류 발생:", error);
+    }
+  };
+
+  const moveToPage = (code) => {
+    navigate(`/${code}`); // 해당 idx로 페이지 이동
+  };
+
+  // 검색
+  const onSearch = async () => {
+    try {
+      setBoardList([]); // 상태 초기화
+      setOffset(0); // offset 초기화
+      setHasMore(false); // 검색 결과는 더보기 버튼 숨김
+
+      const response = await axios.post(`${API_URL}/search`, {
+        search: search,
+        year: selectYear,
+      });
+
+      setBoardList(response.data); // 검색 결과 설정
+    } catch (error) {
+      console.error("검색 중 오류 발생:", error);
+    }
+  };
+
+  // 보기 타입 변경
+  const setList = (type) => {
+    if (type === "list") {
+      setType("list");
+    } else if (type === "card") {
+      setType("card");
+    }
+  };
+
+  // 모달 열기
+  const openModal = (code, data = {}) => {
+    setIsBoardIdx(code);
+    setModalData(data); // 추가 데이터 설정
+    setIsModalOpen(true);
+  };
+
+  const onModalClose = async (val, code) => {
+    if (val === "delete") {
+      setBoardList((prevList) => prevList.filter((item) => item.code !== code));
+    } else {
+      try {
+        // 새로 등록된 데이터를 가져오기 위해 서버에서 최신 데이터를 요청
+        const response = await axios.get(API_URL, {
+          params: { offset: 0, limit: 1 }, // 최신 데이터 1개만 가져옴
+        });
+
+        if (response.data[0].code >= isBoardIdx) return; // 방금 수정된 데이터는 제외
+        const newBoard = response.data[0]; // 새로 등록된 데이터
+        setBoardList((prevList) => [newBoard, ...prevList]); // 새 데이터를 맨 앞에 추가
+      } catch (error) {
+        console.error("새 데이터를 가져오는 중 오류 발생:", error);
+      }
+    }
+  };
+
+  // 더보기 버튼 클릭
+  const moreList = () => {
+    setOffset((prevOffset) => prevOffset + limit); // offset 증가
+  };
+
+  // 검색 입력 처리
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    // setIsYear(() =>)
+    setSearch((prevSearch) => ({
+      ...prevSearch,
+      [name]: value || "",
+    }));
+  };
+
+  // 화면 크기에 따른 그리드 열 계산
+  const calculateGridColumn = () => {
+    const setWidth = 255; // 기준 너비
+    let columns = Math.floor(window.innerWidth / setWidth);
+    columns = Math.max(2, Math.min(columns, 5)); // 최소 2, 최대 5
+    setIsGridColumn(columns);
+  };
+
+  // 팝업창 열기
+  const openPup = (link, title, code) => {
+    // 링크가 없으면 상태를 설정하고 모달 열기
+    if (link === "") {
+      setIsEmptyLink(true);
+      return openModal(code);
+    }
+
+    const popup = window.open(
+      `${link}`,
+      `${title}`,
+      "width=1300px,height=800px,scrollbars=yes"
+    );
+  };
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    setBoardList([]); // 상태 초기화
+    setOffset(0); // offset 초기화
+    getBoardList(); // 게시글 목록 가져오기
+  }, []);
+
+  // offset 변경 시 데이터 로드
+  useEffect(() => {
+    if (offset > 0) getBoardList();
+  }, [offset]);
+
+  // 모달 상태 변경 시 데이터 로드
+  useEffect(() => {
+    if (!isModalOpen) {
+      getBoardList();
+    }
+  }, [isModalOpen]);
+
+  // 화면 크기 변경 이벤트 처리
+  useEffect(() => {
+    window.addEventListener("load", calculateGridColumn);
+    window.addEventListener("resize", calculateGridColumn);
+
+    return () => {
+      window.removeEventListener("load", calculateGridColumn);
+      window.removeEventListener("resize", calculateGridColumn);
+    };
+  }, []);
+
+  // 검색 엔터키 처리
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") onSearch();
+  };
+
+  return (
+    <B.Container>
+      <Modal
+        mode={modalMode}
+        itemIdx={isBoardIdx}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        onModalClose={onModalClose}
+        level={level}
+        isEmptyLink={isEmptyLink}
+        setIsEmptyLink={setIsEmptyLink}
+      />
+
+      {hide && (
+        <B.SearchContainer>
+          <B.Search>
+            <S.Select
+              name="year"
+              value={selectYear}
+              onChange={(e) => {
+                setSelectYear(e.target.value);
+                setSearch({ ...isSearch, year: e.target.value });
+              }}
+            >
+              <option value="all" style={{ backgroundColor: "lightgray" }}>
+                전체보기
+              </option>
+              {Array.from({ length: 7 }, (_, i) => {
+                const year = currentYear + 1 - i; // SelectYear부터 이전 5년까지 옵션 생성
+                return (
+                  <option
+                    key={year}
+                    value={year}
+                    style={{
+                      backgroundColor:
+                        year === selectYear ? "lightblue" : "white",
+                    }}
+                  >
+                    {year}
+                  </option>
+                );
+              })}
+            </S.Select>
+
+            <S.Input
+              type="text"
+              name="search"
+              value={search || ""}
+              onChange={onChange}
+              onKeyDown={handleKeyPress}
+            />
+          </B.Search>
+
+          <S.ButtonWrap direction="row">
+            <B.Button theme="light" onClick={onSearch}>
+              과정검색
+            </B.Button>
+            {level > 2 && (
+              <B.Button
+                theme="dark"
+                onClick={() => {
+                  if (level > 2) {
+                    setModalMode("write");
+                    openModal();
+                  } else {
+                    alert("글쓰기 권한 없음");
+                  }
+                }}
+              >
+                과정등록
+              </B.Button>
+            )}
+          </S.ButtonWrap>
+        </B.SearchContainer>
+      )}
+
+      {hide && (
+        <S.ButtonWrap direction="row-reverse">
+          {["list", "card"].map((type) => (
+            <S.Button
+              key={type}
+              $padding="0 6px"
+              className={isType === type ? "on" : ""}
+              onClick={() => setList(type)}
+            >
+              {type === "list" ? (
+                <B.ListIcon></B.ListIcon>
+              ) : (
+                <B.CardIcon></B.CardIcon>
+              )}
+            </S.Button>
+          ))}
+        </S.ButtonWrap>
+      )}
+
+      <B.GridContainer className={isType} type={isType} $cl={isGridColumn}>
+        {boardList.map((board) => (
+          <B.BoardItem
+            key={board.code}
+            // onClick={() => {
+            //   openPup(board.outerUrl, board.title, board.idx);
+            // }}
+            onClick={() => {
+              moveToPage(board.code);
+            }}
+          >
+            <S.Thumb
+              src={`${board.thumb}?t=${new Date().getTime()}`}
+              alt={board.title}
+            />
+
+            <B.Group>
+              {isType === "list" ? (
+                <B.ListTitle>
+                  <p>{board.title}</p>
+                  <span>{board.outerUrl}</span>
+                </B.ListTitle>
+              ) : (
+                <B.CardTitle>
+                  <p>{board.title}</p>
+                </B.CardTitle>
+              )}
+
+              <S.Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setModalMode("view");
+                  openModal(board.code);
+                }}
+              >
+                ⁝
+              </S.Button>
+            </B.Group>
+          </B.BoardItem>
+        ))}
+      </B.GridContainer>
+
+      <B.CenterBox>
+        {hasMore && (
+          <B.Button theme="light" onClick={moreList}>
+            더보기
+          </B.Button>
+        )}
+      </B.CenterBox>
+    </B.Container>
+  );
+};
+
+export default BoardList;

@@ -11,7 +11,7 @@ const User = (props) => {
     <>
       <p>
         아이디 :
-        <input type="text" name={props.id} value={props.id} />
+        <input type="text" name={props.id} value={props.id || ""} />
       </p>
       <p>
         <label htmlFor="level">레벨 :</label>
@@ -29,16 +29,16 @@ const User = (props) => {
       </p>
 
       <p>
-        이름 : <input type="text" name={props.name} value={props.name} />
+        이름 : <input type="text" name={props.name} value={props.name || ""} />
       </p>
       <p>
-        팀 : <input type="text" name={props.team} value={props.team} />
+        팀 : <input type="text" name={props.team} value={props.team || ""} />
       </p>
       <p>
-        전화번호 : <input type="text" name={props.tel} value={props.tel} />
+        전화번호 : <input type="text" name={props.tel} value={props.tel || ""} />
       </p>
       <p>
-        메일 : <input type="text" name={props.eMail} value={props.eMail} />
+        메일 : <input type="text" name={props.eMail} value={props.eMail || ""} />
       </p>
       {/* <p>etc1 : <input type="text" name={props.etc1} value={props.user.etc1} /></p> */}
       {/* <p>etc2 : <input type="text" name={props.etc2} value={props.user.etc2} /></p> */}
