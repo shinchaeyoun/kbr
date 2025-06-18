@@ -345,17 +345,18 @@ router.patch("/update", upload.array("attachment"), async (req, res) => {
     .catch((err) => res.send({ msg: "전송 실패", err: err }));
 });
 
+// router.delete("/delete", async (req, res) => {
+//   console.log("삭제 요청 받은 idx:", req.query.idx);
+  
+//   const sql = `DELETE FROM board WHERE originIdx = ?`;
+//   query(sql, [req.query.idx]).then((data) => res.send(data));
+// });
+
 router.patch("/delete", async (req, res) => {
   const idx = req.body.idx;
-
-  const sql = `
-    UPDATE board SET 
-    status = ?
-    WHERE idx = ?
-  `;
-
-  query(sql,['delete',idx]).then((data) => res.send({ msg: "전송 성공", data }))
-    .catch((err) => res.send({ msg: "전송 실패", err: err }));
+  
+  console.log("삭제 요청 받은 query:", req.query);
+  console.log("삭제 요청 받은 body:", req.body);
   
 });
 

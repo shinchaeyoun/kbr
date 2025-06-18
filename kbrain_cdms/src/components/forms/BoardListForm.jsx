@@ -32,7 +32,7 @@ const BoardListForm = ({ data, category }) => {
   useEffect(() => {}, [isPopover]);
 
   useEffect(() => {
-    // console.log(category, "category");
+    // console.log("상태 ==>", item.status);
   }, []);
 
   return (
@@ -61,13 +61,12 @@ const BoardListForm = ({ data, category }) => {
 
           {data.map((item, index) => {
             const isPopover = openPopoverIdx === index;
-            // console.log("게시물 저장 시간", item);
 
             // 날짜 파싱 및 포맷팅 (간결하게)
             const itemDate = new Date(item.date);
             const now = new Date(new Date().getTime());
             // console.log("현재 시간", now);
-            
+
             const year = itemDate.getFullYear();
             const month = String(itemDate.getMonth() + 1).padStart(2, "0");
             const day = String(itemDate.getDate()).padStart(2, "0");
@@ -90,12 +89,20 @@ const BoardListForm = ({ data, category }) => {
               <L.Block
                 key={index}
                 onClick={() => {
+                  item.status ?
+                  navigate(`deleted`) :
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
               >
                 <p>{index + 1}</p>
                 <p>{item.tag}</p>
-                <p>{item.title}</p>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {item.depth >= 1 && (
+                    <span style={{ color: "#d0021b" }}>└ [답글] </span>
+                  )}
+                  {item.status ? (<p style={{ color: "#a8a8a8" }}>삭제된 글입니다.</p>) : (<p>{item.title}</p>)}
+                </div>
                 <p>
                   {item.attachment && (
                     <L.AttachmentIcon

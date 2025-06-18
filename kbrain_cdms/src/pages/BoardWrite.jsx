@@ -16,32 +16,45 @@ const BoardWrite = () => {
   const category = location.state?.category || "";
   const { item } = location.state || {};
 
-  const [isEdit, setIsEdit] = useState(item ? true : false);
+  const [isMode, setIsMode] = useState(location.state.mode || "write");
   const [file, setFile] = useState(null);
   const [fileArr, setFileArr] = useState([]);
   const [fileNameArr, setFileNameArr] = useState([]);
   const [fileList, setFileList] = useState(false);
   const fileInputRef = useRef();
 
+  // const basePath = location.pathname.split("/").slice(0, 4).join("/");
+  const basePath = isMode == "reply" ? location.pathname.split("/").slice(0, -2).join("/") :location.pathname.split("/").slice(0, -1).join("/");
+
   const [selectCategory, setSelectCategory] = useState(
     location.state?.category || ""
   );
 
+  // const [data, setData] = useState({
+  //   projectCode: location.pathname.split("/")[1],
+  //   subjectId: location.pathname.split("/")[2],
+  //   category: "" || selectCategory,
+  //   tag: "" || item?.tag,
+  //   title: "" || item?.title,
+  //   content: "" || item?.content,
+  //   attachment: file || item?.attachment,
+  //   user: localStorage.getItem("userId"),
+  // });
   const [data, setData] = useState({
     projectCode: location.pathname.split("/")[1],
     subjectId: location.pathname.split("/")[2],
     category: "" || selectCategory,
-    tag: "" || item?.tag,
-    title: "" || item?.title,
-    content: "" || item?.content,
-    attachment: file || item?.attachment,
+    tag: "",
+    title: "",
+    content: "",
+    attachment: file,
     user: localStorage.getItem("userId"),
   });
 
   const handleFileDelete = (e, index) => {
     e.stopPropagation();
     if (
-      isEdit &&
+      isMode == "edit" &&
       item?.attachment &&
       index < item.attachment.split("|").length
     ) {
@@ -80,15 +93,15 @@ const BoardWrite = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log(data.category, "data.category");
-
     e.preventDefault();
     try {
       const formData = new FormData();
+      formData.append("index", item?.idx || null);
+      formData.append("isMode", isMode);
       formData.append("projectCode", data.projectCode);
       formData.append("subjectId", data.subjectId);
       // 카테고리 추가하기
-      formData.append("category", data.category || null); // 카테고리 값이 필요하면 여기에 추가
+      formData.append("category", selectCategory || null); // 카테고리 값이 필요하면 여기에 추가
       formData.append("title", data.title || "[제목 없음]");
       formData.append("content", data.content || "");
       formData.append("user", data.user);
@@ -99,11 +112,11 @@ const BoardWrite = () => {
         const name = x[0] == "attachment" && x[1].name;
         if (x[0] == "attachment") formData.append("attachment_name", name);
         if (x[0] == "category") {
-          console.log("카테고리 값", x[1]);
+          // console.log("카테고리 값", x[1]);
         }
       }
 
-      if (isEdit && item?.attachment) {
+      if (isMode == "edit" && item?.attachment) {
         const remainFiles = fileNameArr.filter((name) =>
           item.attachment
             .split("|")
@@ -113,9 +126,7 @@ const BoardWrite = () => {
         formData.append("remain_files", JSON.stringify(remainFiles));
       }
 
-      console.log("데이터 카테고리", data.category);
-
-      if (isEdit) {
+      if (isMode == "edit") {
         const res = await axios.patch(
           `${API_URL}/update?idx=${item.idx}`,
           formData,
@@ -123,15 +134,26 @@ const BoardWrite = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-      } else if (!isEdit) {
+
+        if (res.data.msg === "전송 성공") {
+          alert("수정되었습니다.");
+          sessionStorage.setItem("fromWrite", "1");
+          navigate(-1);
+        }
+      } else if (isMode == "write" || isMode == "reply") {
         const res = await axios.post(`${API_URL}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-      }
 
-      alert(isEdit ? "수정되었습니다." : "등록되었습니다.");
-      sessionStorage.setItem("fromWrite", "1");
-      navigate(-1);
+        if (res.data.msg === "전송 성공") {
+          alert("등록되었습니다.");
+          console.log('basePath ==>', basePath);
+          
+          sessionStorage.setItem("fromWrite", "1");
+          navigate(`${basePath}`, { state: { category: selectCategory } });
+          // navigate(-1);
+        }
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -141,9 +163,10 @@ const BoardWrite = () => {
     file !== null && setFileList(true);
     if (fileNameArr.length == 0) setFileList(false);
   }, [file, fileArr]);
-  
+
   useEffect(() => {
-    if (item) {
+    // if (item) {
+    if (isMode == "edit") {
       setData((prev) => ({
         ...prev,
         category: item.category,
@@ -154,29 +177,36 @@ const BoardWrite = () => {
 
       setSelectCategory(item.category);
     }
+    if (isMode == "reply") {
+      setSelectCategory(item.category);
+    }
   }, []);
 
   useEffect(() => {
-    if (isEdit && item?.attachment) {
-      const names = item.attachment.split("|").map((f) => f.split(",")[1]);
-      setFileNameArr(names);
-      setFileArr([]);
-      setFileList(true);
-    }
-  }, [isEdit, item]);
+    // if (isMode == "edit" && item?.attachment) {
+    //   const names = item.attachment.split("|").map((f) => f.split(",")[1]);
+    //   setFileNameArr(names);
+    //   setFileArr([]);
+    //   setFileList(true);
+    // }
+  }, [isMode, item]);
 
   return (
     <>
       {category}
       <B.ButtonWrap>
-        <S.Button onClick={handleSubmit}>{item ? "수정" : "등록"}</S.Button>
+        <S.Button onClick={handleSubmit}>
+          {isMode == "edit" ? "수정" : "등록"}
+        </S.Button>
         {/* <S.Button>등록예약</S.Button>
             <S.Button>임시저장</S.Button>
             <S.Button>미리보기</S.Button> */}
       </B.ButtonWrap>
       <B.OptionWrap>
         <B.Option>
-          <div><p>제목</p></div>
+          <div>
+            <p>제목</p>
+          </div>
           <div>
             <B.Input
               type="text"
@@ -188,7 +218,9 @@ const BoardWrite = () => {
         </B.Option>
 
         <B.Option>
-          <div><p>카테고리</p></div>
+          <div>
+            <p>카테고리</p>
+          </div>
           <div>
             <S.Select
               name="category"
@@ -210,7 +242,9 @@ const BoardWrite = () => {
         </B.Option>
 
         <B.Option>
-          <div><p>첨부파일</p></div>
+          <div>
+            <p>첨부파일</p>
+          </div>
           <div>
             <B.Content>
               <B.Input
@@ -241,7 +275,9 @@ const BoardWrite = () => {
         </B.Option>
 
         <B.Option>
-          <div><p>내용</p></div>
+          <div>
+            <p>내용</p>
+          </div>
           <div>
             <B.Textarea
               name="content"

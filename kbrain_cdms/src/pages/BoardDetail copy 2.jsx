@@ -39,20 +39,30 @@ const BoardDetail = () => {
   };
 
   const handleDelete = async () => {
+    // const deletConfirm = confirm("삭제 하시겠습니까?");
+
+    // if (deletConfirm) {
+    //   await axios
+    //     .delete(`${API_URL}/delete?idx=${detailIndex}`)
+    //     .then((res) => {
+    //       alert("삭제되었습니다.");
+    //       // navigate("/admin/userlist");
+    //       navigate(`${location.pathname.split("/").slice(0, -1).join("/")}`, { state: { category: detail.category } });
+    //     });
+    // }
+
+    // ---
+
+
     const deletConfirm = confirm("삭제 하시겠습니까?");
 
     if (deletConfirm) {
       await axios
-        .patch(`${API_URL}/delete`,{
-          idx: detailIndex,
-        })
+        .delete(`${API_URL}/delete?idx=${detailIndex}`)
         .then((res) => {
-          console.log("삭제 요청");
           alert("삭제되었습니다.");
+          // navigate("/admin/userlist");
           navigate(`${location.pathname.split("/").slice(0, -1).join("/")}`, { state: { category: detail.category } });
-        })
-        .catch((error) => {
-          console.error("삭제 요청 중 오류 발생:", error);
         });
     }
   };

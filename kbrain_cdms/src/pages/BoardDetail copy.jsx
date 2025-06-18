@@ -18,6 +18,7 @@ const BoardDetail = () => {
   const location = useLocation();
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
+  // const { item: initialItem } = location.state || {};
   const { detailIndex } = location.state || null;
   const [detail, setDetail] = useState({});
   const [date, setDate] = useState("");
@@ -27,34 +28,10 @@ const BoardDetail = () => {
   const [views, setViews] = useState(detail?.views || 0);
   const hasViewedRef = useRef(false);
 
-  const ReplyMode = () => {
-    navigate(`reply`, {
-      state: { item: detail, mode: "reply" },
-    });
-  };
   const EditMode = () => {
-    navigate(`edit`, {
-      state: { item: detail, mode: "edit" },
+    navigate(`/${projectCode}/board/edit`, {
+      state: { item: detail },
     });
-  };
-
-  const handleDelete = async () => {
-    const deletConfirm = confirm("삭제 하시겠습니까?");
-
-    if (deletConfirm) {
-      await axios
-        .patch(`${API_URL}/delete`,{
-          idx: detailIndex,
-        })
-        .then((res) => {
-          console.log("삭제 요청");
-          alert("삭제되었습니다.");
-          navigate(`${location.pathname.split("/").slice(0, -1).join("/")}`, { state: { category: detail.category } });
-        })
-        .catch((error) => {
-          console.error("삭제 요청 중 오류 발생:", error);
-        });
-    }
   };
 
   const handleDownloadAll = () => {
@@ -75,6 +52,8 @@ const BoardDetail = () => {
   };
 
   const fetchDetail = async () => {
+    console.log("fetchDetail");
+
     try {
       const response = await axios.get(`${API_URL}/detail`, {
         params: {
@@ -137,9 +116,41 @@ const BoardDetail = () => {
     }
 
     if (sessionStorage.getItem("fromWrite")) {
+      // navigate(-1)로 돌아온 것임
+      console.log("navigate(-1)로 돌아옴");
       sessionStorage.removeItem("fromWrite");
     }
   }, []);
+
+  // useEffect(() => {
+  //   if(initialItem && initialItem.idx) {
+  //     axios.get(`${API_URL}`, {
+  //       params: {
+  //         boardIndex: initialItem.idx,
+  //         code: projectCode
+  //       },
+  //     }).then((res) => {
+  //       if (res.data && res.data[0]) setDetail(res.data[0]);
+  //     });
+  //   }
+  // }, [initialItem?.idx, projectCode]);
+
+  // useEffect(() => {
+  //   // 최초 마운트 또는 item.idx 변경 시 최신 데이터 fetch
+
+  //   console.log("useEffect detail.idx ==>", detail.idx);
+
+  //   axios.get(`${API_URL}`, {
+  //       params: {
+  //         boardIndex: detail.idx,
+  //         code: projectCode
+  //       },
+  //     }).then((res) => {
+  //       console.log("받아온 데이터", res.data[0]);
+
+  //     setDetail(res.data[0]);
+  //   });
+  // }, [detail.idx]);
 
   return (
     <>
@@ -148,12 +159,9 @@ const BoardDetail = () => {
           <p>{detail.title}</p>
           <S.ButtonWrap style={{ flexDirection: "row" }}>
             {detail.user == localStorage.getItem("userId") && (
-              <>
-                <S.Button onClick={EditMode}>수정하기</S.Button>
-                <S.Button onClick={handleDelete}>삭제하기</S.Button>
-              </>
+              <S.Button onClick={EditMode}>수정하기</S.Button>
             )}
-            <S.Button onClick={ReplyMode}>답글달기</S.Button>
+            <S.Button onClick={EditMode}>답글달기</S.Button>
           </S.ButtonWrap>
         </div>
         <div className="info">
