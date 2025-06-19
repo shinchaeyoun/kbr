@@ -9,8 +9,8 @@ import PercentBar from "../components/PercentBar.jsx";
 const ProgressPage = () => {
   const API_SUB = "http://192.168.23.2:5001/subject";
   const location = useLocation();
-  const projectCode = location.state?.code || 0; // 과정 코드
-  const subjectId = location.state?.id || 0; // 과목 ID
+  const projectCode = location.pathname.split("/")[1] || 0; // 과정 코드
+  const subjectId = location.pathname.split("/")[2] || 0; // 과목 ID
 
   const [progressCate, setProgressCate] = useState(
     location.state?.progress
@@ -23,20 +23,13 @@ const ProgressPage = () => {
   const [progressValues, setProgressValues] = useState([{}]);
   const [progressPercent, setProgressPercent] = useState({});
   const [inProgress, setInProgress] = useState({});
-  const totalPrecent = Object.values(progressPercent).reduce(
-    (acc, cur) => acc + cur,
-    0
-  );
-  const totalInPrecent = Object.values(inProgress).reduce(
-    (acc, cur) => acc + cur,
-    0
-  );
 
   const optionArr = ["진행전", "진행중", "수정중", "1차 완료", "완료"];
   const optionCss = ["before", "ing", "edit", "firstDone", "done"];
   const [changeData, setChangeData] = useState({});
 
   const fetchData = async () => {
+    // const projectData = await axios.get(`${API_URL}/project`, { params }); /
     const getChasiTotal = await axios.get(`${API_SUB}/chasiTotal`, {
       params: {
         progress: location.state?.progress,
@@ -198,7 +191,7 @@ const ProgressPage = () => {
         <P.CheckContainer>
           <P.Button onClick={saveBtn}>저장하기</P.Button>
 
-          <P.TitleWrap>
+          <P.TitleWrap $repeat={progressCate.length + 1}>
             <div>차시</div>
             {progressItem.map((item, index) => (
               <div key={index}>{item}</div>
@@ -207,7 +200,7 @@ const ProgressPage = () => {
 
           <P.InnerContainer>
             {Array.from({ length: chasiTotal }, (_, i) => (
-              <P.Line key={i} className="selectLine">
+              <P.Line key={i} className="selectLine" $repeat={progressCate.length + 1}>
                 <div>{String(i + 1).padStart(2, "0")}</div>
                 {progressCate.map((item, index) => (
                   <S.Select

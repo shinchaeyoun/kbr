@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import S from "../styled/GlobalBlock.jsx";
-import B from "../styled/BoardStyled.jsx";
 import axios from "axios";
 import "../styled/boardStyled.scss";
+
+// components
+import Deleted from "../components/DeletedPage.jsx";
 
 // svg
 import AttIcon from "../components/AttachmentIcon.jsx";
 import DownloadIcon from "../assets/icon/download.svg?react";
 
+// utils
 import { downloadAllZip } from "@/utils/fileDownloadAll";
 import { downloadFile } from "@/utils/fileDownload";
 
@@ -18,7 +21,8 @@ const BoardDetail = () => {
   const location = useLocation();
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
-  const { detailIndex } = location.state || null;
+  const detailIndex = Number(location.pathname.split("/").slice(-1).join("/"));
+
   const [detail, setDetail] = useState({});
   const [date, setDate] = useState("");
 
@@ -26,6 +30,8 @@ const BoardDetail = () => {
 
   const [views, setViews] = useState(detail?.views || 0);
   const hasViewedRef = useRef(false);
+
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const ReplyMode = () => {
     navigate(`reply`, {
@@ -43,13 +49,15 @@ const BoardDetail = () => {
 
     if (deletConfirm) {
       await axios
-        .patch(`${API_URL}/delete`,{
+        .patch(`${API_URL}/delete`, {
           idx: detailIndex,
         })
         .then((res) => {
           console.log("삭제 요청");
           alert("삭제되었습니다.");
-          navigate(`${location.pathname.split("/").slice(0, -1).join("/")}`, { state: { category: detail.category } });
+          navigate(`${location.pathname.split("/").slice(0, -1).join("/")}`, {
+            state: { category: detail.category },
+          });
         })
         .catch((error) => {
           console.error("삭제 요청 중 오류 발생:", error);
@@ -83,6 +91,7 @@ const BoardDetail = () => {
           code: projectCode,
         },
       });
+      if (response.data[0].status === "delete") setIsDeleted(true);
 
       if (response.data[0].attachment) {
         const list = response.data[0].attachment.split("|").map((file) => {
@@ -143,71 +152,81 @@ const BoardDetail = () => {
 
   return (
     <>
-      <div id="board_detail">
-        <div className="title">
-          <p>{detail.title}</p>
-          <S.ButtonWrap style={{ flexDirection: "row" }}>
-            {detail.user == localStorage.getItem("userId") && (
-              <>
-                <S.Button onClick={EditMode}>수정하기</S.Button>
-                <S.Button onClick={handleDelete}>삭제하기</S.Button>
-              </>
-            )}
-            <S.Button onClick={ReplyMode}>답글달기</S.Button>
-          </S.ButtonWrap>
-        </div>
-        <div className="info">
-          <div className="user">{detail.user}</div>
-          <div className="block">
-            <div className="date">{date}</div>
-            <div className="views">읽음 {views}</div>
-          </div>
+      {isDeleted ? (
+        <Deleted />
+      ) : (
+        <>
+          <div id="board_detail">
+            <div className="title">
+              <p>{detail.title}</p>
+              <S.ButtonWrap style={{ flexDirection: "row" }}>
+                {detail.user == localStorage.getItem("userId") && (
+                  <>
+                    <S.Button onClick={EditMode}>수정하기</S.Button>
+                    <S.Button onClick={handleDelete}>삭제하기</S.Button>
+                  </>
+                )}
+                <S.Button onClick={ReplyMode}>답글달기</S.Button>
+              </S.ButtonWrap>
+            </div>
+            <div className="info">
+              <div className="user">{detail.user}</div>
+              <div className="block">
+                <div className="date">{date}</div>
+                <div className="views">읽음 {views}</div>
+              </div>
 
-          <div className="flex">
-            <div>
-              {detail.attachment && (
-                <>
-                  <div className="attachmentTitle">
-                    <p>첨부파일: 파일 {attachmentList.length} 개</p>
-                    <S.Button onClick={handleDownloadAll}>
-                      <DownloadIcon width="15px" height="15px" />
-                      전체 다운로드
-                    </S.Button>
-                  </div>
+              <div className="flex">
+                <div>
+                  {detail.attachment && (
+                    <>
+                      <div className="attachmentTitle">
+                        <p>첨부파일: 파일 {attachmentList.length} 개</p>
+                        <S.Button onClick={handleDownloadAll}>
+                          <DownloadIcon width="15px" height="15px" />
+                          전체 다운로드
+                        </S.Button>
+                      </div>
 
-                  <ul>
-                    {attachmentList.map((file, index) => (
-                      <li
-                        key={index}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownload(item, index);
-                        }}
-                      >
-                        <div>
-                          <AttIcon filename={file} width="20px" height="20px" />
-                          <p>{file}</p>
-                        </div>
-                        <DownloadIcon width="20px" height="20px" />
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+                      <ul>
+                        {attachmentList.map((file, index) => (
+                          <li
+                            key={index}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownload(item, index);
+                            }}
+                          >
+                            <div>
+                              <AttIcon
+                                filename={file}
+                                width="20px"
+                                height="20px"
+                              />
+                              <p>{file}</p>
+                            </div>
+                            <DownloadIcon width="20px" height="20px" />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="content">
+              {detail.content &&
+                detail.content.split(/\r?\n/).map((line, idx) => (
+                  <p key={idx}>
+                    {line}
+                    <br />
+                  </p>
+                ))}
             </div>
           </div>
-        </div>
-
-        <div className="content">
-          {detail.content &&
-            detail.content.split(/\r?\n/).map((line, idx) => (
-              <p key={idx}>
-                {line}
-                <br />
-              </p>
-            ))}
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 };

@@ -37,6 +37,8 @@ const BoardListForm = ({ data, category }) => {
 
   return (
     <div
+      className="list-wrap"
+
       onClick={() => {
         if (openPopoverIdx !== null) setOpenPopoverIdx(null);
       }}
@@ -49,6 +51,14 @@ const BoardListForm = ({ data, category }) => {
           }
         }}
       >
+        <CB.Button
+          onClick={() =>
+            navigate(`write`, { state: { mode: "write", category: category } })
+          }
+        >
+          글쓰기
+        </CB.Button>
+
         <L.Content>
           <L.TitleBlock>
             <p>번호</p>
@@ -89,8 +99,10 @@ const BoardListForm = ({ data, category }) => {
               <L.Block
                 key={index}
                 onClick={() => {
-                  item.status ?
-                  navigate(`deleted`) :
+                  console.log("클릭된 아이템:", item.idx);
+
+                  // item.status ?
+                  // navigate(`deleted`) :
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
               >
@@ -101,7 +113,11 @@ const BoardListForm = ({ data, category }) => {
                   {item.depth >= 1 && (
                     <span style={{ color: "#d0021b" }}>└ [답글] </span>
                   )}
-                  {item.status ? (<p style={{ color: "#a8a8a8" }}>삭제된 글입니다.</p>) : (<p>{item.title}</p>)}
+                  {item.status ? (
+                    <p style={{ color: "#a8a8a8" }}>삭제된 글입니다.</p>
+                  ) : (
+                    <p>{item.title}</p>
+                  )}
                 </div>
                 <p>
                   {item.attachment && (
@@ -147,14 +163,6 @@ const BoardListForm = ({ data, category }) => {
             );
           })}
         </L.Content>
-
-        <CB.Button
-          onClick={() =>
-            navigate(`write`, { state: { mode: "write", category: category } })
-          }
-        >
-          글쓰기
-        </CB.Button>
       </L.ListWrap>
     </div>
   );

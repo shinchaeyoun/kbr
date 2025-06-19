@@ -91,6 +91,8 @@ const ProjectPage = () => {
           <p style={{ cursor: "default" }}>과목리스트</p>
           <P.SubTabs>
             {subjectArr.map((subject, index) => {
+              
+                        console.log("progress",  progress);
               return (
                 <li key={index}>
                   <div>
@@ -115,6 +117,7 @@ const ProjectPage = () => {
                         navigate={(path) =>
                           navigate(path, { state: { progress, id, code } })
                         }
+                        
                         as="li"
                       />
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
@@ -12,14 +12,10 @@ import CommonBoard from "./pages/commonBoard.jsx";
 import BoardDetail from "./pages/BoardDetail.jsx";
 import BoardWrite from "./pages/BoardWrite.jsx";
 import ProgressPage from "./pages/ProgressPage.jsx";
-import Page3 from "./pages/Page3.jsx";
-import Page4 from "./pages/Page4.jsx";
+
 import SubjectPage from "./pages/SubjectPage.jsx";
 import SubjectBoard from "./pages/SubjectBoard.jsx";
 import Schedule from "./pages/Schedule.jsx";
-
-import SbBoard from "./pages/SbBoard.jsx";
-import EtcBoard from "./pages/EtcBoard.jsx";
 
 // components
 import Footer from "./components/Footer.jsx";
@@ -50,12 +46,11 @@ function App(props) {
           {/* 게시판 관련 페이지 */}
 
           <Route path="board" element={<CommonBoard />} /> {/* 공통 게시판 페이지 */}
-          <Route path="board/deleted" element={<Deleted />} />
+          <Route path="board/deleted" element={<Deleted />} /> {/* 삭제된 페이지 */}
           <Route path="board/:idx" element={<BoardDetail />} />
           <Route path="board/write" element={<BoardWrite />} />
           <Route path="board/:idx/reply" element={<BoardWrite />} />
           <Route path="board/:idx/edit" element={<BoardWrite />} />
-          
 
           <Route path="schedule" element={<Schedule />} /> {/* 일정표 페이지 */}
           
@@ -67,8 +62,7 @@ function App(props) {
           <Route path=":id/board/:idx/edit" element={<BoardWrite />} /> {/* 과목 진행률 페이지 */}
           <Route path=":id/board/write" element={<BoardWrite />} /> {/* 과목 진행률 페이지 */}
           
-          <Route path=":id/board/deleted" element={<Deleted />} />
-
+          <Route path=":id/board/deleted" element={<Deleted />} /> {/* 삭제된 페이지 */}
         </Route>
       </Routes>
 

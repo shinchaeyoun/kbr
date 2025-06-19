@@ -15,7 +15,6 @@ const BoardWrite = () => {
   const subjectId = location.pathname.split("/")[2];
   const category = location.state?.category || "";
   const { item } = location.state || {};
-  
 
   const [isMode, setIsMode] = useState(location.state.mode || "write");
   const [file, setFile] = useState(null);
