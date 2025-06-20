@@ -34,17 +34,14 @@ const BoardDetail = () => {
   const [isDeleted, setIsDeleted] = useState(false);
 
   const ReplyMode = () => {
-    // navigate(`reply`, {
-    //   state: { item: detail, mode: "reply" },
-    // });
-
-    
-    navigate(`reply?no=${detailIndex}`);
+    navigate(`reply`, {
+      state: { item: detail, mode: "reply" },
+    });
   };
   const EditMode = () => {
-    console.log('detail',detail);
-    
-    navigate(`update?no=${detailIndex}`);
+    navigate(`edit`, {
+      state: { item: detail, mode: "edit" },
+    });
   };
 
   const handleDelete = async () => {
@@ -58,7 +55,9 @@ const BoardDetail = () => {
         .then((res) => {
           console.log("삭제 요청");
           alert("삭제되었습니다.");
-          navigate(`${location.pathname.split("/").slice(0, -1).join("/")}?category=${detail.category}`);
+          navigate(`${location.pathname.split("/").slice(0, -1).join("/")}`, {
+            state: { category: detail.category },
+          });
         })
         .catch((error) => {
           console.error("삭제 요청 중 오류 발생:", error);

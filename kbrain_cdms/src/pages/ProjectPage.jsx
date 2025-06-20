@@ -27,6 +27,7 @@ const ProjectPage = () => {
   const [subjectCategories, setSubjectCategories] = useState([]);
   // const subjectCategories = ["원고", "스토리보드", "영상"];
   const [subjectArr, setSubjectArr] = useState([]);
+  const [categoriesName, setCategoriesName] = useState([]);
 
   const fetchProjectData = async () => {
     // console.log('project ==> ',project);
@@ -46,6 +47,12 @@ const ProjectPage = () => {
       setData(projectData.data);
       setProject({ idx, title, progress });
       setSubjectCategories(
+        (projectData.data.progress || "")
+          .split(",")
+          .map((c) => c.trim())
+          .filter((c) => c)
+      );
+      setCategoriesName(
         (projectData.data.category || "")
           .split(",")
           .map((c) => c.trim())
@@ -91,8 +98,6 @@ const ProjectPage = () => {
           <p style={{ cursor: "default" }}>과목리스트</p>
           <P.SubTabs>
             {subjectArr.map((subject, index) => {
-              
-                        console.log("progress",  progress);
               return (
                 <li key={index}>
                   <div>
@@ -117,16 +122,14 @@ const ProjectPage = () => {
                         navigate={(path) =>
                           navigate(path, { state: { progress, id, code } })
                         }
-                        
                         as="li"
                       />
-
                       {subjectCategories.map((category, cidx) => {
                         return (
                           <NavigationItem
                             key={cidx}
-                            label={category}
-                            path={`${index + 1}/board`}
+                            label={categoriesName[cidx]}
+                            path={`${index + 1}/board?category=${category}`}
                             navigate={(path) =>
                               navigate(path, { state: { category } })
                             }

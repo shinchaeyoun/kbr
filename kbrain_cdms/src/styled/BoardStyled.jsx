@@ -237,12 +237,16 @@ const CenterBox = styled(S.CenterBox)`
   margin: 50px 0 0;
 `;
 
+const Select = styled(S.Select)`
+  width: 110px;
+`;
+
 const Option = styled.div`
   display: grid;
   grid-template-columns: 150px 1fr;
   // align-items: center;
   margin-bottom: 8px;
-  
+
   div:first-child p {
     padding-top: 5px;
   }
@@ -334,6 +338,7 @@ const B = {
 
   ButtonWrap,
   Button,
+  Select,
   Option,
   OptionWrap,
   Input,

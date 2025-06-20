@@ -115,6 +115,11 @@ router.post("/", upload.array("attachment"), async (req, res) => {
   let params;
   let sql;
 
+  
+  console.log("원글 번호", originIdx);
+  console.log("인덱스 못 받아왓니", index);
+  
+
   if (subjectId == "board") {
     // 공통 게시판
     params = [

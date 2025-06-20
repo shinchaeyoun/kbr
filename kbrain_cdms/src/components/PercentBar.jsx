@@ -103,7 +103,7 @@ const PercentBar = ({ changeData, setChangeData }) => {
     for (let i = 0; i < progress.length; i++) {
       let setItem = "";
       if (progress[i] === "script") setItem = "원고";
-      if (progress[i] === "sb") setItem = "스토리보드";
+      if (progress[i] === "sb") setItem = "보드";
       if (progress[i] === "voice") setItem = "음성";
       if (progress[i] === "animation") setItem = "애니";
       if (progress[i] === "video") setItem = "영상";

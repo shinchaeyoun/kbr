@@ -95,7 +95,7 @@ const ProgressPage = () => {
     for (let i = 0; i < progressCate.length; i++) {
       let setItem = "";
       if (progressCate[i] === "script") setItem = "원고";
-      if (progressCate[i] === "sb") setItem = "스토리보드";
+      if (progressCate[i] === "sb") setItem = "보드";
       if (progressCate[i] === "voice") setItem = "음성";
       if (progressCate[i] === "animation") setItem = "애니";
       if (progressCate[i] === "video") setItem = "영상";

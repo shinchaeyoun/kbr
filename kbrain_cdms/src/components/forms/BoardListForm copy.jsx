@@ -123,7 +123,6 @@ const BoardListForm = ({ data, category }) => {
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
               >
-                
                 <p>{index + 1}</p>
                 <p>{item.tag}</p>
 
@@ -138,7 +137,7 @@ const BoardListForm = ({ data, category }) => {
                   )}
                 </div>
                 <p>
-                  {item.attachment && !item.status && (
+                  {item.attachment && (
                     <L.AttachmentIcon
                       onClick={(e) => {
                         e.stopPropagation();
