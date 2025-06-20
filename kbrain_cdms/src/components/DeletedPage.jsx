@@ -11,6 +11,7 @@ const Wrap = styled.div`
 const DeletedPage = () => (
   <Wrap>
     <h2>삭제된 글 입니다.</h2>
+    {/* 관리자가 되돌리기 할 수 있게 할까 ? */}
   </Wrap>
 );
 

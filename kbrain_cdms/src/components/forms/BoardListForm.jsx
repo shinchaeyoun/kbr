@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import styled, { css } from "styled-components";
-import S from "../../styled/GlobalBlock.jsx";
 import L from "../../styled/ListStyled.jsx";
 import CB from "../../styled/CommonBoardStyled.jsx";
 import axios from "axios";
@@ -12,14 +10,17 @@ import { downloadFile } from "@/utils/fileDownload";
 import AttIcon from "../../components/AttachmentIcon.jsx";
 import AttachmentIcon from "../../assets/icon/attachment.svg?react";
 
-const BoardListForm = ({ data, category }) => {
+const BoardListForm = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const navigate = useNavigate();
   const location = useLocation();
-  const [isPopover, setIsPopover] = useState(false);
+  const projectCode = location.pathname.split("/")[1];
+  const subjectId = location.pathname.split("/")[2];
+  const category = location.search.split("=")[1];
+  const [isCategory, setIsCategory] = useState(category); // 카테고리 상태
+  const [data, setData] = useState([]); // 게시글 데이터 상태
   const [openPopoverIdx, setOpenPopoverIdx] = useState(null);
   const [attachmentList, setAttachmentList] = useState([]);
-  const [isCategory, setIsCategory] = useState(location.search.split("=")[1]); // 카테고리 상태
 
   // 파일 다운로드
   const handleDownload = (item, index) => {
@@ -31,38 +32,36 @@ const BoardListForm = ({ data, category }) => {
     });
   };
 
-  useEffect(() => {}, [isPopover]);
+  const fetchData = async () => {
+    setIsCategory(category);
 
-  // useEffect(() => {
-  //   // if(category === "원고") setIsCategory('script');
-  //   // if(category === "스토리보드") setIsCategory('sb');
-  //   // if(category === "음성") setIsCategory('voice');
-  //   // if(category === "애니") setIsCategory('animation');
-  //   // if(category === "영상") setIsCategory('video');
-  //   // if(category === "디자인") setIsCategory('design');
-  //   // if(category === "개발") setIsCategory('content');
-
-  //   setIsCategory(category);
-
-  //   console.log('isCategory ==>',isCategory);
-  // }, [category]);
+    try {
+      const response = await axios.get(`${API_URL}`, {
+        params: {
+          code: projectCode,
+          category: category,
+          id: subjectId,
+        },
+      });
+      setData(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    console.log("카테고리 셋팅:", isCategory);
-    isCategory == undefined && setIsCategory("common")
-  }, []);
+    fetchData();
+  }, [location]);
 
   return (
     <div
       className="list-wrap"
-
       onClick={() => {
         if (openPopoverIdx !== null) setOpenPopoverIdx(null);
       }}
     >
       <L.ListWrap
         onClick={(e) => {
-          // 팝오버가 열려있고, L.ListWrap(배경) 클릭 시 팝오버 닫기
           if (openPopoverIdx !== null && e.target === e.currentTarget) {
             setOpenPopoverIdx(null);
           }
@@ -70,17 +69,19 @@ const BoardListForm = ({ data, category }) => {
       >
         <CB.Button
           onClick={() =>
-            navigate(`write?category=${location.search.split("=")[1]}`, { state: { mode: "write", category: isCategory } })
+            navigate(`write?category=${location.search.split("=")[1]}`, {
+              state: { mode: "write", category: isCategory },
+            })
           }
         >
           글쓰기
         </CB.Button>
 
         <L.Content>
-          <L.TitleBlock>
+          <L.TitleBlock $repeat={isCategory == "common" ? 6 : 5}>
             <p>번호</p>
-            <p>머리말</p>
-            <p>제목</p>
+            {isCategory == "common" && <p>머리말</p>}
+            <p style={{ width: "500px" }}>제목</p>
             <p>첨부파일</p>
             <p>등록일</p>
             <p>조회수</p>
@@ -89,15 +90,11 @@ const BoardListForm = ({ data, category }) => {
           {data.map((item, index) => {
             const isPopover = openPopoverIdx === index;
 
-            // 날짜 파싱 및 포맷팅 (간결하게)
             const itemDate = new Date(item.date);
             const now = new Date(new Date().getTime());
-            // console.log("현재 시간", now);
-
             const year = itemDate.getFullYear();
             const month = String(itemDate.getMonth() + 1).padStart(2, "0");
             const day = String(itemDate.getDate()).padStart(2, "0");
-
             const hours = String(itemDate.getHours()).padStart(2, "0");
             const minutes = String(itemDate.getMinutes()).padStart(2, "0");
 
@@ -116,28 +113,22 @@ const BoardListForm = ({ data, category }) => {
               <L.Block
                 key={index}
                 onClick={() => {
-                  console.log("클릭된 아이템:", item.idx);
-
-                  // item.status ?
-                  // navigate(`deleted`) :
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
+                $repeat={isCategory == "common" ? 6 : 5}
               >
-                
-                <p>{index + 1}</p>
-                <p>{item.tag}</p>
+                <div>{index + 1}</div>
+                {isCategory == "common" && <div>{item.label}</div>}
 
-                <div style={{ display: "flex", gap: "10px" }}>
-                  {item.depth >= 1 && (
-                    <span style={{ color: "#d0021b" }}>└ [답글] </span>
-                  )}
+                <div className="title">
+                  {item.depth >= 1 && <span>└ [답글] </span>}
                   {item.status ? (
                     <p style={{ color: "#a8a8a8" }}>삭제된 글입니다.</p>
                   ) : (
                     <p>{item.title}</p>
                   )}
                 </div>
-                <p>
+                <div>
                   {item.attachment && !item.status && (
                     <L.AttachmentIcon
                       onClick={(e) => {
@@ -174,9 +165,9 @@ const BoardListForm = ({ data, category }) => {
                       )}
                     </L.AttachmentIcon>
                   )}
-                </p>
-                <p>{dateTime}</p>
-                <p>{item.views}</p>
+                </div>
+                <div className="dateTime">{dateTime}</div>
+                <div>{item.views}</div>
               </L.Block>
             );
           })}

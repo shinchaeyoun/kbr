@@ -8,13 +8,12 @@ import Signup from "./pages/Signup.jsx";
 import BoardList from "./pages/BoardList.jsx";
 
 import ProjectPage from "./pages/ProjectPage.jsx";
-import CommonBoard from "./pages/commonBoard.jsx";
+import BoardMain from "./pages/BoardMain.jsx";
 import BoardDetail from "./pages/BoardDetail.jsx";
 import BoardWrite from "./pages/BoardWrite.jsx";
 import ProgressPage from "./pages/ProgressPage.jsx";
 
 import SubjectPage from "./pages/SubjectPage.jsx";
-import SubjectBoard from "./pages/SubjectBoard.jsx";
 import Schedule from "./pages/Schedule.jsx";
 
 // components
@@ -45,7 +44,7 @@ function App(props) {
         <Route path="/:code" element={<ProjectPage />}>
           {/* 게시판 관련 페이지 */}
 
-          <Route path="board" element={<CommonBoard />} /> {/* 공통 게시판 페이지 */}
+          <Route path="board" element={<BoardMain />} /> {/* 공통 게시판 페이지 */}
           <Route path="board/deleted" element={<Deleted />} /> {/* 삭제된 페이지 */}
           {/* 게시판 관련 페이지 */}
           <Route path="board/:idx" element={<BoardDetail />} />
@@ -57,7 +56,7 @@ function App(props) {
           
           <Route path=":id" element={<SubjectPage />} /> {/* 과목 페이지 */}
           <Route path=":id/progress" element={<ProgressPage />} /> {/* 과목 진행률 페이지 */}
-          <Route path=":id/board" element={<SubjectBoard />} /> {/* 과목 기타 게시판 페이지 */}
+          <Route path=":id/board" element={<BoardMain />} /> {/* 과목 기타 게시판 페이지 */}
           {/* 게시판 관련 페이지 */}
           <Route path=":id/board/:idx" element={<BoardDetail />} /> {/* 과목 진행률 페이지 */}
           <Route path=":id/board/write" element={<BoardWrite />} /> {/* 과목 진행률 페이지 */}

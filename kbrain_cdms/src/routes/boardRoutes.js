@@ -56,12 +56,15 @@ router.get("/", async (req, res) => {
 
 // 게시물 상세페이지
 router.get("/detail", async (req, res) => {
-  const detailIndex = req.query.boardIndex
-    ? Number(req.query.boardIndex)
-    : null; // 게시판 인덱스
+  let detailIndex = req.query.boardIndex ? Number(req.query.boardIndex) : null; // 게시판 인덱스
+  if (!detailIndex || isNaN(detailIndex)) {
+    return res.status(400).send({ msg: "잘못된 게시글 인덱스입니다.", detailIndex });
+  }
   const sql = `SELECT * FROM board WHERE idx = ?`; // 최신순
 
-  query(sql, detailIndex).then((data) => res.send(data));
+  query(sql, detailIndex)
+    .then((data) => res.send(data))
+    .catch((err) => res.send({ msg: "데이터 조회 실패", err }));
 });
 
 // 게시판 글 추가
@@ -83,7 +86,8 @@ router.post("/", upload.array("attachment"), async (req, res) => {
 
   const attachment = req.files ? savedName.join("|") : null;
   const caregory = req.body.category || null;
-  const tag = req.body.tag || null;
+  const label = req.body.label || null;
+console.log("라벨 테스트 =====>", req.body);
 
   // 현재 날짜 가져오기
   const now = new Date();
@@ -115,10 +119,8 @@ router.post("/", upload.array("attachment"), async (req, res) => {
   let params;
   let sql;
 
-  
   console.log("원글 번호", originIdx);
   console.log("인덱스 못 받아왓니", index);
-  
 
   if (subjectId == "board") {
     // 공통 게시판
@@ -127,7 +129,7 @@ router.post("/", upload.array("attachment"), async (req, res) => {
       projectCode,
       null, // subjectId를 null로 저장
       caregory,
-      tag,
+      label,
       title,
       content,
       attachment,
@@ -137,7 +139,7 @@ router.post("/", upload.array("attachment"), async (req, res) => {
     ];
     sql = `
       INSERT INTO board
-      (originIdx, projectCode, subjectId, category, tag, title, content, attachment, user, date, depth, views)
+      (originIdx, projectCode, subjectId, category, label, title, content, attachment, user, date, depth, views)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0);
     `;
   } else {
@@ -147,7 +149,7 @@ router.post("/", upload.array("attachment"), async (req, res) => {
       projectCode,
       subjectId,
       caregory,
-      tag,
+      label,
       title,
       content,
       attachment,
@@ -157,7 +159,7 @@ router.post("/", upload.array("attachment"), async (req, res) => {
     ];
     sql = `
       INSERT INTO board
-      (originIdx, projectCode, subjectId, category, tag, title, content, attachment, user, date, depth, views)
+      (originIdx, projectCode, subjectId, category, label, title, content, attachment, user, date, depth, views)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0);
     `;
   }
@@ -290,8 +292,12 @@ router.get("/filedownload", (req, res) => {
 
 // 게시판 글 수정
 router.patch("/update", upload.array("attachment"), async (req, res) => {
+  console.log('수정 요청:', req.body);
+  
   const idx = req.query.idx;
   const { title, content } = req.body;
+
+  let label = req.body.label || null;
   let category = req.body.category;
   if (!category) {
     const prev = await query(`SELECT category FROM board WHERE idx = ?`, [idx]);
@@ -336,11 +342,12 @@ router.patch("/update", upload.array("attachment"), async (req, res) => {
     attachment = null;
   }
 
-  const params = [category, title, content || "", attachment, idx];
+  const params = [category, title, label, content || "", attachment, idx];
   const sql = `
     UPDATE board SET 
     category = ?,
     title = ?,
+    label = ?,
     content = ?,
     attachment = ?
     WHERE idx = ?
@@ -359,9 +366,9 @@ router.patch("/delete", async (req, res) => {
     WHERE idx = ?
   `;
 
-  query(sql,['delete',idx]).then((data) => res.send({ msg: "전송 성공", data }))
+  query(sql, ["delete", idx])
+    .then((data) => res.send({ msg: "전송 성공", data }))
     .catch((err) => res.send({ msg: "전송 실패", err: err }));
-  
 });
 
 export default router;

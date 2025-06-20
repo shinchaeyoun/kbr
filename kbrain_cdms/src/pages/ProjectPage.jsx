@@ -83,7 +83,7 @@ const ProjectPage = () => {
         <li>
           <NavigationItem
             label="공통게시판"
-            path={`/${code}/board`}
+            path={`/${code}/board?category=common`}
             navigate={navigate}
           />
         </li>

@@ -34,16 +34,9 @@ const BoardDetail = () => {
   const [isDeleted, setIsDeleted] = useState(false);
 
   const ReplyMode = () => {
-    // navigate(`reply`, {
-    //   state: { item: detail, mode: "reply" },
-    // });
-
-    
     navigate(`reply?no=${detailIndex}`);
   };
   const EditMode = () => {
-    console.log('detail',detail);
-    
     navigate(`update?no=${detailIndex}`);
   };
 
@@ -58,7 +51,11 @@ const BoardDetail = () => {
         .then((res) => {
           console.log("삭제 요청");
           alert("삭제되었습니다.");
-          navigate(`${location.pathname.split("/").slice(0, -1).join("/")}?category=${detail.category}`);
+          navigate(
+            `${location.pathname.split("/").slice(0, -1).join("/")}?category=${
+              detail.category
+            }`
+          );
         })
         .catch((error) => {
           console.error("삭제 요청 중 오류 발생:", error);
@@ -74,11 +71,11 @@ const BoardDetail = () => {
     });
   };
 
-  const handleDownload = (detail, index) => {
+  const handleDownload = (item, index) => {
     downloadFile({
       url: `${API_URL}/filedownload`,
       params: { idx: detail.idx, fileIdx: index },
-      detail,
+      item,
       index,
     });
   };
@@ -88,10 +85,9 @@ const BoardDetail = () => {
       const response = await axios.get(`${API_URL}/detail`, {
         params: {
           boardIndex: detailIndex,
-          id: subjectId,
-          code: projectCode,
         },
       });
+
       if (response.data[0].status === "delete") setIsDeleted(true);
 
       if (response.data[0].attachment) {
@@ -120,6 +116,7 @@ const BoardDetail = () => {
     } catch (error) {
       console.error("게시글 상세 조회 중 오류 발생:", error);
       alert("게시글을 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.");
+      navigate(-1);
     }
   };
 
@@ -194,8 +191,10 @@ const BoardDetail = () => {
                           <li
                             key={index}
                             onClick={(e) => {
+                              console.log("file", file, "detail", detail);
+
                               e.stopPropagation();
-                              handleDownload(item, index);
+                              handleDownload(detail, index);
                             }}
                           >
                             <div>

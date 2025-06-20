@@ -25,8 +25,11 @@ const Content = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-columns: 60px 100px 2fr 80px 120px 80px;
+  grid-template-columns: repeat(
+    ${(props) => props.$repeat || "auto-fill"},
+    1fr
+  );
+  // grid-template-columns: 60px 100px 2fr 80px 120px 80px;
   justify-items: center;
   align-items: center;
 
@@ -50,6 +53,27 @@ const TitleBlock = styled(Grid)`
 const Block = styled(Grid)`
   padding-bottom: 10px;
   border-bottom: 1px solid #e0e0e0;
+
+  p {
+    width: 100%;
+  }
+
+  .title {
+    display: flex;
+    gap: 10px;
+    padding-left: 10px;
+    width: 500px;
+
+    > span {
+      flex-shrink: 0;
+      color: #d0021b;
+    }
+  }
+
+  .dateTime {
+    width: 100%;
+    text-align: right;
+  }
 `;
 
 const Button = styled(S.Button)`

@@ -3,7 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import S from "../styled/GlobalBlock.jsx";
 import B from "../styled/BoardStyled.jsx";
 import axios from "axios";
+
+// svg
 import AttIcon from "../components/AttachmentIcon.jsx";
+
+// utils
 import { changeCateName } from "@/utils/changeCateName";
 
 const BoardWrite = () => {
@@ -12,28 +16,46 @@ const BoardWrite = () => {
   const navigate = useNavigate();
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
+  // const category = location.state?.category || "";
+  // const { item } = location.state || {};
   const [item, setItem] = useState({});
   const isMode = location.pathname.split("/").slice(-1).join("/");
   const [categoryName, setCategoryName] = useState("");
   const [categoryNameKr, setCategoryNameKr] = useState("");
   const [cateArr, setCateArr] = useState([]);
   const [progArr, setPorgArr] = useState([]);
-  const labelArr = ["회의록", "공지사항", "기타"];
-  const [label, setLabel] = useState("기타");
+
   const [file, setFile] = useState(null);
   const [fileArr, setFileArr] = useState([]);
   const [fileNameArr, setFileNameArr] = useState([]);
   const [fileList, setFileList] = useState(false);
   const fileInputRef = useRef();
+
+  // const basePath = location.pathname.split("/").slice(0, 4).join("/");
   const basePath =
-    isMode == "reply" || isMode == "update"
+    isMode == "reply"
       ? location.pathname.split("/").slice(0, -2).join("/")
       : location.pathname.split("/").slice(0, -1).join("/");
+
+  // const [selectCategory, setSelectCategory] = useState(categoryName);
+
+  // const [data, setData] = useState({
+  //   projectCode: location.pathname.split("/")[1],
+  //   subjectId: location.pathname.split("/")[2],
+  //   category: "" || selectCategory,
+  //   tag: "" || item?.tag,
+  //   title: "" || item?.title,
+  //   content: "" || item?.content,
+  //   attachment: file || item?.attachment,
+  //   user: localStorage.getItem("userId"),
+  // });
+
   const [data, setData] = useState({
-    projectCode: projectCode,
-    subjectId: subjectId,
-    category: categoryName,
-    label: "",
+    projectCode: location.pathname.split("/")[1],
+    subjectId: location.pathname.split("/")[2],
+    // category: "" || selectCategory,
+    category: "" || categoryName,
+    tag: "",
     title: "",
     content: "",
     attachment: file,
@@ -49,18 +71,18 @@ const BoardWrite = () => {
     ) {
       setFileNameArr((prev) => prev.filter((_, idx) => idx !== index));
     } else {
+      // 새로 업로드한 파일 삭제
       const arrIdx =
         index - (item?.attachment ? item.attachment.split("|").length : 0);
       setFileArr((prev) => prev.filter((_, idx) => idx !== arrIdx));
       setFileNameArr((prev) => prev.filter((_, idx) => idx !== index));
     }
+
     if (fileNameArr.length == 1) {
       setFileList(false);
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
-
-    fileInputRef.current.value = ""
   };
 
   const handleFileChange = (e) => {
@@ -89,16 +111,24 @@ const BoardWrite = () => {
       formData.append("isMode", isMode);
       formData.append("projectCode", data.projectCode);
       formData.append("subjectId", data.subjectId);
-      formData.append("category", categoryName || null);
-      formData.append("label", label || null);
+      // 카테고리 추가하기
+      formData.append("category", categoryName || null); // 카테고리 값이 필요하면 여기에 추가
+      console.log("카테고리 값", categoryName);
+
       formData.append("title", data.title || "[제목 없음]");
       formData.append("content", data.content || "");
       formData.append("user", data.user);
+
       fileArr.forEach((file, idx) => formData.append("attachment", file));
+
       for (const x of formData.entries()) {
         const name = x[0] == "attachment" && x[1].name;
         if (x[0] == "attachment") formData.append("attachment_name", name);
+        // if (x[0] == "category") {
+        //   // console.log("카테고리 값", x[1]);
+        // }
       }
+
       if (isMode == "update" && item?.attachment) {
         const remainFiles = fileNameArr.filter((name) =>
           item.attachment
@@ -108,45 +138,73 @@ const BoardWrite = () => {
         );
         formData.append("remain_files", JSON.stringify(remainFiles));
       }
-      const req =
-        isMode === "update"
-          ? axios.patch(`${API_URL}/update?idx=${item.idx}`, formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            })
-          : axios.post(`${API_URL}`, formData, {
-              headers: { "Content-Type": "multipart/form-data" },
-            });
-      const res = await req;
-      if (res.data.msg === "전송 성공") {
-        alert(isMode === "update" ? "수정되었습니다." : "등록되었습니다.");
-        sessionStorage.setItem("fromWrite", "1");
-        navigate(`${basePath}?category=${categoryName}`);
+
+      if (isMode == "update") {
+        const res = await axios.patch(
+          `${API_URL}/update?idx=${item.idx}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
+        if (res.data.msg === "전송 성공") {
+          alert("수정되었습니다.");
+          sessionStorage.setItem("fromWrite", "1");
+          navigate(-1);
+        }
+      } else if (isMode == "write" || isMode == "reply") {
+        const res = await axios.post(`${API_URL}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (res.data.msg === "전송 성공") {
+          alert("등록되었습니다.");
+          console.log("basePath ==>", basePath);
+
+          sessionStorage.setItem("fromWrite", "1");
+          navigate(`${basePath}?category=${categoryName}`);
+          // navigate(-1);
+        }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
 
+  // useEffect(() => {
+  //   // if (isMode == "update" && item?.attachment) {
+  //   //   const names = item.attachment.split("|").map((f) => f.split(",")[1]);
+  //   //   setFileNameArr(names);
+  //   //   setFileArr([]);
+  //   //   setFileList(true);
+  //   // }
+  // }, [isMode, item]);
+
   const fatchCategory = async () => {
-    // try {
-    //   const response = await axios.get(
-    //     `http://192.168.23.2:5001/project/category`,
-    //     { params: { code: projectCode } }
-    //   );
-    //   // setCateArr(response.data.category.split(","));
-    //   // setPorgArr(response.data.progress.split(","));
-    // } catch (error) {
-    //   console.error("Error fetching categories:", error);
-    // }
+    try {
+      const response = await axios.get(
+        `http://192.168.23.2:5001/project/category`,
+        { params: { code: projectCode } }
+      );
+      setCateArr(response.data.category.split(","));
+      setPorgArr(response.data.progress.split(","));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+
     if (location.search.split("=")[0] == "?category") {
       const categoryName = location.search.split("=")[1];
+
       setCategoryNameKr(changeCateName(categoryName));
       setCategoryName(categoryName);
     }
+    //reply 일 때 location.search 값이 안들어와서
   };
 
   const fatchData = async () => {
     fatchCategory();
+
     const boardIndex = location.search.split("=")[1];
     const response = await axios.get(`${API_URL}/detail`, {
       params: {
@@ -154,6 +212,7 @@ const BoardWrite = () => {
       },
     });
     const item = response.data[0];
+
     if (isMode == "update") {
       setData((prev) => ({
         ...prev,
@@ -163,9 +222,11 @@ const BoardWrite = () => {
         attachment: item.attachment,
       }));
     }
+
     setItem(item);
     setCategoryName(item.category);
     setCategoryNameKr(changeCateName(item.category));
+    // setSelectCategory(item.category);
   };
 
   useEffect(() => {
@@ -174,6 +235,7 @@ const BoardWrite = () => {
   }, [file, fileArr]);
 
   useEffect(() => {
+    console.log("isMode", isMode);
     isMode == "write" && fatchCategory();
     isMode == "update" && fatchData();
     isMode == "reply" && fatchData();
@@ -191,6 +253,9 @@ const BoardWrite = () => {
         <S.Button onClick={handleSubmit}>
           {isMode == "update" ? "수정" : "등록"}
         </S.Button>
+        {/* <S.Button>등록예약</S.Button>
+            <S.Button>임시저장</S.Button>
+            <S.Button>미리보기</S.Button> */}
       </B.ButtonWrap>
       <B.OptionWrap>
         <B.Option>
@@ -206,33 +271,36 @@ const BoardWrite = () => {
             />
           </div>
         </B.Option>
+
         {categoryName == "common" && (
           <B.Option>
             <div>
-              <p>말머리</p>
-              {label}
+              <p>카테고리</p>
             </div>
             <div>
               <B.Select
-                name="label"
-                value={label}
+                name="category"
+                value={categoryName}
                 onKeyDown={(e) => {
                   e.preventDefault();
                 }}
                 onChange={(e) => {
-                  setLabel(e.target.value);
+                  setCategoryName(e.target.value);
+                  // setSelectCategory(e.target.value);
+                  setCategoryNameKr(cateArr[e.target.selectedIndex]);
                   handleChange(e);
                 }}
               >
-                {labelArr.map((item, index) => (
-                  <option key={index} value={item}>
-                    {item}
+                {progArr.map((item, index) => (
+                  <option key={index} value={item} idx={index}>
+                    {cateArr[index]}
                   </option>
                 ))}
               </B.Select>
             </div>
           </B.Option>
         )}
+
         <B.Option>
           <div>
             <p>첨부파일</p>
@@ -265,6 +333,7 @@ const BoardWrite = () => {
             </B.Content>
           </div>
         </B.Option>
+
         <B.Option>
           <div>
             <p>내용</p>

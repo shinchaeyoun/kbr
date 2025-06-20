@@ -9,6 +9,8 @@ import axios from "axios";
  * @param {number} options.index - 파일 인덱스
  */
 export async function downloadFile({ url, params, item, index }) {
+  console.log('item',item);
+  
   try {
     // 원본 파일명 추출
     const originalName = item.attachment
