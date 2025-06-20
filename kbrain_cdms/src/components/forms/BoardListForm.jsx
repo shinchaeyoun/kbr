@@ -18,25 +18,22 @@ const BoardListForm = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
   const category = searchParams.get("category");
-  const [isCategory, setIsCategory] = useState(category); // 카테고리 상태
+  // const [isCategory, setIsCategory] = useState(category); // 카테고리 상태
   const [data, setData] = useState([]); // 게시글 데이터 상태
   const [openPopoverIdx, setOpenPopoverIdx] = useState(null);
   const [attachmentList, setAttachmentList] = useState([]);
 
-  
-
   // 페이지버튼관련
   const limit = 15;
-  const [offset, setOffset] = useState(0);
-  const [isPage, setPage] = useState(0);
-  const [totalData, setTotalData] = useState(0);
-  const [pageNo, setPageNo] = useState(1);
+  const [offset, setOffset] = useState(0); // 현재 페이지 오프셋
+  const [isPage, setPage] = useState(0); // 총 페이지 수
+  const [totalData, setTotalData] = useState(0); // 총 데이터 수
+  const [pageNo, setPageNo] = useState(null); // 현재 페이지 번호
 
   // 페이지 버튼 클릭 핸들러
   const handlePageBtn = (direction) => {
@@ -64,10 +61,7 @@ const BoardListForm = () => {
   };
 
   const fetchData = async () => {
-    sessionStorage.getItem("pageNo") && searchParams.set("pageNo", sessionStorage.getItem("pageNo"));
-
-
-    setIsCategory(category);
+    // setIsCategory(category);
     try {
       const response = await axios.get(`${API_URL}`, {
         params: {
@@ -81,6 +75,15 @@ const BoardListForm = () => {
       setData(response.data.list);
       setTotalData(response.data.totalCount);
       setPage(Math.ceil(response.data.totalCount / limit));
+      setPageNo(sessionStorage.getItem("pageNo") || 1);
+
+      const hasPageNo = !!sessionStorage.getItem("pageNo");
+      hasPageNo && setOffset(limit * (Math.ceil(response.data.totalCount / limit) - 1));
+
+      console.log('sessionStorage =>', sessionStorage.getItem("pageNo"),',',sessionStorage.getItem("pageNo") || 1);
+
+      // sessionStorage.removeItem("pageNo"); // 페이지 번호 초기화
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -88,22 +91,10 @@ const BoardListForm = () => {
 
   useEffect(() => {
     fetchData();
-    // test();
-  }, [location, offset]);
 
-  useEffect(() => {
-    test();
-  }, [pageNo]);
-
-  const test = () => {
-
-    console.log('sessionStorage.getItem("pageNo")',sessionStorage.getItem("pageNo"));
-    console.log("pageNo", pageNo);
+    console.log("pageNo ==>", pageNo);
     
-    searchParams.set("pageNo", pageNo);
-    console.log("테스트함수", searchParams.toString());
-    navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
-  }
+  }, [location, offset]);
 
   return (
     <div
@@ -112,7 +103,6 @@ const BoardListForm = () => {
         if (openPopoverIdx !== null) setOpenPopoverIdx(null);
       }}
     >
-      <button onClick={test}>test</button>
       <L.ListWrap
         onClick={(e) => {
           if (openPopoverIdx !== null && e.target === e.currentTarget) {
@@ -120,21 +110,15 @@ const BoardListForm = () => {
           }
         }}
       >
-        <CB.Button
-          onClick={() =>
-            // navigate(`write?category=${category}`, {
-            //   state: { mode: "write", category: isCategory },
-            // })
-            navigate(`write?category=${category}`)
-          }
-        >
+        <button>{pageNo}</button>
+        <CB.Button onClick={() => navigate(`write?category=${category}`)}>
           글쓰기
         </CB.Button>
 
         <L.Content>
-          <L.TitleBlock $repeat={isCategory == "common" ? 6 : 5}>
+          <L.TitleBlock $repeat={category == "common" ? 6 : 5}>
             <p>번호</p>
-            {isCategory == "common" && <p>머리말</p>}
+            {category == "common" && <p>머리말</p>}
             <p style={{ width: "500px" }}>제목</p>
             <p>첨부파일</p>
             <p>등록일</p>
@@ -167,13 +151,15 @@ const BoardListForm = () => {
               <L.Block
                 key={index}
                 onClick={() => {
-                  sessionStorage.setItem("pageNo", `${pageNo}`);
+                  console.log('pageNo ==>',pageNo);
+                  
+                  
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
-                $repeat={isCategory == "common" ? 6 : 5}
+                $repeat={category == "common" ? 6 : 5}
               >
                 <div>{index + 1}</div>
-                {isCategory == "common" && <div>{item.label}</div>}
+                {category == "common" && <div>{item.label}</div>}
 
                 <div className="title">
                   {item.depth >= 1 && <span>└ [답글] </span>}
@@ -232,16 +218,6 @@ const BoardListForm = () => {
           <L.PageWrap>
             <DoublePrev onClick={handlePageBtn("doublePrev")} />
             <Prev onClick={handlePageBtn("prev")} />
-            {/* <L.PageButton
-              onClick={() => {
-                if (isPage > 0) {
-                  setPage(isPage - 1);
-                  fetchData();
-                }
-              }}
-            >
-              이전
-            </L.PageButton> */}
 
             {Array.from({ length: isPage }, (_, i) => i + 1).map(
               (pageNumber) => (
@@ -250,6 +226,7 @@ const BoardListForm = () => {
                   onClick={() => {
                     setOffset(limit * (pageNumber - 1));
                     setPageNo(pageNumber);
+                    sessionStorage.setItem("pageNo", pageNumber);
                   }}
                   className={offset / limit === pageNumber - 1 ? "active" : ""}
                 >
@@ -258,14 +235,6 @@ const BoardListForm = () => {
               )
             )}
 
-            {/* <L.PageButton
-              onClick={() => {
-                setPage(isPage + 1);
-                fetchData();
-              }}
-            >
-              다음
-            </L.PageButton> */}
             <Next onClick={handlePageBtn("next")} />
             <DoubleNext onClick={handlePageBtn("doubleNext")} />
           </L.PageWrap>
