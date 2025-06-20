@@ -30,7 +30,7 @@ router.get("/count", async (req, res) => {
 
 // 게시판 카테고리 정보 가져오기기
 router.get("/category", (req, res) => {
-  console.log("카테고리 정보 요청", req.query);
+  // console.log("카테고리 정보 요청", req.query);
 
   const code = req.query.code;
   const sql = `
@@ -40,7 +40,7 @@ router.get("/category", (req, res) => {
   `;
 
   query(sql, [code]).then((data) => {
-    console.log("카테고리 정보:", data);
+    // console.log("카테고리 정보:", data);
     res.send(data[0]);
     
   })

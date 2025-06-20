@@ -9,7 +9,7 @@ import { changeCateName } from "@/utils/changeCateName";
 
 const BoardMain = () => {
   const location = useLocation();
-  const category = location.search.split("=")[1];
+  const category = location.search.split("=")[1].split("&")[0];
   const [categoryName, setCategoryName] = useState(category || ""); // 카테고리 이름 상태
 
   useEffect(() => {

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import L from "../../styled/ListStyled.jsx";
 import CB from "../../styled/CommonBoardStyled.jsx";
 import axios from "axios";
@@ -9,18 +9,49 @@ import { downloadFile } from "@/utils/fileDownload";
 // svg
 import AttIcon from "../../components/AttachmentIcon.jsx";
 import AttachmentIcon from "../../assets/icon/attachment.svg?react";
+import DoublePrev from "../../assets/icon/double-prev-arrow.svg?react";
+import Prev from "../../assets/icon/prev-arrow.svg?react";
+import Next from "../../assets/icon/next-arrow.svg?react";
+import DoubleNext from "../../assets/icon/double-next-arrow.svg?react";
 
 const BoardListForm = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
-  const category = location.search.split("=")[1];
+  const category = searchParams.get("category");
   const [isCategory, setIsCategory] = useState(category); // 카테고리 상태
   const [data, setData] = useState([]); // 게시글 데이터 상태
   const [openPopoverIdx, setOpenPopoverIdx] = useState(null);
   const [attachmentList, setAttachmentList] = useState([]);
+
+  
+
+  // 페이지버튼관련
+  const limit = 15;
+  const [offset, setOffset] = useState(0);
+  const [isPage, setPage] = useState(0);
+  const [totalData, setTotalData] = useState(0);
+  const [pageNo, setPageNo] = useState(1);
+
+  // 페이지 버튼 클릭 핸들러
+  const handlePageBtn = (direction) => {
+    return () => {
+      if (direction === "prev" && offset > 0) {
+        setOffset((prevOffset) => prevOffset - limit);
+      } else if (direction === "next" && offset + limit < totalData) {
+        setOffset((prevOffset) => prevOffset + limit);
+      } else if (direction === "doublePrev") {
+        setOffset(0);
+      } else if (direction === "doubleNext") {
+        setOffset(limit * (isPage - 1));
+      }
+    };
+  };
 
   // 파일 다운로드
   const handleDownload = (item, index) => {
@@ -33,17 +64,23 @@ const BoardListForm = () => {
   };
 
   const fetchData = async () => {
-    setIsCategory(category);
+    sessionStorage.getItem("pageNo") && searchParams.set("pageNo", sessionStorage.getItem("pageNo"));
 
+
+    setIsCategory(category);
     try {
       const response = await axios.get(`${API_URL}`, {
         params: {
           code: projectCode,
           category: category,
           id: subjectId,
+          limit: limit,
+          offset: offset,
         },
       });
-      setData(response.data);
+      setData(response.data.list);
+      setTotalData(response.data.totalCount);
+      setPage(Math.ceil(response.data.totalCount / limit));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -51,7 +88,22 @@ const BoardListForm = () => {
 
   useEffect(() => {
     fetchData();
-  }, [location]);
+    // test();
+  }, [location, offset]);
+
+  useEffect(() => {
+    test();
+  }, [pageNo]);
+
+  const test = () => {
+
+    console.log('sessionStorage.getItem("pageNo")',sessionStorage.getItem("pageNo"));
+    console.log("pageNo", pageNo);
+    
+    searchParams.set("pageNo", pageNo);
+    console.log("테스트함수", searchParams.toString());
+    navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
+  }
 
   return (
     <div
@@ -60,6 +112,7 @@ const BoardListForm = () => {
         if (openPopoverIdx !== null) setOpenPopoverIdx(null);
       }}
     >
+      <button onClick={test}>test</button>
       <L.ListWrap
         onClick={(e) => {
           if (openPopoverIdx !== null && e.target === e.currentTarget) {
@@ -69,9 +122,10 @@ const BoardListForm = () => {
       >
         <CB.Button
           onClick={() =>
-            navigate(`write?category=${location.search.split("=")[1]}`, {
-              state: { mode: "write", category: isCategory },
-            })
+            // navigate(`write?category=${category}`, {
+            //   state: { mode: "write", category: isCategory },
+            // })
+            navigate(`write?category=${category}`)
           }
         >
           글쓰기
@@ -113,6 +167,7 @@ const BoardListForm = () => {
               <L.Block
                 key={index}
                 onClick={() => {
+                  sessionStorage.setItem("pageNo", `${pageNo}`);
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
                 $repeat={isCategory == "common" ? 6 : 5}
@@ -172,6 +227,49 @@ const BoardListForm = () => {
             );
           })}
         </L.Content>
+
+        {isPage > 0 && (
+          <L.PageWrap>
+            <DoublePrev onClick={handlePageBtn("doublePrev")} />
+            <Prev onClick={handlePageBtn("prev")} />
+            {/* <L.PageButton
+              onClick={() => {
+                if (isPage > 0) {
+                  setPage(isPage - 1);
+                  fetchData();
+                }
+              }}
+            >
+              이전
+            </L.PageButton> */}
+
+            {Array.from({ length: isPage }, (_, i) => i + 1).map(
+              (pageNumber) => (
+                <L.PageButton
+                  key={pageNumber}
+                  onClick={() => {
+                    setOffset(limit * (pageNumber - 1));
+                    setPageNo(pageNumber);
+                  }}
+                  className={offset / limit === pageNumber - 1 ? "active" : ""}
+                >
+                  {pageNumber}
+                </L.PageButton>
+              )
+            )}
+
+            {/* <L.PageButton
+              onClick={() => {
+                setPage(isPage + 1);
+                fetchData();
+              }}
+            >
+              다음
+            </L.PageButton> */}
+            <Next onClick={handlePageBtn("next")} />
+            <DoubleNext onClick={handlePageBtn("doubleNext")} />
+          </L.PageWrap>
+        )}
       </L.ListWrap>
     </div>
   );

@@ -19,8 +19,8 @@ const BoardDetail = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const navigate = useNavigate();
   const location = useLocation();
-  const projectCode = location.pathname.split("/")[1];
-  const subjectId = location.pathname.split("/")[2];
+  // const projectCode = location.pathname.split("/")[1];
+  // const subjectId = location.pathname.split("/")[2];
   const detailIndex = Number(location.pathname.split("/").slice(-1).join("/"));
 
   const [detail, setDetail] = useState({});
@@ -110,9 +110,6 @@ const BoardDetail = () => {
       setDetail(response.data[0]);
       setDate(date + " " + time);
       setViews(response.data[0].views || 0);
-
-      sessionStorage.getItem("fromWrite") &&
-        sessionStorage.removeItem("fromWrite");
     } catch (error) {
       console.error("게시글 상세 조회 중 오류 발생:", error);
       alert("게시글을 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.");

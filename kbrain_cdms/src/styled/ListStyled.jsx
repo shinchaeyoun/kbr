@@ -145,6 +145,40 @@ const AttachmentPop = styled.div`
   }
 `;
 
+const PageWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin-top: 20px;
+  gap: 5px;
+
+  margin: 20px 0 0;
+  width: 100%;
+
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+`;
+const PageButton = styled.div`
+  // display: flex;
+  // justify-content: center;
+  // margin-top: 20px;
+
+  padding: 3px 10px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #aaa;
+  color: #fff;
+  font-size: 16px;
+
+  &.active {
+    background-color: #555555;
+    border: 1px solid #aaa;
+    color: #fff;
+  }
+`;
+
 const L = {
   ListWrap,
   ListBlock,
@@ -156,6 +190,8 @@ const L = {
   Button,
   AttachmentIcon,
   AttachmentPop,
+  PageWrap,
+  PageButton,
 };
 
 export default L;

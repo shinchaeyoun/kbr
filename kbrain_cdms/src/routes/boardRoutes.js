@@ -32,33 +32,50 @@ const router = express.Router();
 
 // 게시판 목록 가져오기
 router.get("/", async (req, res) => {
+  console.log("게시판 목록 요청:", req.body);
+  
   const projectCode = Number(req.query.code);
   const subjectId = req.query.id ? Number(req.query.id) : null;
   const category = req.query.category || null;
 
-  const limit = Number(req.query.limit) || 100; // 기본값 10
-  const offset = parseInt(req.query.offset) || 0; // 기본값 0
+  const limit = Number(req.query.limit) || 10;
+  const offset = parseInt(req.query.offset) || 0;
 
-  let sqlDESC, sqlASC, params;
+  let sqlDESC, params, totalCountSql, totalCountParams;
 
   if (!subjectId || subjectId === null) {
-    sqlDESC = `SELECT * FROM board WHERE projectCode = ? AND (subjectId IS NULL OR subjectId = 'NULL') ORDER BY originIdx DESC LIMIT ?, ?`; // 최신순
+    sqlDESC = `SELECT * FROM board WHERE projectCode = ? AND (subjectId IS NULL OR subjectId = 'NULL') ORDER BY originIdx DESC LIMIT ?, ?`;
     params = [projectCode, offset, limit];
+    totalCountSql = `SELECT COUNT(*) AS totalCount FROM board WHERE projectCode = ? AND (subjectId IS NULL OR subjectId = 'NULL')`;
+    totalCountParams = [projectCode];
   } else {
     sqlDESC = `SELECT * FROM board WHERE projectCode = ? AND subjectId = ? AND category = ? ORDER BY originIdx DESC LIMIT ?, ?`;
     params = [projectCode, subjectId, category, offset, limit];
+    totalCountSql = `SELECT COUNT(*) AS totalCount FROM board WHERE projectCode = ? AND subjectId = ? AND category = ?`;
+    totalCountParams = [projectCode, subjectId, category];
   }
 
-  query(sqlDESC, params).then((data) => {
-    res.send(data);
-  });
+  // 목록 데이터 조회
+  const listPromise = query(sqlDESC, params);
+  // 전체 개수 조회
+  const countPromise = query(totalCountSql, totalCountParams);
+
+  Promise.all([listPromise, countPromise])
+    .then(([list, count]) => {
+      res.send({ list, totalCount: count[0]?.totalCount || 0 });
+    })
+    .catch((err) => {
+      res.status(500).send({ msg: "데이터 조회 실패", err });
+    });
 });
 
 // 게시물 상세페이지
 router.get("/detail", async (req, res) => {
   let detailIndex = req.query.boardIndex ? Number(req.query.boardIndex) : null; // 게시판 인덱스
   if (!detailIndex || isNaN(detailIndex)) {
-    return res.status(400).send({ msg: "잘못된 게시글 인덱스입니다.", detailIndex });
+    return res
+      .status(400)
+      .send({ msg: "잘못된 게시글 인덱스입니다.", detailIndex });
   }
   const sql = `SELECT * FROM board WHERE idx = ?`; // 최신순
 
@@ -87,7 +104,6 @@ router.post("/", upload.array("attachment"), async (req, res) => {
   const attachment = req.files ? savedName.join("|") : null;
   const caregory = req.body.category || null;
   const label = req.body.label || null;
-console.log("라벨 테스트 =====>", req.body);
 
   // 현재 날짜 가져오기
   const now = new Date();
@@ -118,9 +134,6 @@ console.log("라벨 테스트 =====>", req.body);
 
   let params;
   let sql;
-
-  console.log("원글 번호", originIdx);
-  console.log("인덱스 못 받아왓니", index);
 
   if (subjectId == "board") {
     // 공통 게시판
@@ -292,8 +305,8 @@ router.get("/filedownload", (req, res) => {
 
 // 게시판 글 수정
 router.patch("/update", upload.array("attachment"), async (req, res) => {
-  console.log('수정 요청:', req.body);
-  
+  // console.log('수정 요청:', req.body);
+
   const idx = req.query.idx;
   const { title, content } = req.body;
 

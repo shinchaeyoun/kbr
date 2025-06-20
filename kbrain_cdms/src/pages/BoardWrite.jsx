@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import S from "../styled/GlobalBlock.jsx";
 import B from "../styled/BoardStyled.jsx";
 import axios from "axios";
@@ -10,6 +10,7 @@ const BoardWrite = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
   const [item, setItem] = useState({});
@@ -60,7 +61,7 @@ const BoardWrite = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
 
-    fileInputRef.current.value = ""
+    fileInputRef.current.value = "";
   };
 
   const handleFileChange = (e) => {
@@ -119,7 +120,7 @@ const BoardWrite = () => {
       const res = await req;
       if (res.data.msg === "전송 성공") {
         alert(isMode === "update" ? "수정되었습니다." : "등록되었습니다.");
-        sessionStorage.setItem("fromWrite", "1");
+        // sessionStorage.setItem("fromWrite", "1");
         navigate(`${basePath}?category=${categoryName}`);
       }
     } catch (error) {
@@ -128,18 +129,8 @@ const BoardWrite = () => {
   };
 
   const fatchCategory = async () => {
-    // try {
-    //   const response = await axios.get(
-    //     `http://192.168.23.2:5001/project/category`,
-    //     { params: { code: projectCode } }
-    //   );
-    //   // setCateArr(response.data.category.split(","));
-    //   // setPorgArr(response.data.progress.split(","));
-    // } catch (error) {
-    //   console.error("Error fetching categories:", error);
-    // }
-    if (location.search.split("=")[0] == "?category") {
-      const categoryName = location.search.split("=")[1];
+    if (searchParams.has("category")) {
+      const categoryName = searchParams.get("category");
       setCategoryNameKr(changeCateName(categoryName));
       setCategoryName(categoryName);
     }
@@ -147,7 +138,7 @@ const BoardWrite = () => {
 
   const fatchData = async () => {
     fatchCategory();
-    const boardIndex = location.search.split("=")[1];
+    const boardIndex = searchParams.get("no");
     const response = await axios.get(`${API_URL}/detail`, {
       params: {
         boardIndex: boardIndex,
@@ -210,7 +201,6 @@ const BoardWrite = () => {
           <B.Option>
             <div>
               <p>말머리</p>
-              {label}
             </div>
             <div>
               <B.Select
