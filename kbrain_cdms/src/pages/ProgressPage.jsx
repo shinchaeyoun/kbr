@@ -1,6 +1,5 @@
-import React, { useState, useEffect, use } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import styled, { css } from "styled-components";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import S from "../styled/GlobalBlock.jsx";
 import P from "../styled/ProgressStyled.jsx";
 import axios from "axios";
@@ -12,28 +11,35 @@ const ProgressPage = () => {
   const projectCode = location.pathname.split("/")[1] || 0; // 과정 코드
   const subjectId = location.pathname.split("/")[2] || 0; // 과목 ID
 
-  const [progressCate, setProgressCate] = useState(
-    location.state?.progress
-      .split(",")
-      .map((c) => c.trim())
-      .filter((c) => c) || []
-  );
+  const [progressCate, setProgressCate] = useState([]);
   const [progressItem, setProgressItem] = useState([]);
   const [chasiTotal, setChasiTotal] = useState(0);
   const [progressValues, setProgressValues] = useState([{}]);
-  const [progressPercent, setProgressPercent] = useState({});
-  const [inProgress, setInProgress] = useState({});
 
   const optionArr = ["진행전", "진행중", "수정중", "1차 완료", "완료"];
   const optionCss = ["before", "ing", "edit", "firstDone", "done"];
   const [changeData, setChangeData] = useState({});
 
   const fetchData = async () => {
-    // const projectData = await axios.get(`${API_URL}/project`, { params }); /
+    const getProgress = await axios.get(
+      `http://192.168.23.2:5001/project/category`,
+      {
+        params: {
+          code: projectCode,
+        },
+      }
+    );
+    const progressCate =
+      getProgress.data.progress
+        .split(",")
+        .map((c) => c.trim())
+        .filter((c) => c) || [];
+    setProgressCate(progressCate);
+
     const getChasiTotal = await axios.get(`${API_SUB}/chasiTotal`, {
       params: {
-        progress: location.state?.progress,
-        subjectId: location.state?.id,
+        progress: projectCode,
+        subjectId: subjectId,
       },
     });
     setChasiTotal(getChasiTotal.data.chasiTotal);
@@ -42,7 +48,7 @@ const ProgressPage = () => {
       params: {
         progressItem: progressCate,
         subjectId: subjectId,
-        projectCode: location.state?.code, // 프로젝트 코드
+        projectCode: projectCode, // 프로젝트 코드
       },
     });
 
@@ -87,10 +93,7 @@ const ProgressPage = () => {
     }
 
     setProgressValues(progressData);
-    setProgressPercent(percentName);
-    setInProgress(inprogress);
 
-    // progressItem 누적 방지: 새 배열로 생성 후 한 번만 set
     const newProgressItem = [];
     for (let i = 0; i < progressCate.length; i++) {
       let setItem = "";
@@ -156,7 +159,6 @@ const ProgressPage = () => {
 
     if (response.data.msg === "전송 성공") {
       alert("진행률이 저장되었습니다.");
-      // progressPercent 갱신
       const newPercent = {};
       Object.entries(progressValues).forEach(([key, value]) => {
         let perNum = 0;
@@ -167,7 +169,6 @@ const ProgressPage = () => {
         }
         newPercent[key] = perNum;
       });
-      setProgressPercent(newPercent);
 
       setChangeData(newPercent);
     }
@@ -200,7 +201,11 @@ const ProgressPage = () => {
 
           <P.InnerContainer>
             {Array.from({ length: chasiTotal }, (_, i) => (
-              <P.Line key={i} className="selectLine" $repeat={progressCate.length + 1}>
+              <P.Line
+                key={i}
+                className="selectLine"
+                $repeat={progressCate.length + 1}
+              >
                 <div>{String(i + 1).padStart(2, "0")}</div>
                 {progressCate.map((item, index) => (
                   <S.Select

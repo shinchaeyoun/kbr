@@ -48,8 +48,12 @@ router.get("/setData", (req, res) => {
   const columnStr = progressItem && columns.join(", ") || null;
   // const sql = `SELECT ${columnStr} FROM subject WHERE subjectId = ?`;
   const sql = `SELECT ${columnStr} FROM subject WHERE subjectId = ? AND projectCode = ?`;
+// console.log("차시 정보 요청", req.query);
 
-  query(sql, [subjectId, projectCode]).then((data) => res.send(data[0]));
+  query(sql, [subjectId, projectCode]).then((data) => {
+    // console.log("차시 정보:", data);
+    res.send(data[0])
+  });
 });
 
 router.post("/add", (req, res) => {
