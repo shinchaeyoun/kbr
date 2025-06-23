@@ -18,11 +18,13 @@ const BoardListForm = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const projectCode = location.pathname.split("/")[1];
   const subjectId = location.pathname.split("/")[2];
   const category = searchParams.get("category");
+
+  const [pageNo, setPageNo] = useState(Number(searchParams.get("page")) || 1); // 페이지 번호
   // const [isCategory, setIsCategory] = useState(category); // 카테고리 상태
   const [data, setData] = useState([]); // 게시글 데이터 상태
   const [openPopoverIdx, setOpenPopoverIdx] = useState(null);
@@ -33,7 +35,7 @@ const BoardListForm = () => {
   const [offset, setOffset] = useState(0); // 현재 페이지 오프셋
   const [isPage, setPage] = useState(0); // 총 페이지 수
   const [totalData, setTotalData] = useState(0); // 총 데이터 수
-  const [pageNo, setPageNo] = useState(null); // 현재 페이지 번호
+  // const [pageNo, setPageNo] = useState(null); // 현재 페이지 번호
 
   // 페이지 버튼 클릭 핸들러
   const handlePageBtn = (direction) => {
@@ -60,8 +62,18 @@ const BoardListForm = () => {
     });
   };
 
+  const handlePageMove = useCallback(
+    (page) => {
+      setOffset(limit * (page - 1));
+      setPageNo(page);
+      setSearchParams({ category, page: page });
+    },
+    [limit, category, setSearchParams]
+  );
+
   const fetchData = async () => {
-    // setIsCategory(category);
+    if (pageNo > 1) setOffset(limit * (pageNo - 1));
+
     try {
       const response = await axios.get(`${API_URL}`, {
         params: {
@@ -75,15 +87,6 @@ const BoardListForm = () => {
       setData(response.data.list);
       setTotalData(response.data.totalCount);
       setPage(Math.ceil(response.data.totalCount / limit));
-      setPageNo(sessionStorage.getItem("pageNo") || 1);
-
-      const hasPageNo = !!sessionStorage.getItem("pageNo");
-      hasPageNo && setOffset(limit * (Math.ceil(response.data.totalCount / limit) - 1));
-
-      console.log('sessionStorage =>', sessionStorage.getItem("pageNo"),',',sessionStorage.getItem("pageNo") || 1);
-
-      // sessionStorage.removeItem("pageNo"); // 페이지 번호 초기화
-      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -91,9 +94,6 @@ const BoardListForm = () => {
 
   useEffect(() => {
     fetchData();
-
-    console.log("pageNo ==>", pageNo);
-    
   }, [location, offset]);
 
   return (
@@ -110,8 +110,7 @@ const BoardListForm = () => {
           }
         }}
       >
-        <button>{pageNo}</button>
-        <CB.Button onClick={() => navigate(`write?category=${category}`)}>
+        <CB.Button onClick={() => navigate(`write?category=${category}&type=write`)}>
           글쓰기
         </CB.Button>
 
@@ -151,9 +150,6 @@ const BoardListForm = () => {
               <L.Block
                 key={index}
                 onClick={() => {
-                  console.log('pageNo ==>',pageNo);
-                  
-                  
                   navigate(`${item.idx}`, { state: { detailIndex: item.idx } });
                 }}
                 $repeat={category == "common" ? 6 : 5}
@@ -223,11 +219,7 @@ const BoardListForm = () => {
               (pageNumber) => (
                 <L.PageButton
                   key={pageNumber}
-                  onClick={() => {
-                    setOffset(limit * (pageNumber - 1));
-                    setPageNo(pageNumber);
-                    sessionStorage.setItem("pageNo", pageNumber);
-                  }}
+                  onClick={() => handlePageMove(pageNumber)}
                   className={offset / limit === pageNumber - 1 ? "active" : ""}
                 >
                   {pageNumber}

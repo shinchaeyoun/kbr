@@ -87,7 +87,7 @@ const BoardWrite = () => {
     try {
       const formData = new FormData();
       formData.append("index", item?.idx || null);
-      formData.append("isMode", isMode);
+      formData.append("isMode", isMode); // 필요한가 ?
       formData.append("projectCode", data.projectCode);
       formData.append("subjectId", data.subjectId);
       formData.append("category", categoryName || null);

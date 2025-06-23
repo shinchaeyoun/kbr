@@ -6,6 +6,7 @@ import path from "path";
 import multer from "multer";
 import { log } from "console";
 import AdmZip from "adm-zip";
+import { queryObjects } from "v8";
 
 // 한글 파일명도 저장 가능한 multer storage 설정
 const storage = multer.diskStorage({
@@ -123,9 +124,15 @@ router.post("/", upload.array("attachment"), async (req, res) => {
   const nextIdSql = "SHOW TABLE STATUS LIKE 'board'";
   const nextIdQuery = await query(nextIdSql);
   const nextId = nextIdQuery[0].Auto_increment;
+  const ogIdx = await query(
+    `SELECT originIdx FROM board WHERE idx = ?`,[index]);
+    console.log('ogIdx ======>', ogIdx[0].originIdx);
+    
 
   if (isMode == "reply") {
-    originIdx = index; // 답글 작성 시 원본 게시글의 idx
+    originIdx = ogIdx[0].originIdx; // 답글 작성 시 원본 게시글의 idx
+    console.log('originIdx ======>', originIdx);
+    
     depth = 1; // 답글 깊이 증가
   } else {
     originIdx = nextId;

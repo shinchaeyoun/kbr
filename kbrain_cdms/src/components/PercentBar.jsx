@@ -88,7 +88,7 @@ const PercentBar = ({ changeData, setChangeData }) => {
       progress,
       setArray
     );
-    
+
     setProgressPercent(percentName);
     setInProgress(inprogress);
     setTotalPercent(
@@ -134,28 +134,27 @@ const PercentBar = ({ changeData, setChangeData }) => {
               <P.BarProgress
                 $per={
                   Math.round(
-                    totalPercent / (progressItem.length * chasiTotal) * 100
+                    (totalPercent / (progressItem.length * chasiTotal)) * 100
                   ) + "%"
                 }
               >
                 <span>
                   {Math.round(
-                    totalPercent / (progressItem.length * chasiTotal) * 100
+                    (totalPercent / (progressItem.length * chasiTotal)) * 100
                   ) + "%"}
                 </span>
               </P.BarProgress>
               <P.BarProgress2
                 $per={
                   Math.round(
-                    totalInPercent / (progressItem.length * chasiTotal) * 100
+                    (totalInPercent / (progressItem.length * chasiTotal)) * 100
                   ) + "%"
                 }
               >
                 <span>
                   {Math.round(
-                    totalInPercent / (progressItem.length * chasiTotal) * 100
-                  ) + "%"
-                }
+                    (totalInPercent / (progressItem.length * chasiTotal)) * 100
+                  ) + "%"}
                 </span>
               </P.BarProgress2>
             </P.Bar>
@@ -174,12 +173,16 @@ const PercentBar = ({ changeData, setChangeData }) => {
               <P.BarTitle>{item}</P.BarTitle>
               <P.BarContent>
                 <P.Bar>
-                  <P.BarProgress $per={percentValue + "%"}>
-                    <span>{percent}개</span>
-                  </P.BarProgress>
-                  <P.BarProgress2 $per={inPerValue + "%"}>
-                    <span>{inPer}개</span>
-                  </P.BarProgress2>
+                  {percent > 0 && (
+                    <P.BarProgress $per={percentValue + "%"}>
+                      <span>{percent}개</span>
+                    </P.BarProgress>
+                  )}
+                  {inPer > 0 && (
+                    <P.BarProgress2 $per={inPerValue + "%"}>
+                      <span>{inPer}개</span>
+                    </P.BarProgress2>
+                  )}
                 </P.Bar>
               </P.BarContent>
             </P.Group>

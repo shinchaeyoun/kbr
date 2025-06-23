@@ -83,7 +83,7 @@ const ProjectPage = () => {
         <li>
           <NavigationItem
             label="공통게시판"
-            path={`/${code}/board?category=common`}
+            path={`/${code}/board?category=common&page=1`}
             navigate={navigate}
           />
         </li>
@@ -129,7 +129,7 @@ const ProjectPage = () => {
                           <NavigationItem
                             key={cidx}
                             label={categoriesName[cidx]}
-                            path={`${index + 1}/board?category=${category}`}
+                            path={`${index + 1}/board?category=${category}&page=1`}
                             navigate={(path) =>
                               navigate(path, { state: { category } })
                             }
@@ -138,13 +138,6 @@ const ProjectPage = () => {
                           />
                         );
                       })}
-
-                      {/* <NavigationItem
-                        label="기타 게시판"
-                        path={`${id}/board`}
-                        navigate={navigate}
-                        as="li"
-                      /> */}
                     </ul>
                   )}
                 </li>

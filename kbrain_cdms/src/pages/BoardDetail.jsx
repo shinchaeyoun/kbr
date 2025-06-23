@@ -34,10 +34,10 @@ const BoardDetail = () => {
   const [isDeleted, setIsDeleted] = useState(false);
 
   const ReplyMode = () => {
-    navigate(`reply?no=${detailIndex}`);
+    navigate(`reply?no=${detailIndex}&type=reply`);
   };
   const EditMode = () => {
-    navigate(`update?no=${detailIndex}`);
+    navigate(`update?no=${detailIndex}&type=update`);
   };
 
   const handleDelete = async () => {
