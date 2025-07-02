@@ -337,7 +337,6 @@ const B = {
   CenterBox,
 
   ButtonWrap,
-  Button,
   Select,
   Option,
   OptionWrap,

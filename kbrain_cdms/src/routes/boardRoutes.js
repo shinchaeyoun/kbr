@@ -126,9 +126,6 @@ router.post("/", upload.array("attachment"), async (req, res) => {
   const nextId = nextIdQuery[0].Auto_increment;
   const ogIdx = await query(
     `SELECT originIdx FROM board WHERE idx = ?`,[index]);
-    console.log('ogIdx ======>', ogIdx[0].originIdx);
-    
-
   if (isMode == "reply") {
     originIdx = ogIdx[0].originIdx; // 답글 작성 시 원본 게시글의 idx
     console.log('originIdx ======>', originIdx);

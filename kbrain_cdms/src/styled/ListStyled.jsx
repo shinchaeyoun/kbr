@@ -35,7 +35,8 @@ const Grid = styled.div`
 
   & > :nth-child(3) {
     width: 100%;
-    text-align: left;
+    // text-align: left;
+    text-align: center;
   }
 `;
 

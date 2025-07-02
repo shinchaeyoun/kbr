@@ -8,36 +8,63 @@ import PercentBar from "../components/PercentBar.jsx";
 const ProgressPage = () => {
   const API_SUB = "http://192.168.23.2:5001/subject";
   const location = useLocation();
-  const projectCode = location.pathname.split("/")[1];
-  const subjectId = location.pathname.split("/")[2];
+  const projectCode = location.pathname.split("/")[1] || 0; // 과정 코드
+  const subjectId = location.pathname.split("/")[2] || 0; // 과목 ID
 
   const [progressCate, setProgressCate] = useState([]);
   const [progressItem, setProgressItem] = useState([]);
   const [chasiTotal, setChasiTotal] = useState(0);
   const [progressValues, setProgressValues] = useState([{}]);
-  const [progressPercent, setProgressPercent] = useState({});
-  const [inProgress, setInProgress] = useState({});
-  const totalPrecent = Object.values(progressPercent).reduce(
-    (acc, cur) => acc + cur,
-    0
-  );
-  const totalInPrecent = Object.values(inProgress).reduce(
-    (acc, cur) => acc + cur,
-    0
-  );
-  const [changeData, setChangeData] = useState(false);
 
   const optionArr = ["진행전", "진행중", "수정중", "1차 완료", "완료"];
   const optionCss = ["before", "ing", "edit", "firstDone", "done"];
+  const [changeData, setChangeData] = useState({});
 
-  // progress 데이터 파싱 및 percent 계산 함수 분리
-  const parseProgressData = (progressValues, progressCate, setArray) => {
+  const fetchData = async () => {
+    const getProgress = await axios.get(
+      `http://192.168.23.2:5001/project/category`,
+      {
+        params: {
+          code: projectCode,
+        },
+      }
+    );
+    const progressCate =
+      getProgress.data.progress
+        .split(",")
+        .map((c) => c.trim())
+        .filter((c) => c) || [];
+    setProgressCate(progressCate);
+
+    const getChasiTotal = await axios.get(`${API_SUB}/chasiTotal`, {
+      params: {
+        progress: projectCode,
+        subjectId: subjectId,
+      },
+    });
+    setChasiTotal(getChasiTotal.data.chasiTotal);
+
+    const getProgressValues = await axios.get(`${API_SUB}/setData`, {
+      params: {
+        progressItem: progressCate,
+        subjectId: subjectId,
+        projectCode: projectCode, // 프로젝트 코드
+      },
+    });
+
+    const setArray = Array.from(
+      { length: getChasiTotal.data.chasiTotal },
+      () => 0
+    );
     const progressData = {};
     const percentName = {};
     const inprogress = {};
 
-    if (progressValues && Object.keys(progressValues).length > 0) {
-      Object.entries(progressValues).forEach(([key, value]) => {
+    if (
+      getProgressValues.data &&
+      Object.keys(getProgressValues.data).length > 0
+    ) {
+      Object.entries(getProgressValues.data).forEach(([key, value]) => {
         let perNum = 0;
         let inproNum = 0;
         let arr = [];
@@ -58,69 +85,25 @@ const ProgressPage = () => {
         inprogress[key] = inproNum;
       });
     } else {
+      // 데이터가 없을 때 기본값 세팅
       progressCate.forEach((key) => {
         percentName[key] = 0;
         progressData[key] = setArray;
-        inprogress[key] = 0;
       });
     }
 
-    return { progressData, percentName, inprogress };
-  };
-
-  const fetchData = async () => {
-    const projectData = await axios.get(`http://192.168.23.2:5001/project`, {
-      params: { code: projectCode },
-    });
-    const progress = projectData.data.progress
-      .split(",")
-      .map((c) => c.trim())
-      .filter((c) => c);
-    setProgressCate(progress);
-
-    const getChasiTotal = await axios.get(`${API_SUB}/chasiTotal`, {
-      params: {
-        progress: projectData.data.progress,
-        subjectId: subjectId,
-      },
-    });
-    setChasiTotal(getChasiTotal.data.chasiTotal);
-
-    const getProgressValues = await axios.get(`${API_SUB}/setData`, {
-      params: {
-        progressItem: progress,
-        subjectId: subjectId,
-        projectCode: projectCode, // 프로젝트 코드
-      },
-    });
-
-    const setArray = Array.from(
-      { length: getChasiTotal.data.chasiTotal },
-      () => 0
-    );
-
-    // 파싱 함수 사용
-    const { progressData, percentName, inprogress } = parseProgressData(
-      getProgressValues.data,
-      progress,
-      setArray
-    );
-
     setProgressValues(progressData);
-    setProgressPercent(percentName);
-    setInProgress(inprogress);
 
-    // progressItem 누적 방지: 새 배열로 생성 후 한 번만 set
     const newProgressItem = [];
-    for (let i = 0; i < progress.length; i++) {
+    for (let i = 0; i < progressCate.length; i++) {
       let setItem = "";
-      if (progress[i] === "script") setItem = "원고";
-      if (progress[i] === "sb") setItem = "스토리보드";
-      if (progress[i] === "voice") setItem = "음성";
-      if (progress[i] === "animation") setItem = "애니";
-      if (progress[i] === "video") setItem = "영상";
-      if (progress[i] === "design") setItem = "디자인";
-      if (progress[i] === "content") setItem = "개발";
+      if (progressCate[i] === "script") setItem = "원고";
+      if (progressCate[i] === "sb") setItem = "보드";
+      if (progressCate[i] === "voice") setItem = "음성";
+      if (progressCate[i] === "animation") setItem = "애니";
+      if (progressCate[i] === "video") setItem = "영상";
+      if (progressCate[i] === "design") setItem = "디자인";
+      if (progressCate[i] === "content") setItem = "개발";
       newProgressItem.push(setItem);
     }
     setProgressItem(newProgressItem);
@@ -168,7 +151,6 @@ const ProgressPage = () => {
   };
 
   const saveBtn = async () => {
-    setChangeData(true);
     const response = await axios.patch(`${API_SUB}/saveProgress`, {
       progressValues,
       projectCode,
@@ -177,13 +159,6 @@ const ProgressPage = () => {
 
     if (response.data.msg === "전송 성공") {
       alert("진행률이 저장되었습니다.");
-      // progressPercent 갱신 (파싱 함수 사용)
-      // const setArray = Array.from({ length: chasiTotal }, () => 0);
-      // const { percentName: newPercent, inprogress: newInprogress } =
-      //   parseProgressData(progressValues, progressCate, setArray);
-      // setProgressPercent(newPercent);
-      // setInProgress(newInprogress);
-      
       const newPercent = {};
       Object.entries(progressValues).forEach(([key, value]) => {
         let perNum = 0;
@@ -194,10 +169,8 @@ const ProgressPage = () => {
         }
         newPercent[key] = perNum;
       });
-      setProgressPercent(newPercent);
 
-
-
+      setChangeData(newPercent);
     }
   };
 
@@ -213,21 +186,13 @@ const ProgressPage = () => {
     <>
       <div>
         <P.Title>과목1101 진행률</P.Title>
-        <PercentBar
-          changeData={changeData || null}
-          setChangeData={setChangeData || null}
-        />
-        <S.Button
-          onClick={() => {
-            console.log("테스트 :", changeData);
-          }}
-        >
-          test
-        </S.Button>
+
+        <PercentBar changeData={changeData} setChangeData={setChangeData} />
+
         <P.CheckContainer>
           <P.Button onClick={saveBtn}>저장하기</P.Button>
 
-          <P.TitleWrap>
+          <P.TitleWrap $repeat={progressCate.length + 1}>
             <div>차시</div>
             {progressItem.map((item, index) => (
               <div key={index}>{item}</div>
@@ -236,7 +201,11 @@ const ProgressPage = () => {
 
           <P.InnerContainer>
             {Array.from({ length: chasiTotal }, (_, i) => (
-              <P.Line key={i} className="selectLine">
+              <P.Line
+                key={i}
+                className="selectLine"
+                $repeat={progressCate.length + 1}
+              >
                 <div>{String(i + 1).padStart(2, "0")}</div>
                 {progressCate.map((item, index) => (
                   <S.Select

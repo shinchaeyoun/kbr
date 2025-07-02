@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+
 import "./App.css";
 
 // pages
@@ -25,6 +28,7 @@ import Deleted from "./components/DeletedPage.jsx";
 function App(props) {
   const level = props.level;
   const [isLogin, setIsLogin] = useState(false);
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -33,6 +37,7 @@ function App(props) {
 
   return (
     <>
+    <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/" element={<BoardList level={level} />} />
         <Route path="/login" element={<Login isLogin={isLogin} />} />
@@ -68,6 +73,7 @@ function App(props) {
       </Routes>
 
       <Footer />
+      </QueryClientProvider>
     </>
   );
 }

@@ -1,103 +1,101 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+//styled
 import S from "../styled/GlobalBlock.jsx";
 import P from "../styled/ProgressStyled.jsx";
-import axios from "axios";
+// components
+import PercentBar from "../components/PercentBar.jsx";
+// utils
+import { changeCateName } from "@/utils/changeCateName";
 
-const optionArr = ["진행전", "진행중", "수정중", "1차 완료", "완료"];
-const optionCss = ["before", "ing", "edit", "firstDone", "done"];
-
-// progressCate 배열을 한글로 변환
-const mapProgressItemToKorean = (progressCate) => {
-  const map = {
-    script: "원고",
-    sb: "스토리보드",
-    voice: "음성",
-    animation: "애니",
-    video: "영상",
-    design: "디자인",
-    content: "개발",
-  };
-  return progressCate.map((item) => map[item] || item);
+const fetchProgressCate = async (projectCode) => {
+  const res = await axios.get("http://192.168.23.2:5001/project/category", {
+    params: { code: projectCode },
+  });
+  return res.data.progress
+    .split(",")
+    .map((c) => c.trim())
+    .filter((c) => c);
 };
 
-// progressValues에서 완료(4) 개수 계산
-const getProgressPercent = (progressValues) => {
-  const percent = {};
-  Object.entries(progressValues).forEach(([key, value]) => {
-    percent[key] = Array.isArray(value)
-      ? value.filter((v) => v === 4).length
-      : 0;
+const fetchChasiTotal = async ({ projectCode, subjectId }) => {
+  const res = await axios.get("http://192.168.23.2:5001/subject/chasiTotal", {
+    params: { progress: projectCode, subjectId },
   });
-  return percent;
+  return res.data.chasiTotal;
+};
+
+const fetchProgressValues = async ({
+  progressCate,
+  subjectId,
+  projectCode,
+}) => {
+  const res = await axios.get("http://192.168.23.2:5001/subject/setData", {
+    params: { progressItem: progressCate, subjectId, projectCode },
+  });
+  return res.data;
 };
 
 const ProgressPage = () => {
   const API_SUB = "http://192.168.23.2:5001/subject";
   const location = useLocation();
-  const projectCode = location.state?.code || 0;
-  const subjectId = location.state?.id || 0;
-  const [progressCate, setProgressCate] = useState(
-    location.state?.progress
-      ?.split(",")
-      .map((c) => c.trim())
-      .filter((c) => c) || []
-  );
-  const [progressItem, setProgressItem] = useState([]);
-  const [chasiTotal, setChasiTotal] = useState(0);
-  const [progressValues, setProgressValues] = useState({});
-  const [progressPercent, setProgressPercent] = useState({});
+  const projectCode = location.pathname.split("/")[1] || 0; // 과정 코드
+  const subjectId = location.pathname.split("/")[2] || 0; // 과목 ID
 
-  // 데이터 fetch 및 상태 세팅
-  const fetchData = async () => {
-    const { data: chasiData } = await axios.get(`${API_SUB}/chasiTotal`, {
-      params: {
-        progress: location.state?.progress,
-        subjectId: location.state?.id,
-      },
-    });
-    setChasiTotal(chasiData.chasiTotal);
+  const optionArr = ["진행전", "진행중", "수정중", "1차 완료", "완료"];
+  const optionCss = ["before", "ing", "edit", "firstDone", "done"];
+  const [changeData, setChangeData] = useState({});
 
-    const { data: progressDataRaw } = await axios.get(`${API_SUB}/setData`, {
-      params: {
-        progressItem: progressCate,
-        subjectId,
+  // react-query
+  const { data: progressCate = [], isLoading: cateLoading } = useQuery({
+    queryKey: ["progressCate", projectCode],
+    queryFn: () => fetchProgressCate(projectCode),
+    enabled: !!projectCode,
+  });
+
+  const { data: chasiTotal = 0, isLoading: chasiLoading } = useQuery({
+    queryKey: ["chasiTotal", projectCode, subjectId],
+    queryFn: () => fetchChasiTotal({ projectCode, subjectId }),
+    enabled: !!projectCode && !!subjectId,
+  });
+
+  const { data: progressValues = {}, isLoading: valuesLoading } = useQuery({
+    queryKey: ["progressValues", progressCate, subjectId, projectCode],
+    queryFn: () =>
+      fetchProgressValues({ progressCate, subjectId, projectCode }),
+    enabled: progressCate.length > 0 && !!subjectId && !!projectCode,
+  });
+
+  console.log("progressValues", progressValues);
+
+  // 진행 항목 한글명 매핑
+  const progressItem = progressCate.map((cate) => {
+    return changeCateName(cate);
+  });
+
+  // 저장 mutation
+  const queryClient = useQueryClient();
+  const saveMutation = useMutation({
+    mutationFn: ({ progressValues, projectCode, subjectId }) =>
+      axios.patch(`${API_SUB}/saveProgress`, {
+        progressValues,
         projectCode,
-      },
-    });
+        subjectId,
+      }),
+    onSuccess: () => {
+      alert("진행률이 저장되었습니다.");
+      queryClient.invalidateQueries({ queryKey: ["progressValues"] });
+    },
+  });
 
-    const setArray = Array.from({ length: chasiData.chasiTotal }, () => 0);
-    const progressData = {};
-    Object.entries(progressDataRaw).forEach(([key, value]) => {
-      progressData[key] =
-        typeof value === "string" ? value.split(",").map(Number) : setArray;
-    });
-    setProgressValues(progressData);
-    setProgressPercent(getProgressPercent(progressData));
-    setProgressItem(mapProgressItemToKorean(progressCate));
+  // 저장 버튼 클릭 시
+  const handleSave = () => {
+    saveMutation.mutate({ progressValues, projectCode, subjectId });
   };
 
-  // select 박스 상태 동기화
-  const setData = () => {
-    Object.entries(progressValues).forEach(([key, value]) => {
-      const arr = value;
-      const select = document.querySelectorAll(`.selectLine`);
-      if (Array.isArray(arr)) {
-        arr.forEach((val, idx) => {
-          const selectElement = select[idx]?.querySelector(
-            `select[id="${key}"]`
-          );
-          if (selectElement) {
-            selectElement.selectedIndex = Number(val);
-            optionCss.forEach((cls) => selectElement.classList.remove(cls));
-            selectElement.classList.add(optionCss[Number(val)]);
-          }
-        });
-      }
-    });
-  };
-
-  // 진행상태 변경
+  // 셀렉트 박스 스타일 및 값 변경
   const changeProgress = (e, item, index) => {
     const checked = e.target.value;
     const optionIndex = optionArr.indexOf(checked);
@@ -107,72 +105,26 @@ const ProgressPage = () => {
       .filter((cls) => !optionCss.includes(cls))
       .join(" ");
     e.target.className = `${currentClasses} ${className}`.trim();
-
-    setProgressValues((prev) => {
-      const arr = prev[item]
-        ? [...prev[item]]
-        : Array.from({ length: chasiTotal }, () => 0);
-      arr[index] = !checked ? 0 : optionIndex;
-      return {
-        ...prev,
-        [item]: arr,
-      };
-    });
+    // react-query 데이터는 불변이므로 별도 상태관리 필요시 mutation 등 활용
+    // 진행 상태 변경 시 changeData에 반영
+    setChangeData((prev) => ({
+      ...prev,
+      [`${item}_${index}`]: e.target.value,
+    }));
   };
 
-  // 저장 및 percent 갱신
-  const saveBtn = async () => {
-    const response = await axios.patch(`${API_SUB}/saveProgress`, {
-      progressValues,
-      projectCode,
-      subjectId,
-    });
-    if (response.data.msg === "전송 성공") {
-      alert("진행률이 저장되었습니다.");
-      setProgressPercent(getProgressPercent(progressValues));
-    }
-  };
-
-  useEffect(() => {
-    setData();
-  }, [progressValues]);
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
+  if (cateLoading || chasiLoading || valuesLoading) return <div>로딩중...</div>;
 
   return (
     <>
       <div>
         <P.Title>과목1101 진행률</P.Title>
-        <P.BarContainer>
-          {progressItem.map((item, index) => {
-            const percent = Object.values(progressPercent)[index] || 0;
-            const percentValue =
-              chasiTotal > 0 ? Math.round((percent / chasiTotal) * 100) : 0;
-            return (
-              <P.Group key={index}>
-                <P.BarTitle>{item}</P.BarTitle>
-                <P.BarContent>
-                  <P.Bar>
-                    <P.BarProgress $per={percentValue + "%"}></P.BarProgress>
-                  </P.Bar>
-                  <P.NumCate>
-                    <P.Num>
-                      {percent} / {chasiTotal}
-                    </P.Num>
-                  </P.NumCate>
-                </P.BarContent>
-              </P.Group>
-            );
-          })}
-        </P.BarContainer>
+        <PercentBar changeData={changeData} setChangeData={setChangeData} />
 
         <P.CheckContainer>
-          <P.Button onClick={saveBtn}>저장하기</P.Button>
+          <P.Button onClick={handleSave}>저장하기</P.Button>
 
-          <P.TitleWrap>
+          <P.TitleWrap $repeat={progressCate.length + 1}>
             <div>차시</div>
             {progressItem.map((item, index) => (
               <div key={index}>{item}</div>
@@ -181,15 +133,17 @@ const ProgressPage = () => {
 
           <P.InnerContainer>
             {Array.from({ length: chasiTotal }, (_, i) => (
-              <P.Line key={i} className="selectLine">
+              <P.Line
+                key={i}
+                className="selectLine"
+                $repeat={progressCate.length + 1}
+              >
                 <div>{String(i + 1).padStart(2, "0")}</div>
                 {progressCate.map((item, index) => (
                   <S.Select
                     id={item}
                     key={index}
-                    onChange={(e) => {
-                      changeProgress(e, item, i);
-                    }}
+                    onChange={(e) => changeProgress(e, item, i)}
                     className={optionCss[0]}
                   >
                     {optionArr.map((option, idx) => (
