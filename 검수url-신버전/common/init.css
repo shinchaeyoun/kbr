@@ -1,0 +1,41 @@
+@font-face {font-family:'NanumGothic'; font-style: normal; font-weight:400; src: url('./NanumGothic.woff') format('woff');}
+@font-face {font-family:'NanumGothic'; font-style:normal; font-weight:700; src:url('./NanumGothic-Bold.woff') format('woff'); }
+@font-face {font-family:'scd9'; font-style:normal; font-weight: 700; src:url('./SCD9.woff') format('woff'); }
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-5Medium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Paperlogy-6SemiBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+}
+
+/* Reset */
+html,body{width:100%;height:100%; background: #fff;}
+html{overflow-y:scroll;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,form,fieldset,p,button{margin:0;padding:0}
+body,h1,h2,h3,h4,input,button{font-family:'Pretendard-Regular','����',dotum,Helvetica,sans-serif;font-size:12px;color: #333; letter-spacing: 0px; }
+img,fieldset,iframe{border:0 none}
+li{list-style:none}
+input,select,button{vertical-align:middle}
+img{vertical-align:top}
+i,em,address{font-style:normal}
+label,button{cursor:pointer}
+button{margin:0;padding:0}
+a{color:#333;text-decoration:none}
+a:hover{color:#333; padding-bottom:2px; text-decoration:underline;} /*  */
+button img{left:-3px;*left:auto}
+html:first-child select{height:20px;padding-right:6px}
+option{padding-right:6px}
+hr{display:none}
+legend{*width:0}

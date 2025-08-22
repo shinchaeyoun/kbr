@@ -1,0 +1,17 @@
+<li class="l2 active" rel="tab8">[신규1] 건강기능식품 일반판매업</li>
+- class에 "l2"를 추가 할 경우 하위메뉴로 셋팅됨
+- class에 "active"로 초기 강조표시
+
+<li class="active" rel="tab0">신규과정</li>
+- 상위 메뉴에 rel을 "tab0"으로 설정
+- "tab0"은 하위 메뉴를 사용할때 상위 메뉴가 클릭되지 않게 하기 위한 셋팅
+- class에 "active"로 초기 강조표시
+
+
+
+<li class="active" rel="tab1">과정명1</li>
+<li class="" rel="tab2">과정명2</li>
+<li class="" rel="tab3">과정명3</li>
+- 하위메뉴를 사용하지 않을경우 기존 개발방식으로 셋팅하면됨
+
+*config.js는 기존 작성하는 방식과 같음
