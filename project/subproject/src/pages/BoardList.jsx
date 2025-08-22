@@ -5,7 +5,7 @@ import axios from "axios";
 import Modal from "../components/Modal.jsx";
 
 const BoardList = ({ level }) => {
-  const API_URL = 'http://192.168.23.2:5000/project';
+  const API_URL = "http://192.168.23.2:5000/project";
   const [boardList, setBoardList] = useState([]);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -27,10 +27,8 @@ const BoardList = ({ level }) => {
   // 서버에서 게시글 목록 가져오기
   const getBoardList = async () => {
     try {
-      const response = await axios.get(`${API_URL}`, {
-        params: { offset, limit },
-      });
-
+      const response = await axios.get(`${API_URL}`, { params: { offset, limit } });
+      console.log("response.data.length", response.data.length);
       if (response.data.length < limit) setHasMore(false);
 
       setBoardList((prevList) => {
@@ -55,10 +53,7 @@ const BoardList = ({ level }) => {
       setOffset(0); // offset 초기화
       setHasMore(false); // 검색 결과는 더보기 버튼 숨김
 
-      const response = await axios.post(
-        `http://192.168.23.2:5000/project/search`,
-        { search: search, year: selectYear }
-      );
+      const response = await axios.post(`http://192.168.23.2:5000/project/search`, { search: search, year: selectYear });
 
       setBoardList(response.data); // 검색 결과 설정
     } catch (error) {
@@ -78,17 +73,14 @@ const BoardList = ({ level }) => {
 
   // 모달 닫기 및 데이터 갱신
   const onModalClose = async (val, idx) => {
-    console.log('onModalClose', idx);
+    console.log("onModalClose", idx);
 
     if (val === "delete") {
       setBoardList((prevList) => prevList.filter((item) => item.idx !== idx));
     } else {
       try {
         if (search || selectYear) {
-          const response = await axios.post(
-            `http://192.168.23.2:5000/project/search`,
-            { search: search, year: selectYear }
-          );
+          const response = await axios.post(`http://192.168.23.2:5000/project/search`, { search: search, year: selectYear });
           setBoardList(response.data);
         } else {
           const response = await axios.get(`http://192.168.23.2:5000/project`, {
@@ -203,7 +195,7 @@ const BoardList = ({ level }) => {
             name="year"
             value={selectYear}
             onKeyDown={(e) => {
-              handleKeyPress(e)
+              handleKeyPress(e);
               e.preventDefault();
             }}
             onChange={(e) => {
@@ -221,8 +213,7 @@ const BoardList = ({ level }) => {
                   key={year}
                   value={year}
                   style={{
-                    backgroundColor:
-                      year === selectYear ? "lightblue" : "white",
+                    backgroundColor: year === selectYear ? "lightblue" : "white",
                   }}
                 >
                   {year}
@@ -231,13 +222,7 @@ const BoardList = ({ level }) => {
             })}
           </S.Select>
 
-          <S.Input
-            type="text"
-            name="search"
-            value={search || ""}
-            onChange={onChange}
-            onKeyDown={handleKeyPress}
-          />
+          <S.Input type="text" name="search" value={search || ""} onChange={onChange} onKeyDown={handleKeyPress} />
         </B.Search>
 
         <S.ButtonWrap direction="row">
@@ -264,17 +249,8 @@ const BoardList = ({ level }) => {
 
       <S.ButtonWrap direction="row-reverse">
         {["list", "card"].map((type) => (
-          <S.Button
-            key={type}
-            $padding="0 6px"
-            className={isType === type ? "on" : ""}
-            onClick={() => setList(type)}
-          >
-            {type === "list" ? (
-              <B.ListIcon></B.ListIcon>
-            ) : (
-              <B.CardIcon></B.CardIcon>
-            )}
+          <S.Button key={type} $padding="0 6px" className={isType === type ? "on" : ""} onClick={() => setList(type)}>
+            {type === "list" ? <B.ListIcon></B.ListIcon> : <B.CardIcon></B.CardIcon>}
           </S.Button>
         ))}
       </S.ButtonWrap>
@@ -287,19 +263,13 @@ const BoardList = ({ level }) => {
               openPup(board.outerUrl, board.title, board.code);
             }}
           >
-            <S.Thumb
-              src={`${board.thumb}?t=${new Date().getTime()}`}
-              alt={board.title}
-            />
+            <S.Thumb src={`${board.thumb}?t=${new Date().getTime()}`} alt={board.title} />
 
             <B.Group className="group" $isType={isType}>
               {isType === "list" ? (
                 <B.ListTitle className="ListTitle">
                   <p>{board.title}</p>
-                  {board.outerUrl && (
-                    <span>{board.outerUrl}</span>
-                  )}
-
+                  {board.outerUrl && <span>{board.outerUrl}</span>}
                 </B.ListTitle>
               ) : (
                 <B.CardTitle className="CardTitle">

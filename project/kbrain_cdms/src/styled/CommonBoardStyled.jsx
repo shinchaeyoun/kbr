@@ -11,7 +11,9 @@ const BlockWrap = styled.div``;
 
 const BlockTitle = styled.div``;
 
-const Button = styled(S.Button)``;
+const Button = styled(S.Button)`
+  margin: 20px 0;
+`;
 
 const CB = {
   Block,

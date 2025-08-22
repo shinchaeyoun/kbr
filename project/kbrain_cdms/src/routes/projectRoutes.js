@@ -2,6 +2,7 @@
 import express from "express";
 import { query } from "../helpers/dbHelper.js";
 import fs from "fs";
+import { log } from "console";
 
 const router = express.Router();
 
@@ -19,6 +20,31 @@ router.get("/", (req, res) => {
   } else {
     query(sql, [index]).then((data) => res.send(data[0]));
   }
+});
+
+// 게시판 데이터 총 개수 가져오기
+router.get("/count", async (req, res) => {
+  const sql1 = `SELECT COUNT(*) AS totalCount FROM project`;
+  query(sql1).then((data) => res.send(data[0]));
+});
+
+// 게시판 카테고리 정보 가져오기기
+router.get("/category", (req, res) => {
+  // console.log("카테고리 정보 요청", req.query);
+
+  const code = req.query.code;
+  const sql = `
+    SELECT category, progress
+    FROM project 
+    WHERE code = ?;
+  `;
+
+  query(sql, [code]).then((data) => {
+    // console.log("카테고리 정보:", data);
+    res.send(data[0]);
+    
+  })
+  
 });
 
 // 게시판 글 추가
@@ -59,12 +85,6 @@ router.post("/dup", (req, res) => {
     });
 });
 
-// 게시판 데이터 총 개수 가져오기
-router.get("/count", async (req, res) => {
-  const sql1 = `SELECT COUNT(*) AS totalCount FROM project`;
-  query(sql1).then((data) => res.send(data[0]));
-});
-
 // 게시판 글 검색
 router.post("/search", async (req, res) => {
   const { search, year } = req.body;
@@ -90,19 +110,6 @@ router.post("/search", async (req, res) => {
     console.error("검색 중 오류 발생:", error);
     res.status(500).send({ msg: "검색 중 오류가 발생했습니다.", error });
   }
-});
-
-// 게시판 글 삭제
-router.delete("/delete", (req, res) => {
-  const code = req.body.code;
-  const sql = `
-    DELETE FROM project WHERE code = ?  
-  `;
-  query(sql, [code])
-    .then((data) => res.send(data))
-    .catch((err) =>
-      res.status(500).send({ msg: "삭제 중 오류가 발생했습니다.", error: err })
-    );
 });
 
 // 이미지 업로드
@@ -159,6 +166,19 @@ router.post("/upload", async (req, res) => {
   });
 });
 
+// 게시판 글 삭제
+router.delete("/delete", (req, res) => {
+  const code = req.body.code;
+  const sql = `
+    DELETE FROM project WHERE code = ?  
+  `;
+  query(sql, [code])
+    .then((data) => res.send(data))
+    .catch((err) =>
+      res.status(500).send({ msg: "삭제 중 오류가 발생했습니다.", error: err })
+    );
+});
+
 // 게시판 글 수정
 router.patch("/update", (req, res) => {
   const index = req.query.code;
@@ -196,5 +216,7 @@ router.patch("/update", (req, res) => {
         .send({ msg: "게시글 수정 중 오류가 발생했습니다.", error: err });
     });
 });
+
+
 
 export default router;

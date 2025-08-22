@@ -9,6 +9,7 @@ const connection = mysql.createConnection({
   charset: "utf8mb4",
   port: 3306,
   connectionLimit: 10,
+  // timezone: 'Asia/Seoul',
 });
 
 connection.query('SELECT * FROM board', (err, results) => {

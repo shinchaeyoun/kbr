@@ -237,10 +237,19 @@ const CenterBox = styled(S.CenterBox)`
   margin: 50px 0 0;
 `;
 
+const Select = styled(S.Select)`
+  width: 110px;
+`;
+
 const Option = styled.div`
   display: grid;
   grid-template-columns: 150px 1fr;
-  align-items: center;
+  // align-items: center;
+  margin-bottom: 8px;
+
+  div:first-child p {
+    padding-top: 5px;
+  }
 `;
 const OptionWrap = styled.div`
   margin-bottom: 20px;
@@ -254,7 +263,10 @@ const ButtonWrap = styled(S.ButtonWrap)`
 
 const Input = styled(S.Input)`
   width: 100%;
-  height: 30px;
+  height: 35px;
+
+  align-content: center;
+  padding: 0 5px;
 `;
 
 const Textarea = styled.textarea`
@@ -269,19 +281,40 @@ const Textarea = styled.textarea`
 `;
 
 const Content = styled.div`
-  .flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px 0;
 
-    span {
-      cursor: pointer;
-      color: #777777;
-      font-family: "NanumSquareNeo", sans-serif;
-      font-size: 14px;
+  .fileList {
+    border: 1px solid #d9d9d9;
+    // margin: 10px 0;
+
+    .flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 10px;
+
       &:hover {
-        color: #000;
-        text-decoration: underline;
+        background-color: #f5f5f5;
+      }
+
+      .box {
+        display: flex;
+        gap: 0 10px;
+        padding: 0;
+      }
+
+      span {
+        cursor: pointer;
+        color: #777777;
+        font-family: "NanumSquareNeo", sans-serif;
+        font-size: 14px;
+        &:hover {
+          color: #000;
+          text-decoration: underline;
+        }
       }
     }
   }
@@ -304,7 +337,7 @@ const B = {
   CenterBox,
 
   ButtonWrap,
-  Button,
+  Select,
   Option,
   OptionWrap,
   Input,

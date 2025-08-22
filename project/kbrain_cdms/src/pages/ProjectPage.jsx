@@ -1,43 +1,63 @@
-import React, { use, useEffect, useState } from "react";
-import {
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-  Outlet,
-  useParams,
-  useLocation,
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Outlet, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 
 import ProjectMain from "./ProjectMain.jsx";
 import NavigationItem from "../components/NavigationItem.jsx";
 
-import S from "../styled/GlobalBlock";
 import P from "../styled/ProjectStyled.jsx";
 
 const ProjectPage = () => {
-  const API_URL = "http://192.168.23.2:5001/project"; // API URL 상수화
+  // const API_URL = "http://192.168.23.2:5001/project"; // API URL 상수화
+  const API_URL = "http://192.168.23.2:5001"; // API URL 상수화
   const navigate = useNavigate();
   const location = useLocation();
   const { code } = useParams();
-  const [projectName, setProjectName] = useState(null);
-  const [subjectShow, setSubjectShow] = useState(false);
-
+  const [subjectShow, setSubjectShow] = useState(null);
+  const id = subjectShow + 1;
   const [project, setProject] = useState({
     idx: code,
     title: "",
+    progress: "",
   });
+  const [data, setData] = useState({});
 
-  const { idx, title } = project;
+  const { idx, title, progress } = project;
+
+  const [subjectCategories, setSubjectCategories] = useState([]);
+  // const subjectCategories = ["원고", "스토리보드", "영상"];
+  const [subjectArr, setSubjectArr] = useState([]);
+  const [categoriesName, setCategoriesName] = useState([]);
 
   const fetchProjectData = async () => {
+    // console.log('project ==> ',project);
+
     const params = { code }; // 파라미터 상수화
 
     try {
-      const response = await axios.get(API_URL, { params });
-      const { idx, title } = response.data;
-      setProject({ idx, title });
+      const projectData = await axios.get(`${API_URL}/project`, { params });
+      const subjectData = await axios.get(`${API_URL}/subject/setMainList`, {
+        params,
+      });
+
+      // console.log('projectData ==> ',projectData);
+      const { idx, title, progress } = projectData.data;
+
+      setSubjectArr(subjectData.data.map((x) => x.name));
+      setData(projectData.data);
+      setProject({ idx, title, progress });
+      setSubjectCategories(
+        (projectData.data.progress || "")
+          .split(",")
+          .map((c) => c.trim())
+          .filter((c) => c)
+      );
+      setCategoriesName(
+        (projectData.data.category || "")
+          .split(",")
+          .map((c) => c.trim())
+          .filter((c) => c)
+      );
     } catch (error) {
       console.error("프로젝트 데이터를 가져오는 중 오류 발생:", error);
       alert(
@@ -50,63 +70,86 @@ const ProjectPage = () => {
     fetchProjectData();
   }, []);
 
+  useEffect(() => {
+    // console.log("subjectShow", subjectShow,'id',id);
+  }, [subjectShow]);
+
   return (
     <P.Wrap className="flex project-page ">
       <P.Tabs>
         <P.ProjectTitle onClick={() => navigate(`/${code}`)}>
           {title}
         </P.ProjectTitle>
-
         <li>
           <NavigationItem
             label="공통게시판"
-            path={`/${code}/board`}
+            path={`/${code}/board?category=common&page=1`}
             navigate={navigate}
           />
         </li>
         <li>
           <NavigationItem
-            label="진행률"
-            path={`/${code}/progress`}
+            label="일정표"
+            path={`/${code}/schedule`}
             navigate={navigate}
           />
         </li>
         <li>
-          <p>과정리스트</p>
+          <p style={{ cursor: "default" }}>과목리스트</p>
           <P.SubTabs>
-            <li>
-              <NavigationItem
-                label="과정명1101"
-                navigate={navigate}
-                onClick={() => {
-                  setSubjectShow(!subjectShow);
-                }}
-              />
+            {subjectArr.map((subject, index) => {
+              return (
+                <li key={index}>
+                  <div>
+                    <NavigationItem
+                      label={subject}
+                      path={`${index + 1}`}
+                      navigate={navigate}
+                      onClick={() => {
+                        setSubjectShow((prev) =>
+                          prev === index ? null : index
+                        );
+                      }}
+                    />
+                  </div>
 
-              {/* <p onClick={()=>{setSubjectShow(!subjectShow)}}> 과정명1101</p> */}
-              {subjectShow && (
-                <ul>
-                  <li>과정</li>
-                  <li>원고</li>
-                  <li>스토리보드</li>
-                  <li>영상</li>
-                  <li>과정 진행률</li>
-                </ul>
-              )}
-            </li>
-            <li>
-              <p>과정명1102</p>
-            </li>
-            <li>
-              <p>과정명1103</p>
-            </li>
+                  {subjectShow === index && (
+                    <ul>
+                      <NavigationItem
+                        label="진행률"
+                        path={`${id}/progress`}
+                        // navigate={navigate}
+                        navigate={(path) =>
+                          navigate(path, { state: { progress, id, code } })
+                        }
+                        as="li"
+                      />
+                      {subjectCategories.map((category, cidx) => {
+                        return (
+                          <NavigationItem
+                            key={cidx}
+                            label={categoriesName[cidx]}
+                            path={`${index + 1}/board?category=${category}&page=1`}
+                            navigate={(path) =>
+                              navigate(path, { state: { category } })
+                            }
+                            as="li"
+                            category={category}
+                          />
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
           </P.SubTabs>
         </li>
       </P.Tabs>
 
       <section>
         {location.pathname === `/${code}` ? (
-          <ProjectMain code={code} />
+          <ProjectMain code={code} fetchProjectData={fetchProjectData} />
         ) : (
           <Outlet />
         )}

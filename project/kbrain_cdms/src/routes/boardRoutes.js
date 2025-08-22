@@ -6,6 +6,7 @@ import path from "path";
 import multer from "multer";
 import { log } from "console";
 import AdmZip from "adm-zip";
+import { queryObjects } from "v8";
 
 // 한글 파일명도 저장 가능한 multer storage 설정
 const storage = multer.diskStorage({
@@ -28,26 +29,66 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-// const upload = multer({ dest: "public/uploads/" });
-
 const router = express.Router();
 
 // 게시판 목록 가져오기
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  console.log("게시판 목록 요청:", req.body);
+  
   const projectCode = Number(req.query.code);
-  const limit = Number(req.query.limit) || 10; // 기본값 10
-  const offset = parseInt(req.query.offset) || 0; // 기본값 0
+  const subjectId = req.query.id ? Number(req.query.id) : null;
+  const category = req.query.category || null;
 
-  const sqlDESC = `SELECT * FROM board WHERE projectCode = ? ORDER BY idx DESC LIMIT ?, ?`; // 최신순
-  const sqlASC = `SELECT * FROM board WHERE projectCode = ? ORDER BY idx ASC LIMIT ?, ?`; // 오래된순
+  const limit = Number(req.query.limit) || 10;
+  const offset = parseInt(req.query.offset) || 0;
 
-  query(sqlDESC, [projectCode, offset, limit]).then((data) => res.send(data));
+  let sqlDESC, params, totalCountSql, totalCountParams;
+
+  if (!subjectId || subjectId === null) {
+    sqlDESC = `SELECT * FROM board WHERE projectCode = ? AND (subjectId IS NULL OR subjectId = 'NULL') ORDER BY originIdx DESC LIMIT ?, ?`;
+    params = [projectCode, offset, limit];
+    totalCountSql = `SELECT COUNT(*) AS totalCount FROM board WHERE projectCode = ? AND (subjectId IS NULL OR subjectId = 'NULL')`;
+    totalCountParams = [projectCode];
+  } else {
+    sqlDESC = `SELECT * FROM board WHERE projectCode = ? AND subjectId = ? AND category = ? ORDER BY originIdx DESC LIMIT ?, ?`;
+    params = [projectCode, subjectId, category, offset, limit];
+    totalCountSql = `SELECT COUNT(*) AS totalCount FROM board WHERE projectCode = ? AND subjectId = ? AND category = ?`;
+    totalCountParams = [projectCode, subjectId, category];
+  }
+
+  // 목록 데이터 조회
+  const listPromise = query(sqlDESC, params);
+  // 전체 개수 조회
+  const countPromise = query(totalCountSql, totalCountParams);
+
+  Promise.all([listPromise, countPromise])
+    .then(([list, count]) => {
+      res.send({ list, totalCount: count[0]?.totalCount || 0 });
+    })
+    .catch((err) => {
+      res.status(500).send({ msg: "데이터 조회 실패", err });
+    });
+});
+
+// 게시물 상세페이지
+router.get("/detail", async (req, res) => {
+  let detailIndex = req.query.boardIndex ? Number(req.query.boardIndex) : null; // 게시판 인덱스
+  if (!detailIndex || isNaN(detailIndex)) {
+    return res
+      .status(400)
+      .send({ msg: "잘못된 게시글 인덱스입니다.", detailIndex });
+  }
+  const sql = `SELECT * FROM board WHERE idx = ?`; // 최신순
+
+  query(sql, detailIndex)
+    .then((data) => res.send(data))
+    .catch((err) => res.send({ msg: "데이터 조회 실패", err }));
 });
 
 // 게시판 글 추가
-router.post("/", upload.array("attachment"), (req, res) => {
-  const { projectCode, subjectId, title, content, user } = req.body;
-
+router.post("/", upload.array("attachment"), async (req, res) => {
+  const { index, isMode, projectCode, subjectId, title, content, user } =
+    req.body;
   const savedName = [];
 
   if (req.files && req.files.length > 0) {
@@ -59,38 +100,96 @@ router.post("/", upload.array("attachment"), (req, res) => {
 
       savedName.push([file.filename, fileName].join(","));
     });
-  } else {
-    // 파일이 없는 경우 처리
   }
 
   const attachment = req.files ? savedName.join("|") : null;
-  const tag = req.body.tag || null;
+  const caregory = req.body.category || null;
+  const label = req.body.label || null;
 
   // 현재 날짜 가져오기
   const now = new Date();
+
+  // 한국 시간으로 변환 (UTC+9)
+  const nowKR = new Date(now.getTime());
+  const hours = String(nowKR.getHours()).padStart(2, "0");
+  const minutes = String(nowKR.getMinutes()).padStart(2, "0");
+  const time = `${hours}:${minutes}`;
+
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
-  const date = `${year}-${month}-${day}`;
+  const date = `${year}-${month}-${day} ${time}`;
 
-  const params = [
-    projectCode,
-    subjectId,
-    tag,
-    title,
-    content,
-    attachment,
-    user,
-    date,
-  ];
-  const sql = `
-    INSERT INTO board
-    VALUES (NULL, ?,?,?,?,?,?,?,?,0);
-  `;
+  let originIdx, depth;
+  const nextIdSql = "SHOW TABLE STATUS LIKE 'board'";
+  const nextIdQuery = await query(nextIdSql);
+  const nextId = nextIdQuery[0].Auto_increment;
+  const ogIdx = await query(
+    `SELECT originIdx FROM board WHERE idx = ?`,[index]);
+  if (isMode == "reply") {
+    originIdx = ogIdx[0].originIdx; // 답글 작성 시 원본 게시글의 idx
+    console.log('originIdx ======>', originIdx);
+    
+    depth = 1; // 답글 깊이 증가
+  } else {
+    originIdx = nextId;
+    depth = 0; // 새 글 작성 시 depth는 0
+  }
+
+  let params;
+  let sql;
+
+  if (subjectId == "board") {
+    // 공통 게시판
+    params = [
+      originIdx,
+      projectCode,
+      null, // subjectId를 null로 저장
+      caregory,
+      label,
+      title,
+      content,
+      attachment,
+      user,
+      date,
+      depth,
+    ];
+    sql = `
+      INSERT INTO board
+      (originIdx, projectCode, subjectId, category, label, title, content, attachment, user, date, depth, views)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0);
+    `;
+  } else {
+    // 과목 게시판
+    params = [
+      originIdx,
+      projectCode,
+      subjectId,
+      caregory,
+      label,
+      title,
+      content,
+      attachment,
+      user,
+      date,
+      depth,
+    ];
+    sql = `
+      INSERT INTO board
+      (originIdx, projectCode, subjectId, category, label, title, content, attachment, user, date, depth, views)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0);
+    `;
+  }
 
   query(sql, params)
-    .then((data) => res.send({ msg: "전송 성공", data: data }))
-    .catch((err) => res.send({ msg: "전송 실패", err: err }));
+    .then((data) => {
+      log("게시글 추가 성공:", data);
+      res.send({ msg: "전송 성공", data: data, index: nextId });
+    })
+    .catch((err) => {
+      log("게시글 추가 실패:", err);
+      res.send({ msg: "전송 실패", err: err });
+    });
 });
 
 // 게시글 조회수 증가
@@ -209,27 +308,83 @@ router.get("/filedownload", (req, res) => {
 });
 
 // 게시판 글 수정
-router.patch("/update", upload.single("attachment"), (req, res) => {
+router.patch("/update", upload.array("attachment"), async (req, res) => {
+  // console.log('수정 요청:', req.body);
+
   const idx = req.query.idx;
-
   const { title, content } = req.body;
-  const savedValue = req.file
-    ? [req.file.filename, req.body.attachment_name, req.file.path].join(",")
+
+  let label = req.body.label || null;
+  let category = req.body.category;
+  if (!category) {
+    const prev = await query(`SELECT category FROM board WHERE idx = ?`, [idx]);
+    category = prev[0]?.category || null;
+  }
+  const remainFiles = req.body.remain_files
+    ? JSON.parse(req.body.remain_files)
     : null;
-  const attachment = req.file ? savedValue : null;
 
-  const params = [title, content || "", attachment, idx];
+  // 기존 첨부파일 정보 가져오기
+  const getPrevAttachment = async () => {
+    const sql = `SELECT attachment FROM board WHERE idx = ?`;
+    const data = await query(sql, [idx]);
+    return data[0]?.attachment || null;
+  };
 
+  let savedName = [];
+  if (req.files && req.files.length > 0) {
+    req.files.forEach((file, idx) => {
+      const fileName =
+        typeof req.body.attachment_name == "object"
+          ? req.body.attachment_name[idx]
+          : req.body.attachment_name;
+      savedName.push([file.filename, fileName].join(","));
+    });
+  }
+  // 기존 첨부파일과 새 첨부파일 합치기 (삭제 반영)
+  let attachment = null;
+  const prev = await getPrevAttachment();
+  let prevArr = prev ? prev.split("|") : [];
+  if (remainFiles) {
+    // remainFiles에 포함된 파일만 남김
+    prevArr = prevArr.filter((f) => remainFiles.includes(f.split(",")[1]));
+  }
+  if (prevArr.length > 0 && savedName.length > 0) {
+    attachment = prevArr.join("|") + "|" + savedName.join("|");
+  } else if (prevArr.length > 0) {
+    attachment = prevArr.join("|");
+  } else if (savedName.length > 0) {
+    attachment = savedName.join("|");
+  } else {
+    attachment = null;
+  }
+
+  const params = [category, title, label, content || "", attachment, idx];
   const sql = `
     UPDATE board SET 
+    category = ?,
     title = ?,
+    label = ?,
     content = ?,
     attachment = ?
     WHERE idx = ?
   `;
-
   query(sql, params)
-    .then((data) => res.send(data))
+    .then((data) => res.send({ msg: "전송 성공", data }))
+    .catch((err) => res.send({ msg: "전송 실패", err: err }));
+});
+
+router.patch("/delete", async (req, res) => {
+  const idx = req.body.idx;
+
+  const sql = `
+    UPDATE board SET 
+    status = ?
+    WHERE idx = ?
+  `;
+
+  query(sql, ["delete", idx])
+    .then((data) => res.send({ msg: "전송 성공", data }))
     .catch((err) => res.send({ msg: "전송 실패", err: err }));
 });
 

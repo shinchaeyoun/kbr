@@ -85,8 +85,8 @@ const GlobalStyles = createGlobalStyle`
 
   body {
     position: relative;
-    // font-family: 'NanumSquareR';
-    font-family: "NanumSquareNeo", sans-serif;
+    font-family: 'NanumSquareR';
+    // font-family: "NanumSquareNeo", sans-serif;
     // background-color: #edf2f6;
     // -ms-overflow-style: none;
   }

@@ -81,7 +81,7 @@ const Block = styled.div`
 `;
 
 const Footer = styled.footer`
-  height: 15vh;
+  // height: 15vh;
 `;
 
 const CenterBox = styled.div`
@@ -89,6 +89,7 @@ const CenterBox = styled.div`
   justify-content: center;
 `;
 
+const Title = styled.h1``;
 const S = {
   Select,
   Button,
@@ -100,6 +101,7 @@ const S = {
   Notice,
   Footer,
   CenterBox,
+  Title
 };
 
 export default S;

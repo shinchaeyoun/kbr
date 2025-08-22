@@ -1,173 +1,229 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import S from "../styled/GlobalBlock.jsx";
-import B from "../styled/BoardStyled.jsx";
 import axios from "axios";
 import "../styled/boardStyled.scss";
 
+// components
+import Deleted from "../components/DeletedPage.jsx";
+
+// svg
+import AttIcon from "../components/AttachmentIcon.jsx";
 import DownloadIcon from "../assets/icon/download.svg?react";
 
+// utils
 import { downloadAllZip } from "@/utils/fileDownloadAll";
+import { downloadFile } from "@/utils/fileDownload";
 
 const BoardDetail = () => {
   const API_URL = "http://192.168.23.2:5001/board";
   const navigate = useNavigate();
   const location = useLocation();
-  const projectCode = location.pathname.split("/")[1];
-  const { item } = location.state || {};
+  // const projectCode = location.pathname.split("/")[1];
+  // const subjectId = location.pathname.split("/")[2];
+  const detailIndex = Number(location.pathname.split("/").slice(-1).join("/"));
 
-  const [views, setViews] = useState(item?.views || 0);
-  const hasViewedRef = useRef(false);
+  const [detail, setDetail] = useState({});
+  const [date, setDate] = useState("");
 
   const [attachmentList, setAttachmentList] = useState([]);
 
+  const [views, setViews] = useState(detail?.views || 0);
+  const hasViewedRef = useRef(false);
+
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  const ReplyMode = () => {
+    navigate(`reply?no=${detailIndex}&type=reply`);
+  };
   const EditMode = () => {
-    navigate(`/${projectCode}/board/edit`, {
-      state: { item },
-    });
+    navigate(`update?no=${detailIndex}&type=update`);
   };
 
-  
-const handleDownloadAll = () => {
-  downloadAllZip({
-    url: `${API_URL}/downloadAll`,
-    params: { idx: item.idx },
-    defaultFileName: `${item.title}.zip`
-  });
-};
-  // 전체 파일 다운로드 (zip)
-  const downloadAll = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/downloadAll`, {
-        params: { idx: item.idx },
-        responseType: "blob",
-      });
+  const handleDelete = async () => {
+    const deletConfirm = confirm("삭제 하시겠습니까?");
 
-      let fileName = "attachments.zip";
-      const disposition = response.headers["content-disposition"];
-      if (disposition && disposition.indexOf("filename=") !== -1) {
-        const matches = /filename[^;=\n]*=((['\"]).*?\2|[^;\n]*)/.exec(
-          disposition
-        );
-        if (matches != null && matches[1]) {
-          fileName = decodeURIComponent(matches[1].replace(/['"]/g, ""));
-        }
-      }
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${item.title}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-        a.remove();
-      }, 100);
-    } catch (err) {
-      alert("파일 다운로드 실패");
+    if (deletConfirm) {
+      await axios
+        .patch(`${API_URL}/delete`, {
+          idx: detailIndex,
+        })
+        .then((res) => {
+          console.log("삭제 요청");
+          alert("삭제되었습니다.");
+          navigate(
+            `${location.pathname.split("/").slice(0, -1).join("/")}?category=${
+              detail.category
+            }`
+          );
+        })
+        .catch((error) => {
+          console.error("삭제 요청 중 오류 발생:", error);
+        });
     }
   };
 
-  // 개별 파일 다운로드
-  const fileDownload = async (e, item, index) => {
-    e.stopPropagation();
-    const originalName = item.attachment.split("|").map((file, idx) => {
-      const [savedName, originalName] = file.split(",");
-      return originalName;
-    })[index];
+  const handleDownloadAll = () => {
+    downloadAllZip({
+      url: `${API_URL}/downloadAll`,
+      params: { idx: detail.idx },
+      defaultFileName: `${detail.title}.zip`,
+    });
+  };
 
+  const handleDownload = (item, index) => {
+    downloadFile({
+      url: `${API_URL}/filedownload`,
+      params: { idx: detail.idx, fileIdx: index },
+      item,
+      index,
+    });
+  };
+
+  const fetchDetail = async () => {
     try {
-      const response = await axios.get(`${API_URL}/filedownload`, {
-        params: { idx: item.idx, fileIdx: index },
-        responseType: "blob",
+      const response = await axios.get(`${API_URL}/detail`, {
+        params: {
+          boardIndex: detailIndex,
+        },
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      if (response.data[0].status === "delete") setIsDeleted(true);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = originalName || "download";
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-        a.remove();
-      }, 100);
-    } catch (err) {
-      alert("파일 다운로드 실패");
+      if (response.data[0].attachment) {
+        const list = response.data[0].attachment.split("|").map((file) => {
+          const [savedName, originalName] = file.split(",");
+          return originalName;
+        });
+        setAttachmentList(list);
+      }
+      const resDate = new Date(response.data[0].date);
+      const year = resDate.getFullYear();
+      const month = String(resDate.getMonth() + 1).padStart(2, "0");
+      const day = String(resDate.getDate()).padStart(2, "0");
+      const date = `${year}-${month}-${day}`;
+
+      const hours = String(resDate.getHours()).padStart(2, "0");
+      const minutes = String(resDate.getMinutes()).padStart(2, "0");
+      const time = `${hours}:${minutes}`;
+
+      setDetail(response.data[0]);
+      setDate(date + " " + time);
+      setViews(response.data[0].views || 0);
+    } catch (error) {
+      console.error("게시글 상세 조회 중 오류 발생:", error);
+      alert("게시글을 불러오는 중 문제가 발생했습니다. 다시 시도해주세요.");
+      navigate(-1);
     }
   };
 
   useEffect(() => {
-    if (item && item.idx && !hasViewedRef.current) {
-      axios.patch(`${API_URL}/views/${item.idx}`).then(() => {
+    // 페이지가 로드되면 조회수 증가
+    if (detail && detail.idx && !hasViewedRef.current) {
+      axios.patch(`${API_URL}/views/${detail.idx}`).then(() => {
         setViews((prev) => prev + 1);
       });
       hasViewedRef.current = true;
     }
-  }, [item]);
+  }, [detail]);
 
   useEffect(() => {
-    if (item.attachment) {
-      const list = item.attachment.split("|").map((file) => {
+    // 페이지 로드 시 셋팅
+    fetchDetail();
+
+    // 페이지 초기 로드 시 첨부파일 목록 설정
+    if (detail.attachment) {
+      const list = detail.attachment.split("|").map((file) => {
         const [savedName, originalName] = file.split(",");
         return originalName;
       });
       setAttachmentList(list);
     }
+
+    if (sessionStorage.getItem("fromWrite")) {
+      sessionStorage.removeItem("fromWrite");
+    }
   }, []);
 
   return (
     <>
-      <div id="board_detail">
-        <div className="title">
-          <p>{item.title}</p>
-          {item.user == localStorage.getItem("userId") && (
-            <S.Button onClick={EditMode}>수정하기</S.Button>
-          )}
-        </div>
-        <div className="info">
-          <div className="user">{item.user}</div>
-          <div className="block">
-            <div className="date">2025. 05. 20{item.date}</div>
-            <div className="views">읽음 {views}</div>
-          </div>
+      {isDeleted ? (
+        <Deleted />
+      ) : (
+        <>
+          <div id="board_detail">
+            <div className="title">
+              <p>{detail.title}</p>
+              <S.ButtonWrap style={{ flexDirection: "row" }}>
+                {detail.user == localStorage.getItem("userId") && (
+                  <>
+                    <S.Button onClick={EditMode}>수정하기</S.Button>
+                    <S.Button onClick={handleDelete}>삭제하기</S.Button>
+                  </>
+                )}
+                <S.Button onClick={ReplyMode}>답글달기</S.Button>
+              </S.ButtonWrap>
+            </div>
+            <div className="info">
+              <div className="user">{detail.user}</div>
+              <div className="block">
+                <div className="date">{date}</div>
+                <div className="views">읽음 {views}</div>
+              </div>
 
-          <div className="flex">
-            <div>
-              {item.attachment && (
-                <>
-                  <div className="attachmentTitle">
-                    <p>첨부파일: 파일 {attachmentList.length} 개</p>
-                    {/* <S.Button onClick={downloadAll}> */}
-                    <S.Button onClick={handleDownloadAll}>
-                      <DownloadIcon width="15px" height="15px" />
-                      전체 다운로드
-                    </S.Button>
-                  </div>
+              <div className="flex">
+                <div>
+                  {detail.attachment && (
+                    <>
+                      <div className="attachmentTitle">
+                        <p>첨부파일: 파일 {attachmentList.length} 개</p>
+                        <S.Button onClick={handleDownloadAll}>
+                          <DownloadIcon width="15px" height="15px" />
+                          전체 다운로드
+                        </S.Button>
+                      </div>
 
-                  <ul>
-                    {attachmentList.map((file, index) => (
-                      <li
-                        key={index}
-                        onClick={(e) => {
-                          fileDownload(e, item, index);
-                        }}
-                      >
-                        <p>{file}</p>
-                        <DownloadIcon width="20px" height="20px" />
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+                      <ul>
+                        {attachmentList.map((file, index) => (
+                          <li
+                            key={index}
+                            onClick={(e) => {
+                              console.log("file", file, "detail", detail);
+
+                              e.stopPropagation();
+                              handleDownload(detail, index);
+                            }}
+                          >
+                            <div>
+                              <AttIcon
+                                filename={file}
+                                width="20px"
+                                height="20px"
+                              />
+                              <p>{file}</p>
+                            </div>
+                            <DownloadIcon width="20px" height="20px" />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="content">
+              {detail.content &&
+                detail.content.split(/\r?\n/).map((line, idx) => (
+                  <p key={idx}>
+                    {line}
+                    <br />
+                  </p>
+                ))}
             </div>
           </div>
-        </div>
-
-        <div className="content">{item.content}</div>
-      </div>
+        </>
+      )}
     </>
   );
 };
